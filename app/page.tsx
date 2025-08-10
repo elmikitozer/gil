@@ -13,7 +13,7 @@ export default async function Home() {
   const version: "published" | "draft" =
   process.env.NODE_ENV === "production" ? "published" : "draft";
 
-
+  
   const { data } = await api.get("cdn/stories/home", { version });
   return (
     <>
@@ -21,3 +21,4 @@ export default async function Home() {
     </>
   );
 }
+export const revalidate = 60; // ou 0 si tu veux tout dynamique (moins perf)
