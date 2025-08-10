@@ -1,0 +1,7 @@
+import localFont from "next/font/local";
+
+export const custom73554 = localFont({
+  src: [{ path: "./custom_73554.woff2", weight: "400", style: "normal" }],
+  variable: "--font-custom-73554",
+  display: "swap",
+});
