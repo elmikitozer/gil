@@ -15,10 +15,10 @@ export default function Lightbox() {
   if (!mounted || !isOpen) return null;
 
   const node = (
-    <div className="fixed inset-0 z-[60] bg-white">
+    <div className="fixed inset-0 z-[60] bg-white lb-anim-bg">
       <div className="absolute inset-0 grid place-items-center">
         {it?.kind === "image" ? (
-          <div className="relative h-[90vh] w-[90vw]">
+          <div className="relative h-[90vh] w-[90vw] lb-anim-media">
             <Image
               src={it.src}
               alt={it.alt ?? ""}
@@ -29,7 +29,7 @@ export default function Lightbox() {
             />
           </div>
         ) : it?.kind === "video" ? (
-          <div className="relative h-[90vh] w-[90vw]">
+          <div className="relative h-[90vh] w-[90vw] lb-anim-media">
             <video
               className="h-full w-full object-contain"
               controls

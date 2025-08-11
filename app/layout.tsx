@@ -50,6 +50,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
+       <head>
+        <link rel="preconnect" href="https://a.storyblok.com" crossOrigin="" />
+        <link rel="dns-prefetch" href="https://a.storyblok.com" />
+      </head>
       <body
         className={`${inter.variable} ${caslon.variable} antialiased text-neutral-900 bg-white`}
       >

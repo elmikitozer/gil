@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import HoverCover from "@/app/components/ui/HoverCover";
 import Image from "next/image";
 import LightboxClose from "./ui/LightboxClose";
+import { on } from "events";
 
 type Props = {
   src: string;
@@ -27,6 +28,7 @@ export default function ZoomableImage({
   hoverTitle, // ✅ on la récupère bien dans la signature
 }: Props) {
   const [open, setOpen] = useState(false);
+  const [pressed, setPressed] = useState(false);
   const onClose = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
@@ -40,12 +42,23 @@ export default function ZoomableImage({
     };
   }, [open, onClose]);
 
+  const handleClick = () => {
+    setPressed(true);
+    setTimeout(() => {
+      if (onOpen) onOpen();
+      else setOpen(true);
+      setPressed(false);
+    }, 90);
+  };
+
   return (
     <>
       <button
         type="button"
-        onClick={() => (onOpen ? onOpen() : setOpen(true))}
-        className="group relative block w-full focus:outline-none cursor-pointer"
+        onClick={handleClick}
+        className={`group relative block w-full focus:outline-none cursor-pointer pressable ${
+          pressed ? "is-pressed" : ""
+        }`}
         style={{ width: thumbWidth, height: thumbHeight, lineHeight: 0 }}
       >
         <div className="absolute inset-0 z-0">
@@ -67,7 +80,7 @@ export default function ZoomableImage({
 
       {open && (
         <div
-          className="fixed inset-0 z-[100] bg-white flex items-center justify-center p-0 cursor-pointer"
+          className="fixed inset-0 z-[100] bg-white flex items-center justify-center p-0 cursor-pointer lb-anim-bg"
           onClick={onClose}
           aria-modal="true"
           role="dialog"
@@ -77,7 +90,7 @@ export default function ZoomableImage({
             src={src}
             alt={alt}
             fill
-            className="object-contain"
+            className="object-contain lb-anim-media"
             sizes="100vw"
             priority
           />

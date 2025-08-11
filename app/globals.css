@@ -65,7 +65,7 @@ a {
 }
 
 @layer components {
-  /* déjà en place : bordure seulement au hover */
+  /* X to close lightbox */
   .lb-close {
     @apply absolute inline-flex items-center justify-center rounded-full
            hover:bg-white/60 text-neutral-900
@@ -74,13 +74,74 @@ a {
            z-[101] focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-800/20;
     @apply top-3 right-3 md:top-4 md:right-4 w-10 h-10 md:w-12 md:h-12;
   }
-  .lb-close--lg { @apply top-4 right-4 md:top-6 md:right-6 w-12 h-12 md:w-14 md:h-14; }
+  .lb-close--lg {
+    @apply top-4 right-4 md:top-6 md:right-6 w-12 h-12 md:w-14 md:h-14;
+  }
 
   /* icône de la croix avec une petite ombre BLANCHE (sur l’icône, pas sur le bouton) */
-  .lb-close__icon { 
+  .lb-close__icon {
     @apply w-5 h-5 md:w-6 md:h-6 pointer-events-none;
-    filter: drop-shadow(0 0 1px rgba(255,255,255,.85))
-            drop-shadow(0 0 3px rgba(255,255,255,.55));
+    filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.85))
+      drop-shadow(0 0 3px rgba(255, 255, 255, 0.55));
   }
-  .lb-close--lg .lb-close__icon { @apply w-6 h-6 md:w-7 md:h-7; }
+  .lb-close--lg .lb-close__icon {
+    @apply w-6 h-6 md:w-7 md:h-7;
+  }
+
+  /* flèches inspirées de .lb-close */
+  .lb-arrow {
+    @apply absolute inline-flex items-center justify-center rounded-full
+           hover:bg-white/60 text-neutral-900
+           border border-transparent hover:border-neutral-400
+           transition-all duration-150 ease-linear
+           z-[102] focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-800/20
+           w-10 h-10 md:w-12 md:h-12;
+  }
+  .lb-arrow--left {
+    @apply top-1/2 -translate-y-1/2;
+    left: calc(env(safe-area-inset-left, 0px) + 4px);
+  }
+  .lb-arrow--right {
+    @apply top-1/2 -translate-y-1/2;
+    right: calc(env(safe-area-inset-right, 0px) + 4px);
+  }
+
+  .lb-arrow__icon {
+    @apply w-5 h-5 md:w-6 md:h-6 pointer-events-none;
+    filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.85))
+      drop-shadow(0 0 3px rgba(255, 255, 255, 0.55));
+  }
+
+  /* Effet press sur la vignette : légère réduction + flash blanc court */
+  .pressable {
+    @apply relative overflow-hidden transition-transform duration-150 ease-out;
+    will-change: transform;
+  }
+  .pressable:active {
+    transform: scale(0.985);
+  }
+  .pressable::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0);
+    transition: background 180ms ease;
+    pointer-events: none;
+  }
+  .pressable.is-pressed::after {
+    background: rgba(255,255,255,0.45);
+  }
+
+  /* Animations d’entrée de la lightbox */
+  @keyframes lb-bg {
+    from { background: rgba(255,255,255,0); }
+    to   { background: #fff; }
+  }
+  .lb-anim-bg { animation: lb-bg .25s ease both; }
+
+  @keyframes lb-zoom {
+    from { transform: scale(0.985); opacity: 0; }
+    to   { transform: scale(1);     opacity: 1; }
+  }
+  .lb-anim-media { animation: lb-zoom .25s ease both; }
 }
