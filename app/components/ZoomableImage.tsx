@@ -12,6 +12,7 @@ type Props = {
   thumbHeight?: number;
   sizes?: string;
   onLoaded?: (w: number, h: number) => void;
+  onOpen?: () => void;
   hoverTitle?: string; // ✅ on déclare la prop ici
 };
 
@@ -22,6 +23,7 @@ export default function ZoomableImage({
   thumbHeight = 1200,
   sizes,
   onLoaded,
+  onOpen,
   hoverTitle, // ✅ on la récupère bien dans la signature
 }: Props) {
   const [open, setOpen] = useState(false);
@@ -42,7 +44,7 @@ export default function ZoomableImage({
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => (onOpen ? onOpen() : setOpen(true))}
         className="group relative block w-full focus:outline-none cursor-pointer"
         style={{ width: thumbWidth, height: thumbHeight, lineHeight: 0 }}
       >

@@ -4,6 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import ZoomableImage from "./ZoomableImage";
 import ZoomableVideo from "./ZoomableVideo";
 
+import { GalleryProvider, useGallery } from "./ui/gallery/GalleryContext";
+import Lightbox from "./ui/gallery/Lightbox";
+
 type ImageItem = { kind: "image"; src: string; alt?: string; title?: string };
 type VideoItem = {
   kind: "video";
@@ -15,8 +18,6 @@ type VideoItem = {
   title?: string;
 };
 type Item = ImageItem | VideoItem;
-
-// helper: "16:9", "9:16", "3/2" → number
 
 function parseRatio(r?: string): number | undefined {
   if (!r || r === "auto") return;
@@ -55,7 +56,7 @@ export default function MasonryColumns({
   gap?: number;
 }) {
   const [ref, cw] = useContainerWidth<HTMLDivElement>();
-  const [ratios, setRatios] = useState<Record<string, number>>({}); // key -> w/h
+  const [ratios, setRatios] = useState<Record<string, number>>({});
 
   const cols = useMemo(() => (cw >= 1280 ? 4 : cw >= 768 ? 3 : 2), [cw]);
   const colW = useMemo(
@@ -65,12 +66,12 @@ export default function MasonryColumns({
   );
 
   const columns = useMemo(() => {
-    // const fallback = 16 / 9;
-    const arr: { item: Item; w: number; h: number; key: string }[][] =
+    const arr: { item: Item; w: number; h: number; key: string; gi: number }[][] =
       Array.from({ length: cols }, () => []);
     const heights = Array.from({ length: cols }, () => 0);
     if (!colW) return arr;
 
+    let gi = 0; // index global dans la liste
     for (const item of items) {
       const key =
         item.kind === "image"
@@ -78,58 +79,85 @@ export default function MasonryColumns({
           : `vid:${item.srcWebm || item.srcMp4}`;
       const override =
         item.kind === "video" ? parseRatio(item.ratio) : undefined;
-      const r = override ?? ratios[key] ?? 16 / 9; // fallback si rien de connu
+      const r = override ?? ratios[key] ?? 16 / 9;
       const w = colW;
       const h = Math.max(1, Math.round(w / r));
 
       let minIdx = 0;
-      for (let i = 1; i < cols; i++)
+      for (let i = 1; i < cols; i++) {
         if (heights[i] < heights[minIdx]) minIdx = i;
-      arr[minIdx].push({ item, w, h, key });
+      }
+      arr[minIdx].push({ item, w, h, key, gi });
       heights[minIdx] += h + gap;
+      gi++;
     }
     return arr;
   }, [items, cols, colW, ratios, gap]);
 
   return (
-    <div ref={ref} className="flex" style={{ gap }}>
-      {columns.map((col, i) => (
-        <div
-          key={i}
-          className="flex flex-col"
-          style={{ rowGap: gap, width: colW }}
-        >
-          {col.map(({ item, w, h, key }) =>
-            item.kind === "image" ? (
-              <ZoomableImage 
-                key={key}
-                src={item.src}
-                alt={item.alt}
-                thumbWidth={w}
-                thumbHeight={h}
-                sizes={`${colW}px`}
-                hoverTitle={item.title}
-                onLoaded={(nw, nh) =>
-                  setRatios((p) => (p[key] ? p : { ...p, [key]: nw / nh }))
-                }
-              />
-            ) : (
-              <ZoomableVideo
-                key={key}
-                srcMp4={item.srcMp4}
-                srcWebm={item.srcWebm}
-                poster={item.poster}
-                width={w}
-                height={h}
-                hoverTitle={item.title}
-                onLoaded={(vw, vh) =>
-                  setRatios((p) => (p[key] ? p : { ...p, [key]: vw / vh }))
-                }
-              />
-            )
-          )}
-        </div>
-      ))}
+    <GalleryProvider items={items}>
+      <div ref={ref} className="flex" style={{ gap }}>
+        {columns.map((col, i) => (
+          <MasonryColumn
+            key={i}
+            col={col}
+            colW={colW}
+            gap={gap}
+            setRatios={setRatios}
+          />
+        ))}
+      </div>
+      <Lightbox />
+    </GalleryProvider>
+  );
+}
+
+function MasonryColumn({
+  col,
+  colW,
+  gap,
+  setRatios,
+}: {
+  col: { item: Item; w: number; h: number; key: string; gi: number }[];
+  colW: number;
+  gap: number;
+  setRatios: React.Dispatch<React.SetStateAction<Record<string, number>>>;
+}) {
+  const { openAt } = useGallery();
+
+  return (
+    <div className="flex flex-col" style={{ rowGap: gap, width: colW }}>
+      {col.map(({ item, w, h, key, gi }) =>
+        item.kind === "image" ? (
+          <ZoomableImage
+            key={key}
+            src={item.src}
+            alt={item.alt}
+            thumbWidth={w}
+            thumbHeight={h}
+            sizes={`${colW}px`}
+            hoverTitle={item.title}
+            onLoaded={(nw, nh) =>
+              setRatios((p) => (p[key] ? p : { ...p, [key]: nw / nh }))
+            }
+            onOpen={() => openAt(gi)}
+          />
+        ) : (
+          <ZoomableVideo
+            key={key}
+            srcMp4={item.srcMp4}
+            srcWebm={item.srcWebm}
+            poster={item.poster}
+            width={w}
+            height={h}
+            hoverTitle={item.title}
+            onLoaded={(vw, vh) =>
+              setRatios((p) => (p[key] ? p : { ...p, [key]: vw / vh }))
+            }
+            onOpen={() => openAt(gi)}
+          />
+        )
+      )}
     </div>
   );
 }

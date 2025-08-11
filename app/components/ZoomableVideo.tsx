@@ -15,6 +15,7 @@ type Props = {
   loop?: boolean;
   muted?: boolean;
   onLoaded?: (videoW: number, videoH: number) => void;
+  onOpen?: () => void;
   autoplayInViewport?: boolean;
   hoverTitle?: string; // ✅
 };
@@ -29,6 +30,7 @@ export default function ZoomableVideo({
   loop = true,
   muted = true,
   onLoaded,
+  onOpen,
   autoplayInViewport = true,
   hoverTitle, // ✅
 }: Props) {
@@ -90,7 +92,7 @@ export default function ZoomableVideo({
       <button
         ref={btnRef}
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => (onOpen ? onOpen() : setOpen(true))}
         className="group relative block w-full focus:outline-none cursor-pointer"
         style={{ width, height, lineHeight: 0 }}
       >
