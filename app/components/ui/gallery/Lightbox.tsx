@@ -12,6 +12,16 @@ export default function Lightbox() {
   useEffect(() => setMounted(true), []);
   const it = items[index];
 
+// Fermer avec ESC quand la lightbox est ouverte
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" || (e as any).keyCode === 27) close();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isOpen, close]);
+
   if (!mounted || !isOpen) return null;
 
   const node = (

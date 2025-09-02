@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from "react";
 import HoverCover from "@/app/components/ui/HoverCover";
 import Image from "next/image";
 import LightboxClose from "./ui/LightboxClose";
-import { on } from "events";
 
 type Props = {
   src: string;
@@ -34,10 +33,12 @@ export default function ZoomableImage({
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    document.addEventListener("keydown", onKey);
+    // document.addEventListener("keydown", onKey);
+    window.addEventListener("keydown", onKey, { passive: true });
     document.body.style.overflow = "hidden";
     return () => {
-      document.removeEventListener("keydown", onKey);
+      // document.removeEventListener("keydown", onKey);
+      window.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
   }, [open, onClose]);
