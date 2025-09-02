@@ -1,34 +1,27 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import { useEffect, useState } from "react";
 import { useGallery } from "./GalleryContext";
+import type { Item } from "./GalleryContext";
 import { LightboxNav } from "./LightboxNav";
 
 export default function Lightbox() {
   const { isOpen, close, items, index, next, prev } = useGallery();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  const it = items[index];
-
-// Fermer avec ESC quand la lightbox est ouverte
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" || (e as any).keyCode === 27) close();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [isOpen, close]);
 
   if (!mounted || !isOpen) return null;
 
-  const node = (
-    <div className="fixed inset-0 z-[60] bg-white lb-anim-bg">
+  // Typage explicite : pas de `any`
+  const it: Item | undefined = items[index];
+
+  return createPortal(
+    <div className="fixed inset-0 z-[60] bg-white">
       <div className="absolute inset-0 grid place-items-center">
         {it?.kind === "image" ? (
-          <div className="relative h-[90vh] w-[90vw] lb-anim-media">
+          <div className="relative h-[90vh] w-[90vw]">
             <Image
               src={it.src}
               alt={it.alt ?? ""}
@@ -39,24 +32,23 @@ export default function Lightbox() {
             />
           </div>
         ) : it?.kind === "video" ? (
-          <div className="relative h-[90vh] w-[90vw] lb-anim-media">
+          <div className="relative h-[90vh] w-[90vw]">
             <video
               className="h-full w-full object-contain"
               controls
               playsInline
               muted
               loop
-              poster={it.poster}
+              poster={it.poster ?? undefined}
             >
-              {it.srcWebm ? (
-                <source src={it.srcWebm} type="video/webm" />
-              ) : null}
+              {it.srcWebm ? <source src={it.srcWebm} type="video/webm" /> : null}
               <source src={it.srcMp4} type="video/mp4" />
             </video>
           </div>
         ) : null}
       </div>
 
+      {/* Close en haut à droite (tes classes) */}
       <button
         type="button"
         aria-label="Fermer"
@@ -64,20 +56,14 @@ export default function Lightbox() {
         onClick={close}
         className="lb-close"
       >
-
-    
         <svg viewBox="0 0 24 24" className="lb-close__icon" aria-hidden="true">
-          <path
-            d="M6 6L18 18M6 18L18 6"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
+          <path d="M6 6L18 18M6 18L18 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
         </svg>
       </button>
-      <LightboxNav onNext={next} onPrev={prev} />
-    </div>
-  );
 
-  return createPortal(node, document.body);
+      {/* Flèches visibles + clavier + swipe (zones 1/3 supprimées de ton LightboxNav) */}
+      <LightboxNav onNext={next} onPrev={prev} />
+    </div>,
+    document.body
+  );
 }
