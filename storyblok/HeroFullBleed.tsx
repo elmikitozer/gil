@@ -1,19 +1,38 @@
+// import { storyblokEditable } from "@storyblok/react/rsc";
+// import Image from "next/image";
+
+// export default function HeroFullBleed({ blok }: any) {
+//   const media = blok?.media?.filename;
+//   const title = blok?.title;
+//   return (
+//     <section {...storyblokEditable(blok)} className="relative w-full min-h-[70vh] md:min-h-screen">
+//       {media && (
+//         <Image
+//           src={media}
+//           alt={title || "Hero"}
+//           fill
+//           className="object-cover"
+//           priority
+//           sizes="100vw"
+//         />
 import { storyblokEditable } from "@storyblok/react/rsc";
 import Image from "next/image";
+import { getAssetBump, versionUrl } from "@/lib/asset-version";
 
-export default function HeroFullBleed({ blok }: any) {
+export default async function HeroFullBleed({ blok }: any) {
   const media = blok?.media?.filename;
   const title = blok?.title;
+  const bump = await getAssetBump();
+
   return (
     <section {...storyblokEditable(blok)} className="relative w-full min-h-[70vh] md:min-h-screen">
       {media && (
         <Image
-          src={media}
+          src={versionUrl(media, bump)}
           alt={title || "Hero"}
           fill
           className="object-cover"
           priority
-          sizes="100vw"
         />
       )}
       {title && (
