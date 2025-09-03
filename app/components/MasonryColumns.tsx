@@ -7,7 +7,7 @@ import ZoomableVideo from "./ZoomableVideo";
 import { GalleryProvider, useGallery } from "./ui/gallery/GalleryContext";
 import Lightbox from "./ui/gallery/Lightbox";
 
-type ImageItem = { kind: "image"; src: string; alt?: string; title?: string };
+type ImageItem = { kind: "image"; src: string; alt?: string; title?: string; caption?: string };
 type VideoItem = {
   kind: "video";
   srcMp4: string;
@@ -16,6 +16,7 @@ type VideoItem = {
   alt?: string;
   ratio?: string;
   title?: string;
+  caption?: string;
 };
 type Item = ImageItem | VideoItem;
 
@@ -152,6 +153,7 @@ function MasonryColumn({
             width={w}
             height={h}
             hoverTitle={item.title}
+            hoverCaption={item.caption}
             onLoaded={(vw, vh) =>
               setRatios((p) => (p[key] ? p : { ...p, [key]: vw / vh }))
             }

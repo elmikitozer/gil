@@ -18,6 +18,7 @@ type Props = {
   onOpen?: () => void;
   autoplayInViewport?: boolean;
   hoverTitle?: string; // ✅
+  hoverCaption?: string; // ✅
 };
 
 export default function ZoomableVideo({
@@ -32,7 +33,8 @@ export default function ZoomableVideo({
   onLoaded,
   onOpen,
   autoplayInViewport = true,
-  hoverTitle, // ✅
+  hoverTitle,
+  hoverCaption,
 }: Props) {
   const [open, setOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -111,7 +113,7 @@ export default function ZoomableVideo({
         </video>
 
         {/* Label hover */}
-        <HoverCover text={hoverTitle} />
+        <HoverCover text={hoverTitle} caption={hoverCaption} />
       </button>
 
       {open && (
