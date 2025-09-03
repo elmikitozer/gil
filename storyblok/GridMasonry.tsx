@@ -10,7 +10,8 @@ export default function GridMasonry({ blok }: any) {
           kind: "image",
           src: c.media.filename as string,
           alt: c.alt as string | undefined,
-          title: c.title as string | undefined, // ⬅️ NEW
+          title: c.title as string | undefined,
+          caption: c.caption as string | undefined, // ⬅️ NEW
         },
       ];
     }
@@ -24,6 +25,7 @@ export default function GridMasonry({ blok }: any) {
           alt: c.alt as string | undefined,
           ratio: c.ratio as string | undefined,
           title: c.title as string | undefined, // ⬅️ NEW
+          caption: c.caption as string | undefined, // ⬅️ NEW
         },
       ];
     }

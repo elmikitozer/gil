@@ -137,6 +137,7 @@ function MasonryColumn({
             thumbHeight={h}
             sizes={`${colW}px`}
             hoverTitle={item.title}
+            hoverCaption={item.caption}
             onLoaded={(nw, nh) =>
               setRatios((p) => (p[key] ? p : { ...p, [key]: nw / nh }))
             }

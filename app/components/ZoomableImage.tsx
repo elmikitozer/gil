@@ -14,6 +14,7 @@ type Props = {
   onLoaded?: (w: number, h: number) => void;
   onOpen?: () => void;
   hoverTitle?: string; // ✅ on déclare la prop ici
+  hoverCaption?: string; // ✅ on déclare la prop ici
 };
 
 export default function ZoomableImage({
@@ -24,7 +25,8 @@ export default function ZoomableImage({
   sizes,
   onLoaded,
   onOpen,
-  hoverTitle, // ✅ on la récupère bien dans la signature
+  hoverTitle,
+  hoverCaption,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [pressed, setPressed] = useState(false);
@@ -76,7 +78,7 @@ export default function ZoomableImage({
         </div>
 
         {/* Label hover (haut-gauche, slide-in) */}
-        <HoverCover text={hoverTitle} />
+        <HoverCover text={hoverTitle} caption={hoverCaption} />
       </button>
 
       {open && (
