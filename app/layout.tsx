@@ -58,13 +58,13 @@ export default function RootLayout({
         className={`${inter.variable} ${caslon.variable} antialiased text-neutral-900 bg-white`}
       >
         <Navbar />
-        <main className="container mx-auto px-4  pb-12">{children}</main>
+        <main className="container mx-auto px-4 pb-12 mt-2 md:mt-2">{children}</main>
         <footer className="border-t border-neutral-200 mt-16">
           <div className="container mx-auto px-4 py-8 text-sm text-neutral-500">
             © {new Date().getFullYear()} Gil Anselmi
           </div>
         </footer>
-      </body>
+      </body >
     </html>
   );
 }

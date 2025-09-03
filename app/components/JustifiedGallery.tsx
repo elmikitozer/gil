@@ -23,7 +23,7 @@ function useContainerWidth<T extends HTMLElement>() {
 
 export default function JustifiedGallery({
   images,
-  gap = 6, // écart très léger entre images
+  gap = 0, // écart très léger entre images
   rowHeights = { base: 220, md: 280, xl: 340 }, // cible: mobile / tablet / desktop
 }: {
   images: JGImage[];

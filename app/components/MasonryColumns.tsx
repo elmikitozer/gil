@@ -50,7 +50,7 @@ function useContainerWidth<T extends HTMLElement>() {
 
 export default function MasonryColumns({
   items,
-  gap = 6,
+  gap = 0,
 }: {
   items: Item[];
   gap?: number;

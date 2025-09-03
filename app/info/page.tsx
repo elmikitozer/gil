@@ -24,9 +24,9 @@ export const metadata = { title: "Contact — Gil Anselmi" };
 export default function ContactPage() {
   return (
     <section className="max-w-2xl">
-      <h1 className="text-2xl font-medium mb-4">Contact</h1>
-      <p className="text-neutral-600">
-        Pour toute demande, écrivez-moi à{" "}
+      <h1 className="text-2xl font-medium mb-4 flex justify-center items-center mt-14 md:mt-16">Informations</h1>
+      <p className="text-neutral-600  flex justify-center items-center">
+        Pour toute demande, écrivez-moi à {" "}
         <a href="mailto:contact@gilanselmi.com" className="underline hover:opacity-80 transition">
           contact@gilanselmi.com
         </a>.

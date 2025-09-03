@@ -23,7 +23,7 @@ export default function Navbar() {
     <header
       className={[
         "fixed inset-x-0 top-0 z-50",
-        "bg-white/90 backdrop-blur border-b border-neutral-200",
+        "bg-white/90 backdrop-blur border-b border-neutral-900 ",
         "transition-colors"
       ].join(" ")}
     >
@@ -48,8 +48,8 @@ export default function Navbar() {
 
         {/* NAV à droite (cliquable) */}
         <nav className="relative z-20 ml-auto flex items-center gap-6 text-[11px] md:text-[12px] tracking-[0.22em] uppercase text-neutral-900">
-          <Link href="/contact" className="transition-opacity hover:opacity-70">
-            Contact
+          <Link href="/info" className="transition-opacity hover:opacity-70 ">
+            Info
           </Link>
 
           {/* Icône Instagram cliquable (remplace le texte) */}
@@ -59,15 +59,15 @@ export default function Navbar() {
             rel="noopener noreferrer"
             aria-label="Instagram"
             className="transition-opacity hover:opacity-70 inline-flex items-center"
-          >
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              className="w-5 h-5"
-              fill="currentColor"
-            >
-              <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3.5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11zm0 2a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zM18 6.5a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-            </svg>
+          > Instagram
+            {/* <svg
+            //   aria-hidden="true"
+            //   viewBox="0 0 24 24"
+            //   className="w-5 h-5"
+            //   fill="currentColor"
+            // >
+            //   <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3.5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11zm0 2a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zM18 6.5a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            // </svg> */}
           </a>
         </nav>
       </div>

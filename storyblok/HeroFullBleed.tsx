@@ -8,7 +8,7 @@ export default async function HeroFullBleed({ blok }: any) {
   const bump = await getAssetBump();
 
   return (
-    <section {...storyblokEditable(blok)} className="relative w-full min-h-[70vh] md:min-h-screen">
+    <section {...storyblokEditable(blok)} className="relative w-full min-h-[70vh] md:min-h-screen ">
       {media && (
         <Image
           src={versionUrl(media, bump)}
