@@ -60,14 +60,6 @@ export default function Navbar() {
             aria-label="Instagram"
             className="transition-opacity hover:opacity-70 inline-flex items-center"
           > Instagram
-            {/* <svg
-            //   aria-hidden="true"
-            //   viewBox="0 0 24 24"
-            //   className="w-5 h-5"
-            //   fill="currentColor"
-            // >
-            //   <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3.5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11zm0 2a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zM18 6.5a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-            // </svg> */}
           </a>
         </nav>
       </div>
