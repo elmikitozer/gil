@@ -77,6 +77,7 @@
 
 "use client";
 import React from "react";
+import { text } from "stream/consumers";
 
 type CSSVars = React.CSSProperties & {
   ["--hc-dur"]?: string;        // durée des transitions
@@ -113,10 +114,16 @@ export default function HoverCover({
     ["--hc-ov"]: String(overlayOpacity),
   };
 
-  const bgClass = variant === "dark" ? "bg-black" : "bg-white";
-  const titleColor = variant === "dark" ? "text-white" : "text-neutral-900";
-  const captionColor = variant === "dark" ? "text-neutral-100" : "text-neutral-800";
+  // const bgClass = variant === "dark" ? "bg-black" : "bg-white";
+  // const titleColor = variant === "dark" ? "text-white" : "text-neutral-900";
+  // const captionColor = variant === "dark" ? "text-neutral-100" : "text-neutral-800";
   const borderClass = bordered ? "border-[1.5px] border-neutral-900" : "";
+
+const bgClass = "bg-white dark:bg-black";
+const titleColor = "text-neutral-900 dark:text-white";
+const captionColor = "text-neutral-800 dark:text-neutral-100";
+
+
 
   return (
     <div
@@ -146,7 +153,7 @@ export default function HoverCover({
           <div
             className={[
               titleColor,
-              "uppercase tracking-[0.18em]",
+              "tracking-[0.05em]",
               "text-xs md:text-sm leading-tight",
               "opacity-0 translate-y-1",
               "group-hover:opacity-100 group-hover:translate-y-0",

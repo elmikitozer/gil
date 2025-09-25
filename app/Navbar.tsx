@@ -4,6 +4,7 @@ import Link from "next/link";
 // import { usePathname } from "next/navigation";
 // import { useEffect, useState } from "react";
 import { bigCaslon } from "@/app/fonts/big-caslon";
+import ThemeToggle from "./components/ui/ThemeToogle";
 
 
 
@@ -23,7 +24,7 @@ export default function Navbar() {
     <header
       className={[
         "fixed inset-x-0 top-0 z-50",
-        "bg-white/90 backdrop-blur border-b border-neutral-900 ",
+        "bg-white/90 dark:bg-black backdrop-blur border-b border-neutral-900 dark:border-neutral-100",
         "transition-colors"
       ].join(" ")}
     >
@@ -36,20 +37,20 @@ export default function Navbar() {
           <Link
             href="/"
             aria-label="Retour à l’accueil"
-              className={`${bigCaslon.className} whitespace-nowrap font-normal leading-[1] text-neutral-900
+              className={`${bigCaslon.className} whitespace-nowrap font-medium leading-[1]  dark:text-neutral-100
               text-[clamp(20px,3.2vw,40px)] hover:opacity-80 transition-opacity
               animate-slide-nav-bounce-basic-left`}
 
             // style={{ fontFamily: "var(--font-custom-73554, Inter, system-ui, sans-serif)" }}
           >
-            GIL&nbsp;ANSELMI
+            Gil&nbsp;Anselmi
           </Link>
         </div>
 
         {/* NAV à droite (cliquable) */}
-        <nav className="relative z-20 ml-auto flex items-center gap-6 text-[11px] md:text-[12px] tracking-[0.22em] uppercase text-neutral-900">
-          <Link href="/info" className="transition-opacity hover:opacity-70 ">
-            Info
+        <nav className="relative z-20 ml-auto flex items-center gap-6 text-[11px] md:text-[12px] tracking-[0.22em] uppercase text-neutral-900 dark:text-neutral-100">
+          <Link href="/informations" className={`${bigCaslon.className}transition-opacity hover:opacity-70 `}>
+            Informations
           </Link>
 
           {/* Icône Instagram cliquable (remplace le texte) */}
@@ -61,6 +62,7 @@ export default function Navbar() {
             className="transition-opacity hover:opacity-70 inline-flex items-center"
           > Instagram
           </a>
+          {/* <ThemeToggle /> */}
         </nav>
       </div>
     </header>
