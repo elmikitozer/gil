@@ -51,7 +51,7 @@ export function LightboxNav({
         aria-label="Précédent"
         title="Précédent"
         onClick={onPrev}
-        className="lb-arrow lb-arrow--left"
+        className="lb-arrow lb-arrow--left text-neutral-900 dark:text-white"
       >
         <svg viewBox="0 0 24 24" className="lb-arrow__icon" aria-hidden="true">
           <path
@@ -70,7 +70,7 @@ export function LightboxNav({
         aria-label="Suivant"
         title="Suivant"
         onClick={onNext}
-        className="lb-arrow lb-arrow--right"
+        className="lb-arrow lb-arrow--right text-neutral-900 dark:text-white"
       >
         <svg viewBox="0 0 24 24" className="lb-arrow__icon" aria-hidden="true">
           <path

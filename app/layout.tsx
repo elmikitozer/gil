@@ -50,7 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://a.storyblok.com" crossOrigin="" />
         <link rel="dns-prefetch" href="https://a.storyblok.com" />
-      <script
+      {/* <script
       dangerouslySetInnerHTML={{
         __html: `
           (function() {
@@ -64,7 +64,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           })()
         `,
       }}
-    />
+    /> */}
 
       </head>
 

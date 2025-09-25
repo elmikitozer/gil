@@ -83,7 +83,7 @@ export default function ZoomableImage({
 
       {open && (
         <div
-          className="fixed inset-0 z-[100] bg-white flex items-center justify-center p-0 cursor-pointer lb-anim-bg"
+          className="fixed inset-0 z-[100] bg-black flex items-center justify-center p-0 cursor-pointer lb-anim-bg"
           onClick={onClose}
           aria-modal="true"
           role="dialog"
