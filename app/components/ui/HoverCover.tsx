@@ -147,7 +147,7 @@ export default function HoverCover({
             className={[
               titleColor,
               "uppercase tracking-[0.18em]",
-              "text-xs md:text-lg leading-tight",
+              "text-xs md:text-sm leading-tight",
               "opacity-0 translate-y-1",
               "group-hover:opacity-100 group-hover:translate-y-0",
               "group-focus-visible:opacity-100 group-focus-visible:translate-y-0",
