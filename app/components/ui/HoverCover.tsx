@@ -168,7 +168,7 @@ export default function HoverCover({
           <div
             className={[
               captionColor,
-              "mt-2 text-[11px] md:text-base leading-snug",
+              "mt-2 text-[11px] md:text-xs leading-snug",
               "opacity-0 translate-y-1",
               "group-hover:opacity-100 group-hover:translate-y-0",
               "group-focus-visible:opacity-100 group-focus-visible:translate-y-0",
