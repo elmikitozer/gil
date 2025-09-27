@@ -13,16 +13,6 @@ export default function ContactPage() {
   return (
     <section className="mx-auto max-w-2xl min-h-[calc(100vh-var(--nav-h,64px))] grid place-items-center px-4 text-center">
       <div>
-        {/* Image du chien au-dessus */}
-        <div className="mb-8 ">
-          <Image
-            src={randomImage.src}
-            alt="Dog"
-            width={randomImage.width}
-            height={randomImage.height}
-            className="mx-auto"
-          />
-        </div>
         {/* Texte informations */}
         <h1 className="text-2xl font-medium ">
           Gil Anselmi is a Paris-based photographer and director.
@@ -40,12 +30,22 @@ export default function ContactPage() {
         <a
           href="mailto:contact@gilanselmi.com"
           className="underline hover:opacity-80 transition text-semibold-900"
-        >
+          >
           contact@gilanselmi.com
         </a>
         <h3 className="mt-5 text-sm font-medium text-neutral-700 dark:text-neutral-300 leading-relaxed">
           Commercial portfolio upon request
         </h3>
+        <div className="mb-8 ">
+          {/* Image du chien */}
+          <Image
+            src={randomImage.src}
+            alt="Dog"
+            width={randomImage.width}
+            height={randomImage.height}
+            className="mx-auto"
+          />
+        </div>
       </div>
     </section>
   );
