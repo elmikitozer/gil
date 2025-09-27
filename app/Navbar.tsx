@@ -62,7 +62,7 @@ export default function Navbar() {
             className="transition-opacity hover:opacity-70 inline-flex items-center"
           > Instagram
           </a>
-          <ThemeToggle />
+          {/* <ThemeToggle /> */}
         </nav>
       </div>
     </header>
