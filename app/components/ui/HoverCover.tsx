@@ -154,7 +154,7 @@ const captionColor = "text-neutral-800 dark:text-neutral-100";
             className={[
               titleColor,
               "tracking-[0.05em]",
-              "text-xs md:text-sm leading-tight",
+              "text-base md:text-base leading-tight",
               "opacity-0 translate-y-1",
               "group-hover:opacity-100 group-hover:translate-y-0",
               "group-focus-visible:opacity-100 group-focus-visible:translate-y-0",
@@ -175,7 +175,7 @@ const captionColor = "text-neutral-800 dark:text-neutral-100";
           <div
             className={[
               captionColor,
-              "mt-2 text-[11px] md:text-xs leading-snug",
+              "mt-2 text-[11px] md:text-sm leading-snug",
               "opacity-0 translate-y-1",
               "group-hover:opacity-100 group-hover:translate-y-0",
               "group-focus-visible:opacity-100 group-focus-visible:translate-y-0",

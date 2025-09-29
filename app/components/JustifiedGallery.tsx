@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Image from 'next/image';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type JGImage = { src: string; alt?: string };
 type RowItem = JGImage & { w: number; h: number }; // dimensions calculées
@@ -80,9 +80,7 @@ export default function JustifiedGallery({
         pushRow();
       }
       cur.push({ ...img, w, h });
-      rowW =
-        (cur.length === 1 ? 0 : gap * (cur.length - 1)) +
-        cur.reduce((s, x) => s + x.w, 0);
+      rowW = (cur.length === 1 ? 0 : gap * (cur.length - 1)) + cur.reduce((s, x) => s + x.w, 0);
     }
     // dernière ligne: on la laisse "ragged right" (pas étirée)
     if (cur.length) out.push(cur);
@@ -93,12 +91,12 @@ export default function JustifiedGallery({
   const [zoom, setZoom] = useState<string | null>(null);
   useEffect(() => {
     if (!zoom) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setZoom(null);
-    document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setZoom(null);
+    document.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
     return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
     };
   }, [zoom]);
 
@@ -106,11 +104,7 @@ export default function JustifiedGallery({
     <>
       <div ref={ref} className="w-full">
         {rows.map((row, i) => (
-          <div
-            key={i}
-            className="flex"
-            style={{ gap: `${gap}px`, marginBottom: `${gap}px` }}
-          >
+          <div key={i} className="flex" style={{ gap: `${gap}px`, marginBottom: `${gap}px` }}>
             {row.map((it, j) => (
               <button
                 key={it.src + j}
@@ -121,13 +115,14 @@ export default function JustifiedGallery({
               >
                 <Image
                   src={it.src}
-                  alt={it.alt || ""}
+                  alt={it.alt || ''}
                   fill
                   sizes={`${it.w}px`}
                   className="object-cover"
-                  onLoadingComplete={(img) =>
-                    onLoaded(it.src, img.naturalWidth, img.naturalHeight)
-                  }
+                  onLoad={(event) => {
+                    const img = event.currentTarget;
+                    onLoaded(it.src, img.naturalWidth, img.naturalHeight);
+                  }}
                 />
               </button>
             ))}
@@ -142,14 +137,7 @@ export default function JustifiedGallery({
           aria-modal="true"
           role="dialog"
         >
-          <Image
-            src={zoom}
-            alt=""
-            fill
-            className="object-contain"
-            sizes="100vw"
-            priority
-          />
+          <Image src={zoom} alt="" fill className="object-contain" sizes="100vw" priority />
         </div>
       )}
     </>

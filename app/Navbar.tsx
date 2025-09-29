@@ -4,6 +4,7 @@ import Link from "next/link";
 // import { usePathname } from "next/navigation";
 // import { useEffect, useState } from "react";
 import { bigCaslon } from "@/app/fonts/big-caslon";
+import Image from "next/image";
 import ThemeToggle from "./components/ui/ThemeToogle";
 
 
@@ -34,7 +35,7 @@ export default function Navbar() {
           className="absolute inset-0 z-10 flex items-center [--pad:24px] md:[--pad:32px] pl-6 md:pl-8"
           aria-hidden="false"
         >
-          <Link
+          {/* <Link
             href="/"
             aria-label="Retour à l’accueil"
               className={`${bigCaslon.className} whitespace-nowrap font-medium leading-[1]  dark:text-neutral-100
@@ -42,9 +43,25 @@ export default function Navbar() {
               animate-slide-nav-bounce-basic-left`}
 
             // style={{ fontFamily: "var(--font-custom-73554, Inter, system-ui, sans-serif)" }}
+          > */}
+            {/* Gil&nbsp;Anselmi
+          </Link> */}
+          <Link
+            href="/"
+            aria-label="Retour à l’accueil"
+            className="hover:opacity-80 transition-opacity animate-slide-nav-bounce-basic-left"
           >
-            Gil&nbsp;Anselmi
+            <Image
+              src="/test.png" // ton fichier logo dans /public/logo.png
+              alt="Logo Gil Anselmi"
+              width={90}     // adapte la taille
+              height={120}
+              priority       // pour charger vite le logo
+              // style={{ height: "auto", width: "auto" }}
+            />
           </Link>
+
+
         </div>
 
         {/* NAV à droite (cliquable) */}

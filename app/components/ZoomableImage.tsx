@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect, useState, useCallback } from "react";
-import HoverCover from "@/app/components/ui/HoverCover";
-import Image from "next/image";
-import LightboxClose from "./ui/LightboxClose";
+import { useEffect, useState, useCallback } from 'react';
+import HoverCover from '@/app/components/ui/HoverCover';
+import Image from 'next/image';
+import LightboxClose from './ui/LightboxClose';
 
 type Props = {
   src: string;
@@ -19,7 +19,7 @@ type Props = {
 
 export default function ZoomableImage({
   src,
-  alt = "",
+  alt = '',
   thumbWidth = 1600,
   thumbHeight = 1200,
   sizes,
@@ -34,14 +34,14 @@ export default function ZoomableImage({
 
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
     // document.addEventListener("keydown", onKey);
-    window.addEventListener("keydown", onKey, { passive: true });
-    document.body.style.overflow = "hidden";
+    window.addEventListener('keydown', onKey, { passive: true });
+    document.body.style.overflow = 'hidden';
     return () => {
       // document.removeEventListener("keydown", onKey);
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
     };
   }, [open, onClose]);
 
@@ -60,21 +60,22 @@ export default function ZoomableImage({
         type="button"
         onClick={handleClick}
         className={`group relative block w-full focus:outline-none cursor-pointer pressable ${
-          pressed ? "is-pressed" : ""
+          pressed ? 'is-pressed' : ''
         }`}
         style={{ width: thumbWidth, height: thumbHeight, lineHeight: 0 }}
       >
         <div className="absolute inset-0 z-0">
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          sizes={sizes || `${thumbWidth}px`}
-          className="object-cover z-0"
-          onLoadingComplete={(img) =>
-            onLoaded?.(img.naturalWidth, img.naturalHeight)
-          }
-        />
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            sizes={sizes || `${thumbWidth}px`}
+            className="object-cover z-0"
+            onLoad={(event) => {
+              const img = event.currentTarget;
+              onLoaded?.(img.naturalWidth, img.naturalHeight);
+            }}
+          />
         </div>
 
         {/* Label hover (haut-gauche, slide-in) */}
