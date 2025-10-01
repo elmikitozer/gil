@@ -52,9 +52,9 @@ export default function Navbar() {
             className="hover:opacity-80 transition-opacity animate-slide-nav-bounce-basic-left"
           >
             <Image
-              src="/test.png" // ton fichier logo dans /public/logo.png
+              src="/logofi.png" // ton fichier logo dans /public/logo.png
               alt="Logo Gil Anselmi"
-              width={90}     // adapte la taille
+              width={190}     // adapte la taille
               height={120}
               priority       // pour charger vite le logo
               // style={{ height: "auto", width: "auto" }}
