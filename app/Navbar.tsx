@@ -1,13 +1,11 @@
-"use client";
+'use client';
 
-import Link from "next/link";
+import Link from 'next/link';
 // import { usePathname } from "next/navigation";
 // import { useEffect, useState } from "react";
-import { bigCaslon } from "@/app/fonts/big-caslon";
-import Image from "next/image";
-import ThemeToggle from "./components/ui/ThemeToogle";
-
-
+import { bigCaslon } from '@/app/fonts/big-caslon';
+import Image from 'next/image';
+import ThemeToggle from './components/ui/ThemeToogle';
 
 export default function Navbar() {
   // const pathname = usePathname();
@@ -24,10 +22,10 @@ export default function Navbar() {
   return (
     <header
       className={[
-        "fixed inset-x-0 top-0 z-50",
-        "bg-white/90 dark:bg-black backdrop-blur border-b border-neutral-900 dark:border-neutral-100",
-        "transition-colors"
-      ].join(" ")}
+        'fixed inset-x-0 top-0 z-50',
+        'bg-white/90 dark:bg-black backdrop-blur border-b border-neutral-900 dark:border-neutral-100',
+        'transition-colors',
+      ].join(' ')}
     >
       <div className="relative px-6 md:px-8 h-16 flex items-center">
         {/* LOGO animé à gauche — + padding-left pour le respir */}
@@ -44,7 +42,7 @@ export default function Navbar() {
 
             // style={{ fontFamily: "var(--font-custom-73554, Inter, system-ui, sans-serif)" }}
           > */}
-            {/* Gil&nbsp;Anselmi
+          {/* Gil&nbsp;Anselmi
           </Link> */}
           <Link
             href="/"
@@ -54,19 +52,22 @@ export default function Navbar() {
             <Image
               src="/logofi.png" // ton fichier logo dans /public/logo.png
               alt="Logo Gil Anselmi"
-              width={190}     // adapte la taille
+              width={190} // adapte la taille
               height={120}
-              priority       // pour charger vite le logo
+              priority // pour charger vite le logo
+              className="h-auto w-[120px] md:w-[160px] lg:w-[190px]" // tailles adaptatives
+              sizes="(max-width: 640px) 120px, (max-width: 1024px) 160px, 190px"
               // style={{ height: "auto", width: "auto" }}
             />
           </Link>
-
-
         </div>
 
         {/* NAV à droite (cliquable) */}
         <nav className="relative z-20 ml-auto flex items-center gap-6 text-[11px] md:text-[12px] tracking-[0.22em] uppercase text-neutral-900 dark:text-neutral-100">
-          <Link href="/informations" className={`${bigCaslon.className}transition-opacity hover:opacity-70 `}>
+          <Link
+            href="/informations"
+            className={`${bigCaslon.className}transition-opacity hover:opacity-70 `}
+          >
             Informations
           </Link>
 
@@ -77,7 +78,9 @@ export default function Navbar() {
             rel="noopener noreferrer"
             aria-label="Instagram"
             className="transition-opacity hover:opacity-70 inline-flex items-center"
-          > Instagram
+          >
+            {' '}
+            Instagram
           </a>
           {/* <ThemeToggle /> */}
         </nav>
