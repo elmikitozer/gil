@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
+// const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 const caslon = Libre_Caslon_Text({
   subsets: ['latin'],
   weight: ['400', '700'],

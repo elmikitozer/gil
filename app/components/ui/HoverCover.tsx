@@ -77,7 +77,7 @@
 
 "use client";
 import React from "react";
-import { text } from "stream/consumers";
+// import { text } from "stream/consumers";
 
 type CSSVars = React.CSSProperties & {
   ["--hc-dur"]?: string;        // durée des transitions
@@ -101,7 +101,7 @@ export default function HoverCover({
   caption,
   className = "",
   durationMs = 600,
-  variant = "light",
+  // variant = "light",
   overlayOpacity = 0.9,
   bordered = true,
 }: Props) {

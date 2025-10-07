@@ -15,7 +15,7 @@ export default async function Home() {
   process.env.NODE_ENV === "production" ? "published" : "draft";
 
 
-  const { data } = await api.get("cdn/stories/home", { version });
+  const { data } = await api.get("cdn/stories/", { version });
   return (
     <>
       <StoryblokServerComponent blok={data?.story?.content} />
