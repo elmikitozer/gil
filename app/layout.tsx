@@ -1,6 +1,6 @@
 // import './globals.css';
 // import { ensureStoryblok } from "@/lib/storyblok";
-import { Inter, Libre_Caslon_Text } from 'next/font/google';
+import { Libre_Caslon_Text } from 'next/font/google';
 import { Metadata } from 'next';
 import Navbar from './Navbar';
 // app/fonts/epilogue.ts
@@ -27,7 +27,6 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-// const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 const caslon = Libre_Caslon_Text({
   subsets: ['latin'],
   weight: ['400', '700'],
