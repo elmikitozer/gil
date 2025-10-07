@@ -55,7 +55,7 @@ export default function Navbar() {
               width={190} // adapte la taille
               height={120}
               priority // pour charger vite le logo
-              className="h-auto w-[120px] md:w-[160px] lg:w-[190px]" // tailles adaptatives
+              className="w-[120px] md:w-[160px] lg:w-[190px] h-auto"
               sizes="(max-width: 640px) 120px, (max-width: 1024px) 160px, 190px"
               // style={{ height: "auto", width: "auto" }}
             />
@@ -63,26 +63,22 @@ export default function Navbar() {
         </div>
 
         {/* NAV à droite (cliquable) */}
-        <nav className="relative z-20 ml-auto flex items-center gap-6 text-[11px] md:text-[12px] tracking-[0.22em] uppercase text-neutral-900 dark:text-neutral-100">
+        <nav className="relative z-20 ml-auto flex items-center gap-4 text-[9px] sm:text-[11px] md:text-[12px] tracking-[0.22em] uppercase text-neutral-900 dark:text-neutral-100">
           <Link
             href="/informations"
-            className={`${bigCaslon.className}transition-opacity hover:opacity-70 `}
+            className={`${bigCaslon.className} hover:opacity-70 transition-opacity`}
           >
             Informations
           </Link>
-
-          {/* Icône Instagram cliquable (remplace le texte) */}
           <a
             href="https://www.instagram.com/gilanselmi"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram"
-            className="transition-opacity hover:opacity-70 inline-flex items-center"
+            className="hover:opacity-70 inline-flex items-center"
           >
-            {' '}
             Instagram
           </a>
-          {/* <ThemeToggle /> */}
         </nav>
       </div>
     </header>

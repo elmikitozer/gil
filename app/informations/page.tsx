@@ -3,13 +3,9 @@ import Image from "next/image";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Informations — Gil Anselmi" };
 
-const images = [
-  { src: "/dog.png", width: 200, height: 277 },
-  { src: "/dogs.png", width: 413, height: 267 },
-];
 
 export default function ContactPage() {
-  const randomImage = images[Math.floor(Math.random() * images.length)];
+  const randomImage = { src:`/dogs/dog${Math.floor(Math.random() * 100 % 11)}.webp`, width: 200, height: 277 };
   return (
     <section className="mx-auto max-w-2xl min-h-[calc(100vh-var(--nav-h,64px))] grid place-items-center px-4 text-center">
       <div>
@@ -36,16 +32,16 @@ export default function ContactPage() {
         <h3 className="mt-5 text-sm font-medium text-neutral-700 dark:text-neutral-300 leading-relaxed">
           Commercial portfolio upon request
         </h3>
-        <div className="mb-8 ">
-          {/* Image du chien */}
-          <Image
-            src={randomImage.src}
-            alt="Dog"
-            width={randomImage.width}
-            height={randomImage.height}
-            className="mx-auto"
-          />
-        </div>
+<div className="relative w-72 h-72 mx-auto"> {/* 18rem = 288px */}
+  <Image
+    src={randomImage}
+    alt="Dog"
+    fill
+    style={{ objectFit: "contain" }}  // ou "cover" si tu veux remplir entièrement
+    sizes="(max-width: 768px) 100vw, 800px" //
+  />
+</div>
+
       </div>
     </section>
   );
