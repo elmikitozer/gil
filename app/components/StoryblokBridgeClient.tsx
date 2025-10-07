@@ -3,12 +3,13 @@
 import { useStoryblokBridge, ISbStoryData } from "@storyblok/react";
 
 interface Props {
-  storyId: number;
+  storyId?: number;
   mutate?: (story: ISbStoryData) => void;
 }
 
 export default function StoryblokBridgeClient({ storyId, mutate }: Props) {
-  useStoryblokBridge(storyId, (story) => {
+  // Ce hook est toujours appelé, mais il ne fera rien côté serveur
+  useStoryblokBridge(storyId || 0, (story) => {
     if (mutate) mutate(story);
   });
 
