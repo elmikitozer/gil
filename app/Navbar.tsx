@@ -5,7 +5,7 @@ import Link from 'next/link';
 // import { useEffect, useState } from "react";
 import { bigCaslon } from '@/app/fonts/big-caslon';
 import Image from 'next/image';
-import ThemeToggle from './components/ui/ThemeToogle';
+// import ThemeToggle from './components/ui/ThemeToogle';
 
 export default function Navbar() {
   // const pathname = usePathname();
