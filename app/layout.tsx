@@ -3,6 +3,8 @@ import './globals.css';
 import { Libre_Caslon_Text } from 'next/font/google';
 import { Metadata } from 'next';
 import Navbar from './Navbar';
+import StoryblokBridgeLoader from './components/StoryblokBridgeLoader';
+// import StoryblokClientInit from './components/StoryblokClientInit';
 // app/fonts/epilogue.ts
 // import { Epilogue } from "next/font/google";
 // export const epilogue = Epilogue({
@@ -70,11 +72,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${caslon.variable} antialiased text-neutral-900 bg-bg text-fg dark:bg-darkbg dark:text-darkfg`}>
         <Navbar />
         <main className="container mx-auto px-4 pb-12 mt-2 md:mt-2">{children}</main>
+        {/* <StoryblokClientInit /> */}
+        <StoryblokBridgeLoader />
         <footer className="border-t border-neutral-200 mt-16">
           <div className="container mx-auto px-4 py-8 text-sm text-neutral-500">
             © {new Date().getFullYear()} Gil Anselmi
           </div>
         </footer>
+
       </body>
     </html>
   );

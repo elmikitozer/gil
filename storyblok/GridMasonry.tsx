@@ -1,4 +1,5 @@
-// /storyblok/GridMasonry.tsx
+"use client";
+
 import { storyblokEditable } from "@storyblok/react/rsc";
 import MasonryColumns from "@/app/components/MasonryColumns";
 
@@ -11,7 +12,7 @@ export default function GridMasonry({ blok }: any) {
           src: c.media.filename as string,
           alt: c.alt as string | undefined,
           title: c.title as string | undefined,
-          caption: c.caption as string | undefined, // ⬅️ NEW
+          caption: c.caption as string | undefined,
         },
       ];
     }
@@ -24,8 +25,8 @@ export default function GridMasonry({ blok }: any) {
           poster: c.poster?.filename as string | undefined,
           alt: c.alt as string | undefined,
           ratio: c.ratio as string | undefined,
-          title: c.title as string | undefined, // ⬅️ NEW
-          caption: c.caption as string | undefined, // ⬅️ NEW
+          title: c.title as string | undefined,
+          caption: c.caption as string | undefined,
         },
       ];
     }

@@ -1,6 +1,7 @@
 import { getStoryblokApi, StoryblokServerComponent } from "@storyblok/react/rsc";
 import { ensureStoryblok } from "@/lib/storyblok";
 import StoryblokBridgeClient from "./components/StoryblokBridgeClient";
+import StoryblokLiveBridge from "./components/StoryblokLiveBridge";
 
 export const dynamic = "force-dynamic"; // ⬅️ ajoute ceci tout en haut
 export const revalidate = 0;
@@ -18,7 +19,7 @@ export default async function Home() {
   return (
     <>
       <StoryblokServerComponent blok={story.content} />
-      <StoryblokBridgeClient storyId={story.id} />
+      <StoryblokLiveBridge storyId={story.id} />
     </>
   );
 }
