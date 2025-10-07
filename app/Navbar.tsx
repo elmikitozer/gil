@@ -33,17 +33,6 @@ export default function Navbar() {
           className="absolute inset-0 z-10 flex items-center [--pad:24px] md:[--pad:32px] pl-6 md:pl-8"
           aria-hidden="false"
         >
-          {/* <Link
-            href="/"
-            aria-label="Retour à l’accueil"
-              className={`${bigCaslon.className} whitespace-nowrap font-medium leading-[1]  dark:text-neutral-100
-              text-[clamp(20px,3.2vw,40px)] hover:opacity-80 transition-opacity
-              animate-slide-nav-bounce-basic-left`}
-
-            // style={{ fontFamily: "var(--font-custom-73554, Inter, system-ui, sans-serif)" }}
-          > */}
-          {/* Gil&nbsp;Anselmi
-          </Link> */}
           <Link
             href="/"
             aria-label="Retour à l’accueil"
@@ -57,7 +46,6 @@ export default function Navbar() {
               priority // pour charger vite le logo
               className="w-[120px] md:w-[160px] lg:w-[190px] h-auto"
               sizes="(max-width: 640px) 120px, (max-width: 1024px) 160px, 190px"
-              // style={{ height: "auto", width: "auto" }}
             />
           </Link>
         </div>
@@ -75,7 +63,7 @@ export default function Navbar() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram"
-            className="hover:opacity-70 inline-flex items-center"
+            className={`${bigCaslon.className} hover:opacity-70 transition-opacity`}
           >
             Instagram
           </a>
