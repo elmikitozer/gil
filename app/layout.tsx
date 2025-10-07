@@ -1,4 +1,4 @@
-// import './globals.css';
+import './globals.css';
 // import { ensureStoryblok } from "@/lib/storyblok";
 import { Libre_Caslon_Text } from 'next/font/google';
 import { Metadata } from 'next';
