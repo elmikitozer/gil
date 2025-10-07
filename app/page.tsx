@@ -1,6 +1,5 @@
 import { getStoryblokApi, StoryblokServerComponent } from "@storyblok/react/rsc";
 import { ensureStoryblok } from "@/lib/storyblok";
-import StoryblokBridgeClient from "./components/StoryblokBridgeClient";
 import StoryblokLiveBridge from "./components/StoryblokLiveBridge";
 
 export const dynamic = "force-dynamic"; // ⬅️ ajoute ceci tout en haut

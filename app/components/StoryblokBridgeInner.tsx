@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useStoryblokBridge, ISbStoryData } from "@storyblok/react";
+import { useStoryblokBridge, type ISbStoryData } from "@storyblok/react";
 
 interface Props {
   storyId?: number;
@@ -9,13 +9,17 @@ interface Props {
 }
 
 export default function StoryblokBridgeInner({ storyId, mutate }: Props) {
-  // Attendre que le bridge apparaisse dans window ou window.parent
   useEffect(() => {
     let tries = 0;
     const timer = setInterval(() => {
-      const sb =
-        (window as any)?.storyblok || (window.parent as any)?.storyblok;
-      if (sb) {
+      // on vérifie côté client
+      if (typeof window === "undefined") return;
+
+      const sb = (window as unknown as { storyblok?: unknown }).storyblok;
+      const parentSb = (window.parent as unknown as { storyblok?: unknown })
+        ?.storyblok;
+
+      if (sb || parentSb) {
         console.log("✅ Bridge Storyblok détecté après", tries, "tentatives");
         clearInterval(timer);
       } else {
@@ -29,10 +33,10 @@ export default function StoryblokBridgeInner({ storyId, mutate }: Props) {
     return () => clearInterval(timer);
   }, []);
 
-  // Reste inchangé
+  // Hook toujours appelé (jamais conditionnel)
   useStoryblokBridge(storyId ?? 0, (story) => {
     console.log("🔁 Storyblok Bridge TRIGGERED:", story);
-    if (mutate) mutate(story);
+    mutate?.(story);
   });
 
   console.log("✅ StoryblokBridgeInner monté — storyId:", storyId);
