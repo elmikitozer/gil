@@ -1,25 +1,22 @@
-import { getStoryblokApi, StoryblokServerComponent } from "@storyblok/react/rsc";
+import { getStoryblokApi } from "@storyblok/react/rsc";
 import { ensureStoryblok } from "@/lib/storyblok";
-import StoryblokLiveBridge from "./components/StoryblokLiveBridge";
+import ClientStoryRenderer from "./components/ClientStoryRenderer";
 
 export const dynamic = "force-dynamic"; // ⬅️ ajoute ceci tout en haut
 export const revalidate = 0;
 
-export default async function Home() {
+export default async function Home({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   ensureStoryblok();
   const api = getStoryblokApi();
 
-  const version: "published" | "draft" =
-    process.env.NODE_ENV === "production" ? "published" : "draft";
+  // In Visual Editor, Storyblok app adds _storyblok query param; always use draft when present
+  const sp = await searchParams;
+  const isEditor = typeof sp._storyblok !== 'undefined' || typeof sp._storyblok_version !== 'undefined';
+  const version: "published" | "draft" = isEditor || process.env.NODE_ENV !== "production" ? "draft" : "published";
 
   const { data } = await api.get("cdn/stories/home", { version });
   const story = data?.story;
 
-  return (
-    <>
-      <StoryblokServerComponent blok={story.content} />
-      <StoryblokLiveBridge storyId={story.id} />
-    </>
-  );
+  return <ClientStoryRenderer story={story} />;
 }
 
