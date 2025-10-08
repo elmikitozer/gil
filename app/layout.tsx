@@ -1,5 +1,5 @@
 import './globals.css';
-// import { ensureStoryblok } from "@/lib/storyblok";fed
+// import { ensureStoryblok } from "@/lib/storyblok";
 import { Libre_Caslon_Text } from 'next/font/google';
 import { Metadata } from 'next';
 import Navbar from './Navbar';
