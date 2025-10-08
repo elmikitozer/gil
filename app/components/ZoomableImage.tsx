@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import useIsStoryblokEditor from '@/app/components/useIsStoryblokEditor';
 import HoverCover from '@/app/components/ui/HoverCover';
 import Image from 'next/image';
 import LightboxClose from './ui/LightboxClose';
@@ -31,6 +32,7 @@ export default function ZoomableImage({
   const [open, setOpen] = useState(false);
   const [pressed, setPressed] = useState(false);
   const onClose = useCallback(() => setOpen(false), []);
+  const isEditor = useIsStoryblokEditor();
 
   useEffect(() => {
     if (!open) return;
@@ -45,7 +47,11 @@ export default function ZoomableImage({
     };
   }, [open, onClose]);
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    // En mode Visual Editor, on laisse le clic SERVIR à sélectionner l’élément dans Storyblok
+    // -> ne pas preventDefault / stopPropagation pour que l’événement remonte jusqu’au parent
+    // Astuce: meta/ctrl/shift-click autorise quand même l’ouverture locale si besoin
+    if (isEditor && !(e.metaKey || e.ctrlKey || e.shiftKey)) return;
     setPressed(true);
     setTimeout(() => {
       if (onOpen) onOpen();
@@ -59,9 +65,9 @@ export default function ZoomableImage({
       <button
         type="button"
         onClick={handleClick}
-        className={`group relative block w-full focus:outline-none cursor-pointer pressable ${
+        className={`group relative block w-full focus:outline-none pressable ${
           pressed ? 'is-pressed' : ''
-        }`}
+        } ${isEditor ? 'pointer-events-none' : 'cursor-pointer'}`}
         style={{ width: thumbWidth, height: thumbHeight, lineHeight: 0 }}
       >
         <div className="absolute inset-0 z-0">
@@ -78,8 +84,10 @@ export default function ZoomableImage({
           />
         </div>
 
-        {/* Label hover (haut-gauche, slide-in) */}
-        <HoverCover text={hoverTitle} caption={hoverCaption} />
+        {/* Label hover (haut-gauche, slide-in) — ne doit pas intercepter les clics */}
+        <div className="pointer-events-none">
+          <HoverCover text={hoverTitle} caption={hoverCaption} />
+        </div>
       </button>
 
       {open && (

@@ -3,12 +3,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import ZoomableImage from "./ZoomableImage";
 import ZoomableVideo from "./ZoomableVideo";
+import { storyblokEditable } from "@storyblok/react/rsc";
+import type { SbBlokData } from "@storyblok/react/rsc";
 
 import { GalleryProvider, useGallery } from "./ui/gallery/GalleryContext";
 import Lightbox from "./ui/gallery/Lightbox";
 
-type ImageItem = { kind: "image"; src: string; alt?: string; title?: string; caption?: string };
-type VideoItem = {
+export type ImageItem = { kind: "image"; src: string; alt?: string; title?: string; caption?: string; blok?: SbBlokData };
+export type VideoItem = {
   kind: "video";
   srcMp4: string;
   srcWebm?: string;
@@ -17,8 +19,9 @@ type VideoItem = {
   ratio?: string;
   title?: string;
   caption?: string;
+  blok?: SbBlokData;
 };
-type Item = ImageItem | VideoItem;
+export type Item = ImageItem | VideoItem;
 
 function parseRatio(r?: string): number | undefined {
   if (!r || r === "auto") return;
@@ -130,35 +133,37 @@ function MasonryColumn({
     <div className="flex flex-col" style={{ rowGap: gap, width: colW }}>
       {col.map(({ item, w, h, key, gi }) =>
         item.kind === "image" ? (
-          <ZoomableImage
-            key={key}
-            src={item.src}
-            alt={item.alt}
-            thumbWidth={w}
-            thumbHeight={h}
-            sizes={`${colW}px`}
-            hoverTitle={item.title}
-            hoverCaption={item.caption}
-            onLoaded={(nw, nh) =>
-              setRatios((p) => (p[key] ? p : { ...p, [key]: nw / nh }))
-            }
-            onOpen={() => openAt(gi)}
-          />
+          <div key={key} {...(item.blok ? storyblokEditable(item.blok) : {})}>
+            <ZoomableImage
+              src={item.src}
+              alt={item.alt}
+              thumbWidth={w}
+              thumbHeight={h}
+              sizes={`${colW}px`}
+              hoverTitle={item.title}
+              hoverCaption={item.caption}
+              onLoaded={(nw, nh) =>
+                setRatios((p) => (p[key] ? p : { ...p, [key]: nw / nh }))
+              }
+              onOpen={() => openAt(gi)}
+            />
+          </div>
         ) : (
-          <ZoomableVideo
-            key={key}
-            srcMp4={item.srcMp4}
-            srcWebm={item.srcWebm}
-            poster={item.poster}
-            width={w}
-            height={h}
-            hoverTitle={item.title}
-            hoverCaption={item.caption}
-            onLoaded={(vw, vh) =>
-              setRatios((p) => (p[key] ? p : { ...p, [key]: vw / vh }))
-            }
-            onOpen={() => openAt(gi)}
-          />
+          <div key={key} {...(item.blok ? storyblokEditable(item.blok) : {})}>
+            <ZoomableVideo
+              srcMp4={item.srcMp4}
+              srcWebm={item.srcWebm}
+              poster={item.poster}
+              width={w}
+              height={h}
+              hoverTitle={item.title}
+              hoverCaption={item.caption}
+              onLoaded={(vw, vh) =>
+                setRatios((p) => (p[key] ? p : { ...p, [key]: vw / vh }))
+              }
+              onOpen={() => openAt(gi)}
+            />
+          </div>
         )
       )}
     </div>

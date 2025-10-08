@@ -1,37 +1,60 @@
 "use client";
 
 import { storyblokEditable } from "@storyblok/react/rsc";
-import MasonryColumns from "@/app/components/MasonryColumns";
+import type { SbBlokData } from "@storyblok/react/rsc";
+import MasonryColumns, { type Item, type ImageItem, type VideoItem } from "@/app/components/MasonryColumns";
 
-export default function GridMasonry({ blok }: any) {
-  const items = (blok?.items || []).flatMap((c: any) => {
+type MediaItemBlok = SbBlokData & {
+  component: "media_item";
+  media?: { filename?: string };
+  alt?: string;
+  title?: string;
+  caption?: string;
+};
+
+type VideoItemBlok = SbBlokData & {
+  component: "video_item";
+  srcMp4?: string;
+  srcWebm?: string;
+  poster?: { filename?: string };
+  alt?: string;
+  ratio?: string;
+  title?: string;
+  caption?: string;
+};
+
+type GridMasonryBlok = SbBlokData & {
+  items?: Array<MediaItemBlok | VideoItemBlok>;
+};
+
+export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
+  const items: Item[] = (blok.items ?? []).reduce<Item[]>((acc, c) => {
     if (c?.component === "media_item" && c?.media?.filename) {
-      return [
-        {
-          kind: "image",
-          src: c.media.filename as string,
-          alt: c.alt as string | undefined,
-          title: c.title as string | undefined,
-          caption: c.caption as string | undefined,
-        },
-      ];
+      const item: ImageItem = {
+        kind: "image",
+        src: c.media.filename as string,
+        alt: c.alt as string | undefined,
+        title: c.title as string | undefined,
+        caption: c.caption as string | undefined,
+        blok: c,
+      };
+      acc.push(item);
+    } else if (c?.component === "video_item" && c?.srcMp4) {
+      const item: VideoItem = {
+        kind: "video",
+        srcMp4: c.srcMp4 as string,
+        srcWebm: c.srcWebm as string | undefined,
+        poster: c.poster?.filename as string | undefined,
+        alt: c.alt as string | undefined,
+        ratio: c.ratio as string | undefined,
+        title: c.title as string | undefined,
+        caption: c.caption as string | undefined,
+        blok: c,
+      };
+      acc.push(item);
     }
-    if (c?.component === "video_item" && c?.srcMp4) {
-      return [
-        {
-          kind: "video",
-          srcMp4: c.srcMp4 as string,
-          srcWebm: c.srcWebm as string | undefined,
-          poster: c.poster?.filename as string | undefined,
-          alt: c.alt as string | undefined,
-          ratio: c.ratio as string | undefined,
-          title: c.title as string | undefined,
-          caption: c.caption as string | undefined,
-        },
-      ];
-    }
-    return [];
-  });
+    return acc;
+  }, []);
 
   return (
     <section
