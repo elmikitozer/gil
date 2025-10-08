@@ -1,23 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-// import { usePathname } from "next/navigation";
-// import { useEffect, useState } from "react";
 import { bigCaslon } from '@/app/fonts/big-caslon';
 import Image from 'next/image';
-// import ThemeToggle from './components/ui/ThemeToogle';
 
 export default function Navbar() {
-  // const pathname = usePathname();
-  // const [scrolled, setScrolled] = useState(false);
-  // scrolled; // pour forcer le re-render
-
-  // useEffect(() => {
-  //   const onScroll = () => setScrolled(window.scrollY > 8);
-  //   onScroll();
-  //   window.addEventListener("scroll", onScroll, { passive: true });
-  //   return () => window.removeEventListener("scroll", onScroll);
-  // }, []);
 
   return (
     <header
