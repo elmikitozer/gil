@@ -18,6 +18,11 @@ const nextConfig: NextConfig = {
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+          // Autorise l’intégration dans l’éditeur Storyblok (iframe)
+          {
+            key: 'Content-Security-Policy',
+            value: "frame-ancestors 'self' https://app.storyblok.com https://m.storyblok.com;"
+          },
           // Active uniquement si ton domaine est bien en HTTPS:
           {
             key: 'Strict-Transport-Security',
