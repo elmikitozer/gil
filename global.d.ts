@@ -4,14 +4,8 @@ declare global {
   interface Window {
     storyblok?: {
       init: () => void;
-      on?: (
-        event: string | string[],
-        cb: (...args: unknown[]) => void
-      ) => void;
-      off?: (
-        event: string | string[],
-        cb: (...args: unknown[]) => void
-      ) => void;
+      on?: (event: string | string[], cb: (...args: unknown[]) => void) => void;
+      off?: (event: string | string[], cb: (...args: unknown[]) => void) => void;
     };
   }
 }

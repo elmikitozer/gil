@@ -1,17 +1,24 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import ZoomableImage from "./ZoomableImage";
-import ZoomableVideo from "./ZoomableVideo";
-import { storyblokEditable } from "@storyblok/react/rsc";
-import type { SbBlokData } from "@storyblok/react/rsc";
+import { useEffect, useMemo, useRef, useState } from 'react';
+import ZoomableImage from './ZoomableImage';
+import ZoomableVideo from './ZoomableVideo';
+import { storyblokEditable } from '@storyblok/react/rsc';
+import type { SbBlokData } from '@storyblok/react/rsc';
 
-import { GalleryProvider, useGallery } from "./ui/gallery/GalleryContext";
-import Lightbox from "./ui/gallery/Lightbox";
+import { GalleryProvider, useGallery } from './ui/gallery/GalleryContext';
+import Lightbox from './ui/gallery/Lightbox';
 
-export type ImageItem = { kind: "image"; src: string; alt?: string; title?: string; caption?: string; blok?: SbBlokData };
+export type ImageItem = {
+  kind: 'image';
+  src: string;
+  alt?: string;
+  title?: string;
+  caption?: string;
+  blok?: SbBlokData;
+};
 export type VideoItem = {
-  kind: "video";
+  kind: 'video';
   srcMp4: string;
   srcWebm?: string;
   poster?: string;
@@ -24,11 +31,10 @@ export type VideoItem = {
 export type Item = ImageItem | VideoItem;
 
 function parseRatio(r?: string): number | undefined {
-  if (!r || r === "auto") return;
-  const byColon = r.split(":");
-  const bySlash = r.split("/");
-  const parts =
-    byColon.length === 2 ? byColon : bySlash.length === 2 ? bySlash : [];
+  if (!r || r === 'auto') return;
+  const byColon = r.split(':');
+  const bySlash = r.split('/');
+  const parts = byColon.length === 2 ? byColon : bySlash.length === 2 ? bySlash : [];
   if (parts.length === 2) {
     const w = parseFloat(parts[0]);
     const h = parseFloat(parts[1]);
@@ -52,37 +58,28 @@ function useContainerWidth<T extends HTMLElement>() {
   return [ref, w] as const;
 }
 
-export default function MasonryColumns({
-  items,
-  gap = 0,
-}: {
-  items: Item[];
-  gap?: number;
-}) {
+export default function MasonryColumns({ items, gap = 0 }: { items: Item[]; gap?: number }) {
   const [ref, cw] = useContainerWidth<HTMLDivElement>();
   const [ratios, setRatios] = useState<Record<string, number>>({});
 
   const cols = useMemo(() => (cw >= 1280 ? 4 : cw >= 768 ? 3 : 2), [cw]);
   const colW = useMemo(
-    () =>
-      cw && cols ? Math.max(1, Math.floor((cw - gap * (cols - 1)) / cols)) : 0,
+    () => (cw && cols ? Math.max(1, Math.floor((cw - gap * (cols - 1)) / cols)) : 0),
     [cw, cols, gap]
   );
 
   const columns = useMemo(() => {
-    const arr: { item: Item; w: number; h: number; key: string; gi: number }[][] =
-      Array.from({ length: cols }, () => []);
+    const arr: { item: Item; w: number; h: number; key: string; gi: number }[][] = Array.from(
+      { length: cols },
+      () => []
+    );
     const heights = Array.from({ length: cols }, () => 0);
     if (!colW) return arr;
 
     let gi = 0; // index global dans la liste
     for (const item of items) {
-      const key =
-        item.kind === "image"
-          ? `img:${item.src}`
-          : `vid:${item.srcWebm || item.srcMp4}`;
-      const override =
-        item.kind === "video" ? parseRatio(item.ratio) : undefined;
+      const key = item.kind === 'image' ? `img:${item.src}` : `vid:${item.srcWebm || item.srcMp4}`;
+      const override = item.kind === 'video' ? parseRatio(item.ratio) : undefined;
       const r = override ?? ratios[key] ?? 16 / 9;
       const w = colW;
       const h = Math.max(1, Math.round(w / r));
@@ -102,13 +99,7 @@ export default function MasonryColumns({
     <GalleryProvider items={items}>
       <div ref={ref} className="flex" style={{ gap }}>
         {columns.map((col, i) => (
-          <MasonryColumn
-            key={i}
-            col={col}
-            colW={colW}
-            gap={gap}
-            setRatios={setRatios}
-          />
+          <MasonryColumn key={i} col={col} colW={colW} gap={gap} setRatios={setRatios} />
         ))}
       </div>
       <Lightbox />
@@ -132,7 +123,7 @@ function MasonryColumn({
   return (
     <div className="flex flex-col" style={{ rowGap: gap, width: colW }}>
       {col.map(({ item, w, h, key, gi }) =>
-        item.kind === "image" ? (
+        item.kind === 'image' ? (
           <div key={key} {...(item.blok ? storyblokEditable(item.blok) : {})}>
             <ZoomableImage
               src={item.src}
@@ -142,9 +133,7 @@ function MasonryColumn({
               sizes={`${colW}px`}
               hoverTitle={item.title}
               hoverCaption={item.caption}
-              onLoaded={(nw, nh) =>
-                setRatios((p) => (p[key] ? p : { ...p, [key]: nw / nh }))
-              }
+              onLoaded={(nw, nh) => setRatios((p) => (p[key] ? p : { ...p, [key]: nw / nh }))}
               onOpen={() => openAt(gi)}
             />
           </div>
@@ -158,9 +147,7 @@ function MasonryColumn({
               height={h}
               hoverTitle={item.title}
               hoverCaption={item.caption}
-              onLoaded={(vw, vh) =>
-                setRatios((p) => (p[key] ? p : { ...p, [key]: vw / vh }))
-              }
+              onLoaded={(vw, vh) => setRatios((p) => (p[key] ? p : { ...p, [key]: vw / vh }))}
               onOpen={() => openAt(gi)}
             />
           </div>

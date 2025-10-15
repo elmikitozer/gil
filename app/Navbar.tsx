@@ -5,7 +5,6 @@ import { bigCaslon } from '@/app/fonts/big-caslon';
 import Image from 'next/image';
 
 export default function Navbar() {
-
   return (
     <header
       className={[
@@ -40,10 +39,10 @@ export default function Navbar() {
         {/* NAV à droite (cliquable) */}
         <nav className="relative z-20 ml-auto flex items-center gap-4 text-[9px] sm:text-[11px] md:text-[12px] tracking-[0.22em] uppercase text-neutral-900 dark:text-neutral-100">
           <Link
-            href="/informations"
+            href="/information"
             className={`${bigCaslon.className} hover:opacity-70 transition-opacity`}
           >
-            Informations
+            Information
           </Link>
           <a
             href="https://www.instagram.com/gilanselmi"

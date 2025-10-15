@@ -1,11 +1,15 @@
-"use client";
+'use client';
 
-import { storyblokEditable } from "@storyblok/react/rsc";
-import type { SbBlokData } from "@storyblok/react/rsc";
-import MasonryColumns, { type Item, type ImageItem, type VideoItem } from "@/app/components/MasonryColumns";
+import { storyblokEditable } from '@storyblok/react/rsc';
+import type { SbBlokData } from '@storyblok/react/rsc';
+import MasonryColumns, {
+  type Item,
+  type ImageItem,
+  type VideoItem,
+} from '@/app/components/MasonryColumns';
 
 type MediaItemBlok = SbBlokData & {
-  component: "media_item";
+  component: 'media_item';
   media?: { filename?: string };
   alt?: string;
   title?: string;
@@ -13,7 +17,7 @@ type MediaItemBlok = SbBlokData & {
 };
 
 type VideoItemBlok = SbBlokData & {
-  component: "video_item";
+  component: 'video_item';
   srcMp4?: string;
   srcWebm?: string;
   poster?: { filename?: string };
@@ -29,9 +33,9 @@ type GridMasonryBlok = SbBlokData & {
 
 export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
   const items: Item[] = (blok.items ?? []).reduce<Item[]>((acc, c) => {
-    if (c?.component === "media_item" && c?.media?.filename) {
+    if (c?.component === 'media_item' && c?.media?.filename) {
       const item: ImageItem = {
-        kind: "image",
+        kind: 'image',
         src: c.media.filename as string,
         alt: c.alt as string | undefined,
         title: c.title as string | undefined,
@@ -39,9 +43,9 @@ export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
         blok: c,
       };
       acc.push(item);
-    } else if (c?.component === "video_item" && c?.srcMp4) {
+    } else if (c?.component === 'video_item' && c?.srcMp4) {
       const item: VideoItem = {
-        kind: "video",
+        kind: 'video',
         srcMp4: c.srcMp4 as string,
         srcWebm: c.srcWebm as string | undefined,
         poster: c.poster?.filename as string | undefined,
