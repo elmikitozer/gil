@@ -6,7 +6,6 @@ import LightboxClose from './ui/LightboxClose';
 
 type Props = {
   vimeoId: string;
-  poster?: string;
   width: number;
   height: number;
   onOpen?: () => void;
@@ -16,7 +15,6 @@ type Props = {
 
 export default function ZoomableVimeo({
   vimeoId,
-  poster,
   width,
   height,
   onOpen,
@@ -38,9 +36,6 @@ export default function ZoomableVimeo({
     };
   }, [open, onClose]);
 
-  // Vimeo thumbnail URL
-  const thumbnailUrl = poster || `https://vumbnail.com/${vimeoId}.jpg`;
-
   return (
     <>
       <button
@@ -49,22 +44,17 @@ export default function ZoomableVimeo({
         className="group relative block w-full focus:outline-none cursor-pointer overflow-hidden"
         style={{ width, height, lineHeight: 0 }}
       >
-        {/* Thumbnail */}
-        <div
-          className="absolute inset-0 w-full h-full bg-cover bg-center"
-          style={{ backgroundImage: `url(${thumbnailUrl})` }}
+        {/* Iframe Vimeo en autoplay muted loop (comme vidéo locale) */}
+        <iframe
+          src={`https://player.vimeo.com/video/${vimeoId}?background=1&autoplay=1&loop=1&muted=1&title=0&byline=0&portrait=0`}
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          frameBorder="0"
+          allow="autoplay; muted"
+          title={hoverTitle || 'Vidéo Vimeo'}
         />
 
-        {/* Play button overlay */}
-        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 group-hover:bg-opacity-30 transition-all">
-          <svg
-            className="w-16 h-16 text-white opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path d="M8 5v14l11-7z" />
-          </svg>
-        </div>
+        {/* Layer cliquable transparent par-dessus la vidéo */}
+        <div className="absolute inset-0 z-10" />
 
         {/* Label hover */}
         <HoverCover text={hoverTitle} caption={hoverCaption} />
