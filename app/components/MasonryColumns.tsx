@@ -177,6 +177,7 @@ function MasonryColumn({
             <div key={key} {...(item.blok ? storyblokEditable(item.blok) : {})}>
               <ZoomableVimeo
                 vimeoId={item.vimeoId}
+                poster={item.poster}
                 width={w}
                 height={h}
                 hoverTitle={item.title}
