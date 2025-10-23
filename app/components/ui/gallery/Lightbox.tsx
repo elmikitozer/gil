@@ -26,7 +26,7 @@ export default function Lightbox() {
     >
       <div className="absolute inset-0 grid place-items-center">
         {it?.kind === 'image' ? (
-          <div className="relative h-[90vh] w-[90vw]">
+          <div className="relative h-full w-full md:h-[90vh] md:w-[90vw]">
             <Image
               src={it.src}
               alt={it.alt ?? ''}
@@ -37,7 +37,7 @@ export default function Lightbox() {
             />
           </div>
         ) : it?.kind === 'video' ? (
-          <div className="relative h-[90vh] w-[90vw]" onClick={(e) => e.stopPropagation()}>
+          <div className="relative h-full w-full md:h-[90vh] md:w-[90vw]">
             <video
               key={it.srcMp4} // Force re-render when video changes
               className="h-full w-full object-contain"
@@ -67,7 +67,7 @@ export default function Lightbox() {
           (() => {
             const vimeoId = extractVimeoId(it.vimeoId);
             return vimeoId ? (
-              <div className="relative h-[min(90vh,50.625vw)] w-[min(90vw,160vh)]">
+              <div className="relative h-full w-full md:h-[min(90vh,50.625vw)] md:w-[min(90vw,160vh)] aspect-video">
                 <iframe
                   key={vimeoId}
                   src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1&loop=1&title=0&byline=0&portrait=0`}
@@ -80,7 +80,7 @@ export default function Lightbox() {
               </div>
             ) : (
               // Fallback : afficher le MP4 si vimeoId invalide
-              <div className="relative h-[90vh] w-[90vw]" onClick={(e) => e.stopPropagation()}>
+              <div className="relative h-full w-full md:h-[90vh] md:w-[90vw]">
                 <video
                   key={it.srcMp4}
                   className="h-full w-full object-contain"
@@ -100,7 +100,7 @@ export default function Lightbox() {
           (() => {
             const vimeoId = extractVimeoId(it.vimeoId);
             return vimeoId ? (
-              <div className="relative h-[min(90vh,50.625vw)] w-[min(90vw,160vh)]">
+              <div className="relative h-full w-full md:h-[min(90vh,50.625vw)] md:w-[min(90vw,160vh)] aspect-video">
                 <iframe
                   key={vimeoId}
                   src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1&loop=1&title=0&byline=0&portrait=0`}

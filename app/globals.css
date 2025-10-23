@@ -121,27 +121,41 @@ a {
     transform: scale(0.985);
   }
   .pressable::after {
-    content: "";
+    content: '';
     position: absolute;
     inset: 0;
-    background: rgba(255,255,255,0);
+    background: rgba(255, 255, 255, 0);
     transition: background 180ms ease;
     pointer-events: none;
   }
   .pressable.is-pressed::after {
-    background: rgba(255,255,255,0.45);
+    background: rgba(255, 255, 255, 0.45);
   }
 
   /* Animations d’entrée de la lightbox */
   @keyframes lb-bg {
-    from { background: rgba(255,255,255,0); }
-    to   { background: #fff; }
+    from {
+      background: rgba(255, 255, 255, 0);
+    }
+    to {
+      background: #fff;
+    }
   }
-  .lb-anim-bg { animation: lb-bg .25s ease both; }
+  .lb-anim-bg {
+    animation: lb-bg 0.25s ease both;
+  }
 
   @keyframes lb-zoom {
-    from { transform: scale(0.985); opacity: 0; }
-    to   { transform: scale(1);     opacity: 1; }
+    from {
+      transform: scale(0.985);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
   }
-  .lb-anim-media { animation: lb-zoom .25s ease both; }
+  .lb-anim-media {
+    animation: lb-zoom 0.25s ease both;
+  }
 }
