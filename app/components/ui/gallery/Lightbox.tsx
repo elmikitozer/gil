@@ -67,7 +67,7 @@ export default function Lightbox() {
           (() => {
             const vimeoId = extractVimeoId(it.vimeoId);
             return vimeoId ? (
-              <div className="relative h-full w-full md:h-[min(90vh,50.625vw)] md:w-[min(90vw,160vh)] aspect-video">
+              <div className="relative h-[min(90vh,50.625vw)] w-[min(90vw,160vh)]">
                 <iframe
                   key={vimeoId}
                   src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1&loop=1&title=0&byline=0&portrait=0`}
@@ -100,7 +100,7 @@ export default function Lightbox() {
           (() => {
             const vimeoId = extractVimeoId(it.vimeoId);
             return vimeoId ? (
-              <div className="relative h-full w-full md:h-[min(90vh,50.625vw)] md:w-[min(90vw,160vh)] aspect-video">
+              <div className="relative h-[min(90vh,50.625vw)] w-[min(90vw,160vh)]">
                 <iframe
                   key={vimeoId}
                   src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1&loop=1&title=0&byline=0&portrait=0`}
