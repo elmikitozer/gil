@@ -43,7 +43,9 @@ export default function ZoomableVimeo({
   const thumbnailUrl = cleanVimeoId ? `https://vumbnail.com/${cleanVimeoId}.jpg` : '';
 
   if (!cleanVimeoId) {
-    console.error('ID Vimeo invalide:', vimeoId);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('ID Vimeo invalide:', vimeoId);
+    }
     return null;
   }
 
@@ -63,11 +65,15 @@ export default function ZoomableVimeo({
         className="group relative block w-full focus:outline-none cursor-pointer overflow-hidden"
         style={{ width, height, lineHeight: 0 }}
       >
-        {/* Thumbnail */}
-        <div
-          className="absolute inset-0 w-full h-full bg-cover bg-center"
-          style={{ backgroundImage: `url(${thumbnailUrl})` }}
-        />
+        {/* Thumbnail avec lazy loading */}
+        {thumbnailUrl && (
+          <img
+            src={thumbnailUrl}
+            alt="Vimeo thumbnail"
+            loading="lazy"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        )}
 
         {/* Play button overlay */}
         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 group-hover:bg-opacity-30 transition-all">

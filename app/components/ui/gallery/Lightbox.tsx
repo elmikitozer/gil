@@ -49,14 +49,10 @@ export default function Lightbox() {
               preload="auto"
               poster={it.poster ?? undefined}
               onError={(e) => {
-                console.error('Erreur vidéo lightbox:', e);
-                console.error('srcMp4:', it.srcMp4);
-                console.error('srcWebm:', it.srcWebm);
-                console.error('Erreur détails:', e.currentTarget.error);
+                if (process.env.NODE_ENV === 'development') {
+                  console.error('Erreur vidéo lightbox:', it.srcMp4, e);
+                }
               }}
-              onLoadedMetadata={() => console.log('Lightbox: Metadata chargée')}
-              onCanPlay={() => console.log('Lightbox: Prête à jouer')}
-              onPlay={() => console.log('Lightbox: Lecture démarrée')}
             >
               {it.srcWebm ? <source src={it.srcWebm} type="video/webm" /> : null}
               <source src={it.srcMp4} type="video/mp4" />

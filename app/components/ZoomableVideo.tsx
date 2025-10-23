@@ -28,7 +28,7 @@ export default function ZoomableVideo({
   poster,
   width,
   height,
-  autoPlay = true,
+  autoPlay = false,
   loop = true,
   muted = true,
   onLoaded,
@@ -67,20 +67,23 @@ export default function ZoomableVideo({
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
-          if (e.isIntersecting && e.intersectionRatio > 0.35) {
+          if (e.isIntersecting && e.intersectionRatio > 0.5) {
             // Charger la vidéo si pas déjà fait
             if (v.readyState === 0) {
               v.load();
             }
-            v.play().catch(() => {});
+            // Petit délai pour éviter de surcharger
+            setTimeout(() => {
+              v.play().catch(() => {});
+            }, 100);
           } else {
             v.pause();
           }
         }
       },
-      { 
-        threshold: [0, 0.35, 1],
-        rootMargin: '50px' // Commence à charger 50px avant d'être visible
+      {
+        threshold: [0, 0.5],
+        rootMargin: '100px', // Pré-charge plus tôt
       }
     );
 
@@ -155,12 +158,11 @@ export default function ZoomableVideo({
             preload="auto"
             className="w-[min(100vw,90vh)] max-h-[90vh] object-contain"
             onError={(e) => {
-              console.error('Erreur de chargement vidéo:', e);
-              console.error('srcMp4:', srcMp4);
-              console.error('srcWebm:', srcWebm);
+              // Erreur silencieuse en production
+              if (process.env.NODE_ENV === 'development') {
+                console.error('Erreur vidéo:', srcMp4, e);
+              }
             }}
-            onLoadedMetadata={() => console.log('Vidéo metadata chargée:', srcMp4)}
-            onCanPlay={() => console.log('Vidéo prête à jouer:', srcMp4)}
           >
             {srcWebm && <source src={srcWebm} type="video/webm" />}
             <source src={srcMp4} type="video/mp4" />
