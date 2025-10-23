@@ -39,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       >
         <StoryblokClientInit />
         <Navbar />
-        <main className="container mx-auto px-4 pb-12 pt-[calc(64px+env(safe-area-inset-top))]">
+        <main className="container mx-auto px-4 pb-12 pt-3">
           {children}
         </main>
         <StoryblokBridgeLoader />

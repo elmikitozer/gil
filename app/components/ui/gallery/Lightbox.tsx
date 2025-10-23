@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useGallery } from './GalleryContext';
 import type { Item } from './GalleryContext';
 import { LightboxNav } from './LightboxNav';
+import { extractVimeoId } from '@/app/utils/vimeo';
 
 export default function Lightbox() {
   const { isOpen, close, items, index, next, prev } = useGallery();
@@ -36,7 +37,7 @@ export default function Lightbox() {
             />
           </div>
         ) : it?.kind === 'video' ? (
-          <div className="relative h-[90vh] w-[90vw]">
+          <div className="relative h-[90vh] w-[90vw]" onClick={(e) => e.stopPropagation()}>
             <video
               key={it.srcMp4} // Force re-render when video changes
               className="h-full w-full object-contain"
@@ -63,29 +64,55 @@ export default function Lightbox() {
           </div>
         ) : it?.kind === 'hybrid' ? (
           // HYBRIDE : Affiche la vidéo Vimeo complète dans la lightbox
-          <div className="relative h-[min(90vh,50.625vw)] w-[min(90vw,160vh)]">
-            <iframe
-              key={it.vimeoId}
-              src={`https://player.vimeo.com/video/${it.vimeoId}?autoplay=1&title=0&byline=0&portrait=0`}
-              className="w-full h-full"
-              frameBorder="0"
-              allow="autoplay; fullscreen; picture-in-picture"
-              allowFullScreen
-              title={it.title || 'Vidéo complète'}
-            />
-          </div>
+          (() => {
+            const vimeoId = extractVimeoId(it.vimeoId);
+            return vimeoId ? (
+              <div className="relative h-[min(90vh,50.625vw)] w-[min(90vw,160vh)]">
+                <iframe
+                  key={vimeoId}
+                  src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1&loop=1&title=0&byline=0&portrait=0`}
+                  className="w-full h-full"
+                  frameBorder="0"
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  allowFullScreen
+                  title={it.title || 'Vidéo complète'}
+                />
+              </div>
+            ) : (
+              // Fallback : afficher le MP4 si vimeoId invalide
+              <div className="relative h-[90vh] w-[90vw]" onClick={(e) => e.stopPropagation()}>
+                <video
+                  key={it.srcMp4}
+                  className="h-full w-full object-contain"
+                  controls
+                  autoPlay
+                  playsInline
+                  muted={false}
+                  loop
+                  preload="auto"
+                >
+                  <source src={it.srcMp4} type="video/mp4" />
+                </video>
+              </div>
+            );
+          })()
         ) : it?.kind === 'vimeo' ? (
-          <div className="relative h-[min(90vh,50.625vw)] w-[min(90vw,160vh)]">
-            <iframe
-              key={it.vimeoId}
-              src={`https://player.vimeo.com/video/${it.vimeoId}?autoplay=1&title=0&byline=0&portrait=0`}
-              className="w-full h-full"
-              frameBorder="0"
-              allow="autoplay; fullscreen; picture-in-picture"
-              allowFullScreen
-              title={it.title || 'Vidéo Vimeo'}
-            />
-          </div>
+          (() => {
+            const vimeoId = extractVimeoId(it.vimeoId);
+            return vimeoId ? (
+              <div className="relative h-[min(90vh,50.625vw)] w-[min(90vw,160vh)]">
+                <iframe
+                  key={vimeoId}
+                  src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1&loop=1&title=0&byline=0&portrait=0`}
+                  className="w-full h-full"
+                  frameBorder="0"
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  allowFullScreen
+                  title={it.title || 'Vidéo Vimeo'}
+                />
+              </div>
+            ) : null;
+          })()
         ) : null}
       </div>
 

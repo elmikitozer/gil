@@ -3,10 +3,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import HoverCover from '@/app/components/ui/HoverCover';
 import LightboxClose from './ui/LightboxClose';
+import { extractVimeoId } from '@/app/utils/vimeo';
+import useIsStoryblokEditor from './useIsStoryblokEditor';
 
 type Props = {
   vimeoId: string;
-  poster?: string;
   width: number;
   height: number;
   onOpen?: () => void;
@@ -16,7 +17,6 @@ type Props = {
 
 export default function ZoomableVimeo({
   vimeoId,
-  poster,
   width,
   height,
   onOpen,
@@ -24,6 +24,7 @@ export default function ZoomableVimeo({
   hoverCaption,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const isStoryblokEditor = useIsStoryblokEditor();
 
   const onClose = useCallback(() => setOpen(false), []);
 
@@ -38,14 +39,27 @@ export default function ZoomableVimeo({
     };
   }, [open, onClose]);
 
-  // Vimeo thumbnail URL
-  const thumbnailUrl = poster || `https://vumbnail.com/${vimeoId}.jpg`;
+  const cleanVimeoId = extractVimeoId(vimeoId);
+  const thumbnailUrl = cleanVimeoId ? `https://vumbnail.com/${cleanVimeoId}.jpg` : '';
+
+  if (!cleanVimeoId) {
+    console.error('ID Vimeo invalide:', vimeoId);
+    return null;
+  }
 
   return (
     <>
       <button
         type="button"
-        onClick={() => (onOpen ? onOpen() : setOpen(true))}
+        onClick={() => {
+          // Ne pas ouvrir la lightbox dans l'éditeur Storyblok
+          if (isStoryblokEditor) return;
+          if (onOpen) {
+            onOpen();
+          } else {
+            setOpen(true);
+          }
+        }}
         className="group relative block w-full focus:outline-none cursor-pointer overflow-hidden"
         style={{ width, height, lineHeight: 0 }}
       >
@@ -83,7 +97,7 @@ export default function ZoomableVimeo({
             onClick={(e) => e.stopPropagation()}
           >
             <iframe
-              src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1&title=0&byline=0&portrait=0`}
+              src={`https://player.vimeo.com/video/${cleanVimeoId}?autoplay=1&loop=1&title=0&byline=0&portrait=0`}
               className="w-full h-full"
               frameBorder="0"
               allow="autoplay; fullscreen; picture-in-picture"

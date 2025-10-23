@@ -4,6 +4,7 @@ import LightboxClose from './ui/LightboxClose';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import HoverCover from '@/app/components/ui/HoverCover';
+import useIsStoryblokEditor from './useIsStoryblokEditor';
 
 type Props = {
   srcMp4: string;
@@ -39,6 +40,7 @@ export default function ZoomableVideo({
   const [open, setOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const btnRef = useRef<HTMLButtonElement | null>(null);
+  const isStoryblokEditor = useIsStoryblokEditor();
 
   useEffect(() => {
     const v = videoRef.current;
@@ -94,7 +96,15 @@ export default function ZoomableVideo({
       <button
         ref={btnRef}
         type="button"
-        onClick={() => (onOpen ? onOpen() : setOpen(true))}
+        onClick={() => {
+          // Ne pas ouvrir la lightbox dans l'éditeur Storyblok
+          if (isStoryblokEditor) return;
+          if (onOpen) {
+            onOpen();
+          } else {
+            setOpen(true);
+          }
+        }}
         className="group relative block w-full focus:outline-none cursor-pointer"
         style={{ width, height, lineHeight: 0 }}
       >
