@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import LightboxClose from "./ui/LightboxClose";
+import LightboxClose from './ui/LightboxClose';
 
-import { useEffect, useState, useCallback, useRef } from "react";
-import HoverCover from "@/app/components/ui/HoverCover";
+import { useEffect, useState, useCallback, useRef } from 'react';
+import HoverCover from '@/app/components/ui/HoverCover';
 
 type Props = {
   srcMp4: string;
@@ -46,8 +46,8 @@ export default function ZoomableVideo({
     const onMeta = () => {
       if (v.videoWidth && v.videoHeight) onLoaded?.(v.videoWidth, v.videoHeight);
     };
-    v.addEventListener("loadedmetadata", onMeta);
-    return () => v.removeEventListener("loadedmetadata", onMeta);
+    v.addEventListener('loadedmetadata', onMeta);
+    return () => v.removeEventListener('loadedmetadata', onMeta);
   }, [onLoaded]);
 
   useEffect(() => {
@@ -57,9 +57,9 @@ export default function ZoomableVideo({
     if (!v || !el) return;
 
     const prefersReduced =
-      typeof window !== "undefined" &&
+      typeof window !== 'undefined' &&
       window.matchMedia &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReduced) return;
 
     const io = new IntersectionObserver(
@@ -80,12 +80,12 @@ export default function ZoomableVideo({
 
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    document.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
     return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
     };
   }, [open, onClose]);
 
@@ -125,14 +125,22 @@ export default function ZoomableVideo({
         >
           <LightboxClose onClick={onClose} size="lg" />
           <video
+            key={srcMp4} // Force re-render when video changes
             poster={poster}
             autoPlay
             loop
             muted={false}
             controls
             playsInline
-            preload="metadata"
+            preload="auto"
             className="w-[min(100vw,90vh)] max-h-[90vh] object-contain"
+            onError={(e) => {
+              console.error('Erreur de chargement vidéo:', e);
+              console.error('srcMp4:', srcMp4);
+              console.error('srcWebm:', srcWebm);
+            }}
+            onLoadedMetadata={() => console.log('Vidéo metadata chargée:', srcMp4)}
+            onCanPlay={() => console.log('Vidéo prête à jouer:', srcMp4)}
           >
             {srcWebm && <source src={srcWebm} type="video/webm" />}
             <source src={srcMp4} type="video/mp4" />
@@ -142,4 +150,3 @@ export default function ZoomableVideo({
     </>
   );
 }
-

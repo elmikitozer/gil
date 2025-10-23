@@ -6,6 +6,7 @@ import MasonryColumns, {
   type Item,
   type ImageItem,
   type VideoItem,
+  type VimeoVideoItem,
 } from '@/app/components/MasonryColumns';
 
 type MediaItemBlok = SbBlokData & {
@@ -18,6 +19,8 @@ type MediaItemBlok = SbBlokData & {
 
 type VideoItemBlok = SbBlokData & {
   component: 'video_item';
+  video_source?: 'mp4' | 'vimeo';
+  vimeoId?: string;
   srcMp4?: string;
   srcWebm?: string;
   poster?: { filename?: string };
@@ -43,19 +46,35 @@ export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
         blok: c,
       };
       acc.push(item);
-    } else if (c?.component === 'video_item' && c?.srcMp4) {
-      const item: VideoItem = {
-        kind: 'video',
-        srcMp4: c.srcMp4 as string,
-        srcWebm: c.srcWebm as string | undefined,
-        poster: c.poster?.filename as string | undefined,
-        alt: c.alt as string | undefined,
-        ratio: c.ratio as string | undefined,
-        title: c.title as string | undefined,
-        caption: c.caption as string | undefined,
-        blok: c,
-      };
-      acc.push(item);
+    } else if (c?.component === 'video_item') {
+      const source = c.video_source || 'mp4';
+
+      if (source === 'vimeo' && c.vimeoId) {
+        const item: VimeoVideoItem = {
+          kind: 'vimeo',
+          vimeoId: c.vimeoId as string,
+          poster: c.poster?.filename as string | undefined,
+          alt: c.alt as string | undefined,
+          ratio: c.ratio as string | undefined,
+          title: c.title as string | undefined,
+          caption: c.caption as string | undefined,
+          blok: c,
+        };
+        acc.push(item);
+      } else if (source === 'mp4' && c.srcMp4) {
+        const item: VideoItem = {
+          kind: 'video',
+          srcMp4: c.srcMp4 as string,
+          srcWebm: c.srcWebm as string | undefined,
+          poster: c.poster?.filename as string | undefined,
+          alt: c.alt as string | undefined,
+          ratio: c.ratio as string | undefined,
+          title: c.title as string | undefined,
+          caption: c.caption as string | undefined,
+          blok: c,
+        };
+        acc.push(item);
+      }
     }
     return acc;
   }, []);

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import ZoomableImage from './ZoomableImage';
 import ZoomableVideo from './ZoomableVideo';
+import ZoomableVimeo from './ZoomableVimeo';
 import { storyblokEditable } from '@storyblok/react/rsc';
 import type { SbBlokData } from '@storyblok/react/rsc';
 
@@ -28,7 +29,17 @@ export type VideoItem = {
   caption?: string;
   blok?: SbBlokData;
 };
-export type Item = ImageItem | VideoItem;
+export type VimeoVideoItem = {
+  kind: 'vimeo';
+  vimeoId: string;
+  poster?: string;
+  alt?: string;
+  ratio?: string;
+  title?: string;
+  caption?: string;
+  blok?: SbBlokData;
+};
+export type Item = ImageItem | VideoItem | VimeoVideoItem;
 
 function parseRatio(r?: string): number | undefined {
   if (!r || r === 'auto') return;
@@ -78,8 +89,14 @@ export default function MasonryColumns({ items, gap = 0 }: { items: Item[]; gap?
 
     let gi = 0; // index global dans la liste
     for (const item of items) {
-      const key = item.kind === 'image' ? `img:${item.src}` : `vid:${item.srcWebm || item.srcMp4}`;
-      const override = item.kind === 'video' ? parseRatio(item.ratio) : undefined;
+      const key =
+        item.kind === 'image'
+          ? `img:${item.src}`
+          : item.kind === 'video'
+          ? `vid:${item.srcWebm || item.srcMp4}`
+          : `vimeo:${item.vimeoId}`;
+      const override =
+        item.kind === 'video' || item.kind === 'vimeo' ? parseRatio(item.ratio) : undefined;
       const r = override ?? ratios[key] ?? 16 / 9;
       const w = colW;
       const h = Math.max(1, Math.round(w / r));
@@ -122,37 +139,56 @@ function MasonryColumn({
 
   return (
     <div className="flex flex-col" style={{ rowGap: gap, width: colW }}>
-      {col.map(({ item, w, h, key, gi }) =>
-        item.kind === 'image' ? (
-          <div key={key} {...(item.blok ? storyblokEditable(item.blok) : {})}>
-            <ZoomableImage
-              src={item.src}
-              alt={item.alt}
-              thumbWidth={w}
-              thumbHeight={h}
-              sizes={`${colW}px`}
-              hoverTitle={item.title}
-              hoverCaption={item.caption}
-              onLoaded={(nw, nh) => setRatios((p) => (p[key] ? p : { ...p, [key]: nw / nh }))}
-              onOpen={() => openAt(gi)}
-            />
-          </div>
-        ) : (
-          <div key={key} {...(item.blok ? storyblokEditable(item.blok) : {})}>
-            <ZoomableVideo
-              srcMp4={item.srcMp4}
-              srcWebm={item.srcWebm}
-              poster={item.poster}
-              width={w}
-              height={h}
-              hoverTitle={item.title}
-              hoverCaption={item.caption}
-              onLoaded={(vw, vh) => setRatios((p) => (p[key] ? p : { ...p, [key]: vw / vh }))}
-              onOpen={() => openAt(gi)}
-            />
-          </div>
-        )
-      )}
+      {col.map(({ item, w, h, key, gi }) => {
+        if (item.kind === 'image') {
+          return (
+            <div key={key} {...(item.blok ? storyblokEditable(item.blok) : {})}>
+              <ZoomableImage
+                src={item.src}
+                alt={item.alt}
+                thumbWidth={w}
+                thumbHeight={h}
+                sizes={`${colW}px`}
+                hoverTitle={item.title}
+                hoverCaption={item.caption}
+                onLoaded={(nw, nh) => setRatios((p) => (p[key] ? p : { ...p, [key]: nw / nh }))}
+                onOpen={() => openAt(gi)}
+              />
+            </div>
+          );
+        } else if (item.kind === 'video') {
+          return (
+            <div key={key} {...(item.blok ? storyblokEditable(item.blok) : {})}>
+              <ZoomableVideo
+                srcMp4={item.srcMp4}
+                srcWebm={item.srcWebm}
+                poster={item.poster}
+                width={w}
+                height={h}
+                hoverTitle={item.title}
+                hoverCaption={item.caption}
+                onLoaded={(vw, vh) => setRatios((p) => (p[key] ? p : { ...p, [key]: vw / vh }))}
+                onOpen={() => openAt(gi)}
+              />
+            </div>
+          );
+        } else if (item.kind === 'vimeo') {
+          return (
+            <div key={key} {...(item.blok ? storyblokEditable(item.blok) : {})}>
+              <ZoomableVimeo
+                vimeoId={item.vimeoId}
+                poster={item.poster}
+                width={w}
+                height={h}
+                hoverTitle={item.title}
+                hoverCaption={item.caption}
+                onOpen={() => openAt(gi)}
+              />
+            </div>
+          );
+        }
+        return null;
+      })}
     </div>
   );
 }
