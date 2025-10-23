@@ -6,3 +6,4 @@ out
 .sass-cache
 *.log
 localhost*
+.md

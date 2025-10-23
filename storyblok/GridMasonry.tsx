@@ -47,9 +47,11 @@ export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
       };
       acc.push(item);
     } else if (c?.component === 'video_item') {
-      const source = c.video_source || 'mp4';
+      // Support Vimeo ET MP4
+      const source = c.video_source || (c.vimeoId ? 'vimeo' : 'mp4');
 
-      if (source === 'vimeo' && c.vimeoId) {
+      // Vidéo Vimeo
+      if ((source === 'vimeo' || c.vimeoId) && c.vimeoId) {
         const item: VimeoVideoItem = {
           kind: 'vimeo',
           vimeoId: c.vimeoId as string,
@@ -61,7 +63,9 @@ export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
           blok: c,
         };
         acc.push(item);
-      } else if (source === 'mp4' && c.srcMp4) {
+      }
+      // Vidéo MP4 (condition moins stricte pour compatibilité)
+      else if (c.srcMp4) {
         const item: VideoItem = {
           kind: 'video',
           srcMp4: c.srcMp4 as string,
@@ -74,6 +78,10 @@ export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
           blok: c,
         };
         acc.push(item);
+      }
+      // Si ni vimeoId ni srcMp4, on affiche quand même (pour debug)
+      else {
+        console.warn('video_item sans vimeoId ni srcMp4:', c);
       }
     }
     return acc;

@@ -11,7 +11,7 @@ export default function ContactPage() {
   };
 
   return (
-    <section className="mx-auto max-w-2xl px-4 text-center py-[clamp(32px,10vh,96px)]">
+    <section className="mx-auto max-w-2xl mt-4 px-4 text-center py-[clamp(32px,10vh,96px)]">
       {/* Texte informations */}
       <h1 className="font-medium text-[clamp(18px,5vw,24px)]">
         Gil Anselmi is a Paris-based photographer and director.
