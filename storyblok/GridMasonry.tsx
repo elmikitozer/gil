@@ -7,6 +7,7 @@ import MasonryColumns, {
   type ImageItem,
   type VideoItem,
   type VimeoVideoItem,
+  type HybridVideoItem,
 } from '@/app/components/MasonryColumns';
 
 type MediaItemBlok = SbBlokData & {
@@ -47,11 +48,24 @@ export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
       };
       acc.push(item);
     } else if (c?.component === 'video_item') {
-      // Support Vimeo ET MP4
-      const source = c.video_source || (c.vimeoId ? 'vimeo' : 'mp4');
-
-      // Vidéo Vimeo
-      if ((source === 'vimeo' || c.vimeoId) && c.vimeoId) {
+      // HYBRIDE : Si les deux sont présents (preview Cloudinary + vidéo complète Vimeo)
+      if (c.srcMp4 && c.vimeoId) {
+        const item: HybridVideoItem = {
+          kind: 'hybrid',
+          srcMp4: c.srcMp4 as string, // Preview pour grille
+          vimeoId: c.vimeoId as string, // Vidéo complète pour lightbox
+          srcWebm: c.srcWebm as string | undefined,
+          poster: c.poster?.filename as string | undefined,
+          alt: c.alt as string | undefined,
+          ratio: c.ratio as string | undefined,
+          title: c.title as string | undefined,
+          caption: c.caption as string | undefined,
+          blok: c,
+        };
+        acc.push(item);
+      }
+      // Vidéo Vimeo uniquement
+      else if (c.vimeoId) {
         const item: VimeoVideoItem = {
           kind: 'vimeo',
           vimeoId: c.vimeoId as string,
@@ -64,7 +78,7 @@ export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
         };
         acc.push(item);
       }
-      // Vidéo MP4 (condition moins stricte pour compatibilité)
+      // Vidéo MP4 uniquement
       else if (c.srcMp4) {
         const item: VideoItem = {
           kind: 'video',
@@ -79,7 +93,7 @@ export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
         };
         acc.push(item);
       }
-      // Si ni vimeoId ni srcMp4, on affiche quand même (pour debug)
+      // Debug
       else {
         console.warn('video_item sans vimeoId ni srcMp4:', c);
       }

@@ -39,7 +39,19 @@ export type VimeoVideoItem = {
   caption?: string;
   blok?: SbBlokData;
 };
-export type Item = ImageItem | VideoItem | VimeoVideoItem;
+export type HybridVideoItem = {
+  kind: 'hybrid';
+  srcMp4: string; // Preview Cloudinary pour grille
+  vimeoId: string; // Vidéo complète Vimeo pour lightbox
+  srcWebm?: string;
+  poster?: string;
+  alt?: string;
+  ratio?: string;
+  title?: string;
+  caption?: string;
+  blok?: SbBlokData;
+};
+export type Item = ImageItem | VideoItem | VimeoVideoItem | HybridVideoItem;
 
 function parseRatio(r?: string): number | undefined {
   if (!r || r === 'auto') return;
@@ -94,9 +106,13 @@ export default function MasonryColumns({ items, gap = 0 }: { items: Item[]; gap?
           ? `img:${item.src}`
           : item.kind === 'video'
           ? `vid:${item.srcWebm || item.srcMp4}`
+          : item.kind === 'hybrid'
+          ? `hybrid:${item.srcMp4}:${item.vimeoId}`
           : `vimeo:${item.vimeoId}`;
       const override =
-        item.kind === 'video' || item.kind === 'vimeo' ? parseRatio(item.ratio) : undefined;
+        item.kind === 'video' || item.kind === 'vimeo' || item.kind === 'hybrid'
+          ? parseRatio(item.ratio)
+          : undefined;
       const r = override ?? ratios[key] ?? 16 / 9;
       const w = colW;
       const h = Math.max(1, Math.round(w / r));
@@ -172,12 +188,28 @@ function MasonryColumn({
               />
             </div>
           );
+        } else if (item.kind === 'hybrid') {
+          // HYBRIDE : Affiche la preview MP4 dans la grille
+          return (
+            <div key={key} {...(item.blok ? storyblokEditable(item.blok) : {})}>
+              <ZoomableVideo
+                srcMp4={item.srcMp4}
+                srcWebm={item.srcWebm}
+                poster={item.poster}
+                width={w}
+                height={h}
+                hoverTitle={item.title}
+                hoverCaption={item.caption}
+                onLoaded={(vw, vh) => setRatios((p) => (p[key] ? p : { ...p, [key]: vw / vh }))}
+                onOpen={() => openAt(gi)}
+              />
+            </div>
+          );
         } else if (item.kind === 'vimeo') {
           return (
             <div key={key} {...(item.blok ? storyblokEditable(item.blok) : {})}>
               <ZoomableVimeo
                 vimeoId={item.vimeoId}
-                poster={item.poster}
                 width={w}
                 height={h}
                 hoverTitle={item.title}

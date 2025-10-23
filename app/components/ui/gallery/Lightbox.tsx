@@ -61,6 +61,19 @@ export default function Lightbox() {
               <source src={it.srcMp4} type="video/mp4" />
             </video>
           </div>
+        ) : it?.kind === 'hybrid' ? (
+          // HYBRIDE : Affiche la vidéo Vimeo complète dans la lightbox
+          <div className="relative h-[min(90vh,50.625vw)] w-[min(90vw,160vh)]">
+            <iframe
+              key={it.vimeoId}
+              src={`https://player.vimeo.com/video/${it.vimeoId}?autoplay=1&title=0&byline=0&portrait=0`}
+              className="w-full h-full"
+              frameBorder="0"
+              allow="autoplay; fullscreen; picture-in-picture"
+              allowFullScreen
+              title={it.title || 'Vidéo complète'}
+            />
+          </div>
         ) : it?.kind === 'vimeo' ? (
           <div className="relative h-[min(90vh,50.625vw)] w-[min(90vw,160vh)]">
             <iframe

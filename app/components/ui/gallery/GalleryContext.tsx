@@ -19,7 +19,17 @@ export type VimeoVideoItem = {
   title?: string;
   ratio?: string;
 };
-export type Item = ImageItem | VideoItem | VimeoVideoItem;
+export type HybridVideoItem = {
+  kind: 'hybrid';
+  srcMp4: string; // Pour la grille (preview Cloudinary)
+  vimeoId: string; // Pour la lightbox (vidéo complète Vimeo)
+  srcWebm?: string;
+  poster?: string;
+  alt?: string;
+  title?: string;
+  ratio?: string;
+};
+export type Item = ImageItem | VideoItem | VimeoVideoItem | HybridVideoItem;
 
 type GalleryAPI = {
   items: Item[];
