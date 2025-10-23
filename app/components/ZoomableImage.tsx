@@ -77,6 +77,7 @@ export default function ZoomableImage({
             fill
             sizes={sizes || `${thumbWidth}px`}
             className="object-cover z-0"
+            loading="lazy"
             onLoad={(event) => {
               const img = event.currentTarget;
               onLoaded?.(img.naturalWidth, img.naturalHeight);

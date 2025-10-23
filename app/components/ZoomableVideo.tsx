@@ -67,11 +67,21 @@ export default function ZoomableVideo({
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
-          if (e.isIntersecting && e.intersectionRatio > 0.35) v.play().catch(() => {});
-          else v.pause();
+          if (e.isIntersecting && e.intersectionRatio > 0.35) {
+            // Charger la vidéo si pas déjà fait
+            if (v.readyState === 0) {
+              v.load();
+            }
+            v.play().catch(() => {});
+          } else {
+            v.pause();
+          }
         }
       },
-      { threshold: [0, 0.35, 1] }
+      { 
+        threshold: [0, 0.35, 1],
+        rootMargin: '50px' // Commence à charger 50px avant d'être visible
+      }
     );
 
     io.observe(el);
@@ -115,7 +125,7 @@ export default function ZoomableVideo({
           loop={loop}
           muted={muted}
           playsInline
-          preload="metadata"
+          preload="none"
           className="absolute inset-0 w-full h-full object-cover z-0"
         >
           {srcWebm && <source src={srcWebm} type="video/webm" />}
