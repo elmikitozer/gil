@@ -9,7 +9,7 @@ import { LightboxNav } from './LightboxNav';
 import { extractVimeoId } from '@/app/utils/vimeo';
 
 export default function Lightbox() {
-  const { isOpen, close, items, index, next, prev } = useGallery();
+  const { isOpen, close, items, index, mode, next, prev, openAt } = useGallery();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -20,11 +20,12 @@ export default function Lightbox() {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[60] bg-white dark:bg-black flex items-center justify-center p-0 lb-anim-fade"
+      className="fixed inset-0 z-[60] bg-white dark:bg-black flex flex-col p-0 lb-anim-fade"
       role="dialog"
       aria-modal="true"
     >
-      <div className="absolute inset-0 grid place-items-center">
+      {/* Contenu principal */}
+      <div className="flex-1 flex items-center justify-center relative">
         {it?.kind === 'image' ? (
           <div className="relative h-full w-full md:h-[90vh] md:w-[90vw]">
             <Image
@@ -111,6 +112,48 @@ export default function Lightbox() {
           })()
         ) : null}
       </div>
+
+      {/* Miniatures en mode carrousel */}
+      {mode === 'carousel' && items.length > 1 && (
+        <div className="flex justify-center p-4 bg-black/20">
+          <div className="flex gap-2 max-w-full overflow-x-auto">
+            {items.map((item, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => openAt(i, 'carousel')}
+                className={`flex-shrink-0 w-16 h-16 rounded overflow-hidden border-2 transition-all ${
+                  i === index
+                    ? 'border-white scale-110'
+                    : 'border-transparent hover:border-white/50'
+                }`}
+              >
+                {item.kind === 'image' ? (
+                  <Image
+                    src={item.src}
+                    alt={item.alt ?? ''}
+                    width={64}
+                    height={64}
+                    className="w-full h-full object-cover"
+                  />
+                ) : item.kind === 'video' || item.kind === 'hybrid' ? (
+                  <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                ) : item.kind === 'vimeo' ? (
+                  <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                ) : null}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Close en haut à droite (tes classes) */}
       <button

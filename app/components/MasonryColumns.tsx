@@ -17,6 +17,9 @@ export type ImageItem = {
   title?: string;
   caption?: string;
   blok?: SbBlokData;
+  // Props pour l'album
+  albumPhotos?: ImageItem[];
+  isCoverPhoto?: boolean;
 };
 export type VideoItem = {
   kind: 'video';
@@ -167,8 +170,16 @@ function MasonryColumn({
                 sizes={`${colW}px`}
                 hoverTitle={item.title}
                 hoverCaption={item.caption}
+                albumPhotos={item.albumPhotos}
+                isCoverPhoto={item.isCoverPhoto}
                 onLoaded={(nw, nh) => setRatios((p) => (p[key] ? p : { ...p, [key]: nw / nh }))}
                 onOpen={() => openAt(gi)}
+                onOpenAlbum={(index) => {
+                  if (item.albumPhotos) {
+                    // Ouvrir la galerie avec toutes les photos de l'album
+                    openAt(index, 'carousel');
+                  }
+                }}
               />
             </div>
           );

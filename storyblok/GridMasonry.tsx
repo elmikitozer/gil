@@ -16,6 +16,9 @@ type MediaItemBlok = SbBlokData & {
   alt?: string;
   title?: string;
   caption?: string;
+  // Champs pour l'album
+  album_photos?: Array<{ filename?: string; alt?: string; title?: string; caption?: string }>;
+  is_cover_photo?: boolean;
 };
 
 type VideoItemBlok = SbBlokData & {
@@ -38,6 +41,20 @@ type GridMasonryBlok = SbBlokData & {
 export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
   const items: Item[] = (blok.items ?? []).reduce<Item[]>((acc, c) => {
     if (c?.component === 'media_item' && c?.media?.filename) {
+      // Traitement des photos d'album
+      let albumPhotos: ImageItem[] | undefined;
+      if (c.album_photos && Array.isArray(c.album_photos)) {
+        albumPhotos = c.album_photos
+          .filter((photo: { filename?: string }) => photo?.filename)
+          .map((photo: { filename?: string; alt?: string; title?: string; caption?: string }) => ({
+            kind: 'image' as const,
+            src: photo.filename!,
+            alt: photo.alt || '',
+            title: photo.title || '',
+            caption: photo.caption || '',
+          }));
+      }
+
       const item: ImageItem = {
         kind: 'image',
         src: c.media.filename as string,
@@ -45,6 +62,8 @@ export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
         title: c.title as string | undefined,
         caption: c.caption as string | undefined,
         blok: c,
+        albumPhotos,
+        isCoverPhoto: c.is_cover_photo === true,
       };
       acc.push(item);
     } else if (c?.component === 'video_item') {

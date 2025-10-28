@@ -5,6 +5,7 @@ import useIsStoryblokEditor from '@/app/components/useIsStoryblokEditor';
 import HoverCover from '@/app/components/ui/HoverCover';
 import Image from 'next/image';
 import LightboxClose from './ui/LightboxClose';
+import type { ImageItem } from './ui/gallery/GalleryContext';
 
 type Props = {
   src: string;
@@ -14,8 +15,12 @@ type Props = {
   sizes?: string;
   onLoaded?: (w: number, h: number) => void;
   onOpen?: () => void;
-  hoverTitle?: string; // ✅ on déclare la prop ici
-  hoverCaption?: string; // ✅ on déclare la prop ici
+  hoverTitle?: string;
+  hoverCaption?: string;
+  // Props pour le mode album
+  albumPhotos?: ImageItem[];
+  isCoverPhoto?: boolean;
+  onOpenAlbum?: (index: number) => void;
 };
 
 export default function ZoomableImage({
@@ -28,6 +33,8 @@ export default function ZoomableImage({
   onOpen,
   hoverTitle,
   hoverCaption,
+  albumPhotos,
+  onOpenAlbum,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [pressed, setPressed] = useState(false);
@@ -48,14 +55,25 @@ export default function ZoomableImage({
   }, [open, onClose]);
 
   const handleClick = (e: React.MouseEvent) => {
-    // En mode Visual Editor, on laisse le clic SERVIR à sélectionner l’élément dans Storyblok
-    // -> ne pas preventDefault / stopPropagation pour que l’événement remonte jusqu’au parent
-    // Astuce: meta/ctrl/shift-click autorise quand même l’ouverture locale si besoin
+    // En mode Visual Editor, on laisse le clic SERVIR à sélectionner l'élément dans Storyblok
+    // -> ne pas preventDefault / stopPropagation pour que l'événement remonte jusqu'au parent
+    // Astuce: meta/ctrl/shift-click autorise quand même l'ouverture locale si besoin
     if (isEditor && !(e.metaKey || e.ctrlKey || e.shiftKey)) return;
+
     setPressed(true);
     setTimeout(() => {
-      if (onOpen) onOpen();
-      else setOpen(true);
+      // Si on a des photos d'album et une fonction d'ouverture d'album, ouvrir en mode carrousel
+      if (albumPhotos && albumPhotos.length > 0 && onOpenAlbum) {
+        // Trouver l'index de cette photo dans l'album
+        const currentIndex = albumPhotos.findIndex((photo) => photo.src === src);
+        if (currentIndex !== -1) {
+          onOpenAlbum(currentIndex);
+        }
+      } else if (onOpen) {
+        onOpen();
+      } else {
+        setOpen(true);
+      }
       setPressed(false);
     }, 90);
   };

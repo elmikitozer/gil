@@ -2,7 +2,13 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-export type ImageItem = { kind: 'image'; src: string; alt?: string; title?: string };
+export type ImageItem = {
+  kind: 'image';
+  src: string;
+  alt?: string;
+  title?: string;
+  caption?: string;
+};
 export type VideoItem = {
   kind: 'video';
   srcMp4: string;
@@ -35,7 +41,8 @@ type GalleryAPI = {
   items: Item[];
   isOpen: boolean;
   index: number;
-  openAt: (i: number) => void;
+  mode: 'zoom' | 'carousel';
+  openAt: (i: number, mode?: 'zoom' | 'carousel') => void;
   close: () => void;
   next: () => void;
   prev: () => void;
@@ -53,9 +60,11 @@ export function GalleryProvider({ items, children }: { items: Item[]; children: 
   const [list] = useState(items);
   const [isOpen, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
+  const [mode, setMode] = useState<'zoom' | 'carousel'>('zoom');
 
-  const openAt = useCallback((i: number) => {
+  const openAt = useCallback((i: number, newMode: 'zoom' | 'carousel' = 'zoom') => {
     setIndex(i);
+    setMode(newMode);
     setOpen(true);
   }, []);
   const close = useCallback(() => setOpen(false), []);
@@ -75,8 +84,8 @@ export function GalleryProvider({ items, children }: { items: Item[]; children: 
   }, [isOpen]);
 
   const value = useMemo(
-    () => ({ items: list, isOpen, index, openAt, close, next, prev }),
-    [list, isOpen, index, openAt, close, next, prev]
+    () => ({ items: list, isOpen, index, mode, openAt, close, next, prev }),
+    [list, isOpen, index, mode, openAt, close, next, prev]
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
