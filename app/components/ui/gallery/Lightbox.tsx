@@ -119,7 +119,7 @@ export default function Lightbox() {
           <div className="flex gap-2 max-w-full overflow-x-auto">
             {items.map((item, i) => (
               <button
-                key={`${i}-${item.src}`}
+                key={`${i}-${item.kind}-${'src' in item ? item.src : item.title ?? 'no-src'}`}
                 type="button"
                 onClick={() => openAt(i)}
                 className={`flex-shrink-0 w-16 h-16 rounded overflow-hidden border-2 transition-all ${
