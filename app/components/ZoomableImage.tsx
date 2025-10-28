@@ -36,7 +36,7 @@ export default function ZoomableImage({
     // -> ne pas preventDefault / stopPropagation pour que l'événement remonte jusqu'au parent
     // Astuce: meta/ctrl/shift-click autorise quand même l'ouverture locale si besoin
     if (isEditor && !(e.metaKey || e.ctrlKey || e.shiftKey)) return;
-    
+
     setPressed(true);
     setTimeout(() => {
       if (onOpen) {

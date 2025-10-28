@@ -174,11 +174,22 @@ function MasonryColumn({
                 onOpen={() => {
                   if (item.albumPhotos && item.albumPhotos.length > 0) {
                     // Trouver l'index de cette photo dans l'album
-                    const albumIndex = item.albumPhotos.findIndex(photo => photo.src === item.src);
+                    const albumIndex = item.albumPhotos.findIndex(
+                      (photo) => photo.src === item.src
+                    );
                     openAlbum(item.albumPhotos, albumIndex >= 0 ? albumIndex : 0);
                   } else {
-                    // Fallback si pas d'album (ne devrait plus arriver)
-                    openAt(gi);
+                    // Si pas d'album, créer un carrousel avec juste cette photo
+                    const singlePhotoAlbum = [
+                      {
+                        kind: 'image' as const,
+                        src: item.src,
+                        alt: item.alt || '',
+                        title: item.title || '',
+                        caption: item.caption || '',
+                      },
+                    ];
+                    openAlbum(singlePhotoAlbum, 0);
                   }
                 }}
               />

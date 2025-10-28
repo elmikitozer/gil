@@ -66,19 +66,22 @@ export function GalleryProvider({ items, children }: { items: Item[]; children: 
     setIndex(i);
     setOpen(true);
   }, []);
-  
+
   const openAlbum = useCallback((albumItems: Item[], startIndex: number) => {
     setCurrentItems(albumItems);
     setIndex(startIndex);
     setOpen(true);
   }, []);
-  
+
   const close = useCallback(() => {
     setOpen(false);
     setCurrentItems(originalItems); // Restaurer les items originaux
   }, [originalItems]);
-  
-  const next = useCallback(() => setIndex((i) => (i + 1) % currentItems.length), [currentItems.length]);
+
+  const next = useCallback(
+    () => setIndex((i) => (i + 1) % currentItems.length),
+    [currentItems.length]
+  );
   const prev = useCallback(
     () => setIndex((i) => (i - 1 + currentItems.length) % currentItems.length),
     [currentItems.length]

@@ -115,11 +115,11 @@ export default function Lightbox() {
 
       {/* Miniatures en mode carrousel */}
       {items.length > 1 && (
-        <div className="flex justify-center p-4 bg-black/20">
+        <div className="flex justify-center p-4 bg-transparent">
           <div className="flex gap-2 max-w-full overflow-x-auto">
             {items.map((item, i) => (
               <button
-                key={i}
+                key={`${i}-${item.src}`}
                 type="button"
                 onClick={() => openAt(i)}
                 className={`flex-shrink-0 w-16 h-16 rounded overflow-hidden border-2 transition-all ${
