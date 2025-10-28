@@ -2,7 +2,7 @@
 
 ## Fonctionnalité implémentée
 
-✅ **Mode carrousel avec miniatures** : Au lieu du zoom, les photos s'ouvrent maintenant en carrousel avec des miniatures en bas.
+✅ **Mode carrousel avec miniatures** : Toutes les photos s'ouvrent maintenant en carrousel avec des miniatures en bas.
 
 ✅ **Navigation** : Flèches + miniatures cliquables + navigation clavier.
 
@@ -14,30 +14,22 @@
 
 Dans Storyblok, allez dans **Components** > **media_item** et ajoutez ces champs :
 
-#### Champ `album_photos` (Asset - Multi-select)
-
+#### Champ `album_photos` (Multi-asset)
 - **Field name** : `album_photos`
-- **Type** : Asset
-- **Multiple** : ✅ Oui
+- **Type** : **Multi-asset**
 - **Description** : "Sélectionnez toutes les photos qui appartiennent à cet album"
 
-#### Champ `is_cover_photo` (Boolean)
-
+#### Champ `is_cover_photo` (Boolean) - Optionnel
 - **Field name** : `is_cover_photo`
 - **Type** : Boolean
 - **Description** : "Cochez si cette photo est la photo de couverture de l'album"
 
 ### 2. Comment utiliser
 
-1. **Pour une photo normale** (comportement zoom classique) :
-
-   - Laissez `album_photos` vide
-   - Pas besoin de cocher `is_cover_photo`
-
-2. **Pour une photo d'album** (comportement carrousel) :
-   - Sélectionnez toutes les photos de l'album dans `album_photos`
-   - Cochez `is_cover_photo` si c'est la photo de couverture
-   - Quand on clique sur cette photo, elle ouvrira le carrousel avec toutes les photos de l'album
+**Pour chaque photo d'album** :
+- Sélectionnez toutes les photos de l'album dans `album_photos` (Multi-asset)
+- Optionnel : Cochez `is_cover_photo` si c'est la photo de couverture
+- Quand on clique sur cette photo, elle ouvrira le carrousel avec toutes les photos de l'album
 
 ### 3. Exemple d'utilisation
 
@@ -60,11 +52,10 @@ Dans Storyblok, allez dans **Components** > **media_item** et ajoutez ces champs
 1. Configurez quelques photos avec des albums dans Storyblok
 2. Publiez les changements
 3. Testez en cliquant sur les photos configurées comme albums
-4. Vérifiez que les photos normales gardent le comportement zoom
+4. Vérifiez que le carrousel s'ouvre avec toutes les photos de l'album
 
-## Retour en arrière
+## Important
 
-Si vous voulez désactiver cette fonctionnalité temporairement :
-
-- Laissez simplement `album_photos` vide sur toutes les photos
-- Elles retrouveront le comportement zoom classique
+- **Toutes les photos** doivent maintenant avoir des albums configurés
+- **Plus de mode zoom** : Toutes les photos s'ouvrent en carrousel
+- **Champ obligatoire** : `album_photos` doit être rempli pour chaque photo

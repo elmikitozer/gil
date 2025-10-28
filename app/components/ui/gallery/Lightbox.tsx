@@ -9,7 +9,7 @@ import { LightboxNav } from './LightboxNav';
 import { extractVimeoId } from '@/app/utils/vimeo';
 
 export default function Lightbox() {
-  const { isOpen, close, items, index, mode, next, prev, openAt } = useGallery();
+  const { isOpen, close, items, index, next, prev, openAt } = useGallery();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -114,14 +114,14 @@ export default function Lightbox() {
       </div>
 
       {/* Miniatures en mode carrousel */}
-      {mode === 'carousel' && items.length > 1 && (
+      {items.length > 1 && (
         <div className="flex justify-center p-4 bg-black/20">
           <div className="flex gap-2 max-w-full overflow-x-auto">
             {items.map((item, i) => (
               <button
                 key={i}
                 type="button"
-                onClick={() => openAt(i, 'carousel')}
+                onClick={() => openAt(i)}
                 className={`flex-shrink-0 w-16 h-16 rounded overflow-hidden border-2 transition-all ${
                   i === index
                     ? 'border-white scale-110'

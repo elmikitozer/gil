@@ -154,7 +154,7 @@ function MasonryColumn({
   gap: number;
   setRatios: React.Dispatch<React.SetStateAction<Record<string, number>>>;
 }) {
-  const { openAt } = useGallery();
+  const { openAt, openAlbum } = useGallery();
 
   return (
     <div className="flex flex-col" style={{ rowGap: gap, width: colW }}>
@@ -170,14 +170,15 @@ function MasonryColumn({
                 sizes={`${colW}px`}
                 hoverTitle={item.title}
                 hoverCaption={item.caption}
-                albumPhotos={item.albumPhotos}
-                isCoverPhoto={item.isCoverPhoto}
                 onLoaded={(nw, nh) => setRatios((p) => (p[key] ? p : { ...p, [key]: nw / nh }))}
-                onOpen={() => openAt(gi)}
-                onOpenAlbum={(index) => {
-                  if (item.albumPhotos) {
-                    // Ouvrir la galerie avec toutes les photos de l'album
-                    openAt(index, 'carousel');
+                onOpen={() => {
+                  if (item.albumPhotos && item.albumPhotos.length > 0) {
+                    // Trouver l'index de cette photo dans l'album
+                    const albumIndex = item.albumPhotos.findIndex(photo => photo.src === item.src);
+                    openAlbum(item.albumPhotos, albumIndex >= 0 ? albumIndex : 0);
+                  } else {
+                    // Fallback si pas d'album (ne devrait plus arriver)
+                    openAt(gi);
                   }
                 }}
               />

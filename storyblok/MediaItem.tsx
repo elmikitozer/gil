@@ -31,10 +31,12 @@ export default async function MediaItem({ blok }: any) {
       <ZoomableImage
         src={versionUrl(file, bump)}
         alt={alt}
-        albumPhotos={albumPhotos}
-        isCoverPhoto={isCoverPhoto}
         hoverTitle={blok?.title}
         hoverCaption={blok?.caption}
+        onOpen={() => {
+          // Cette fonction sera appelée par ZoomableImage mais ne sera pas utilisée
+          // car MasonryColumns gère l'ouverture de l'album
+        }}
       />
       {blok?.caption && (
         <figcaption className="mt-2 text-sm text-[--color-muted]">{blok.caption}</figcaption>
