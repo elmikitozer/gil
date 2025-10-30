@@ -24,6 +24,16 @@ export default function Lightbox() {
   );
   useEffect(() => setMounted(true), []);
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as Window & { __LB_DISABLE_SWIPE?: boolean }).__LB_DISABLE_SWIPE = true;
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        (window as Window & { __LB_DISABLE_SWIPE?: boolean }).__LB_DISABLE_SWIPE = false;
+      }
+    };
+  }, []);
+  useEffect(() => {
     const onResize = () =>
       setViewportWidth(typeof window !== 'undefined' ? window.innerWidth : 1000);
     window.addEventListener('resize', onResize);
@@ -108,8 +118,10 @@ export default function Lightbox() {
               }
               setDisableTransition(true);
               setDragX(0);
-              setNeighborIndex(null);
-              requestAnimationFrame(() => setDisableTransition(false));
+              requestAnimationFrame(() => {
+                setNeighborIndex(null);
+                setDisableTransition(false);
+              });
             }, 180);
           } else {
             setDragX(0);
@@ -229,7 +241,7 @@ export default function Lightbox() {
             <div
               className="pointer-events-none absolute inset-0"
               style={{
-                transform: `translateX(${dragX + (dragX < 0 ? viewportWidth : -viewportWidth)}px)`,
+                transform: `translateX(${dragX < 0 ? viewportWidth : -viewportWidth}px)`,
                 transition:
                   isDragging || disableTransition
                     ? 'none'
@@ -339,7 +351,7 @@ export default function Lightbox() {
         </svg>
       </button>
 
-      {/* Flèches visibles + clavier + swipe (zones 1/3 supprimées de ton LightboxNav) */}
+      {/* Flèches visibles + clavier */}
       <LightboxNav
         onNext={() => {
           const candidate = index + 1;
@@ -350,8 +362,10 @@ export default function Lightbox() {
             next();
             setDisableTransition(true);
             setDragX(0);
-            setNeighborIndex(null);
-            requestAnimationFrame(() => setDisableTransition(false));
+            requestAnimationFrame(() => {
+              setNeighborIndex(null);
+              setDisableTransition(false);
+            });
           }, 180);
         }}
         onPrev={() => {
@@ -363,8 +377,10 @@ export default function Lightbox() {
             prev();
             setDisableTransition(true);
             setDragX(0);
-            setNeighborIndex(null);
-            requestAnimationFrame(() => setDisableTransition(false));
+            requestAnimationFrame(() => {
+              setNeighborIndex(null);
+              setDisableTransition(false);
+            });
           }, 180);
         }}
       />

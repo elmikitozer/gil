@@ -5,10 +5,12 @@ export function LightboxNav({
   onNext,
   onPrev,
   label,
+  disableSwipe,
 }: {
   onNext: () => void;
   onPrev: () => void;
   label?: string;
+  disableSwipe?: boolean;
 }) {
   // clavier
   useEffect(() => {
@@ -27,6 +29,12 @@ export function LightboxNav({
   const THRESHOLD = 48;
 
   useEffect(() => {
+    if (disableSwipe) return;
+    if (
+      typeof window !== 'undefined' &&
+      (window as Window & { __LB_DISABLE_SWIPE?: boolean }).__LB_DISABLE_SWIPE
+    )
+      return;
     const onPointerDown = (e: PointerEvent) => {
       const target = e.target as HTMLElement;
       // Vérifier si on clique sur une vidéo, iframe ou leurs contrôles
@@ -68,7 +76,7 @@ export function LightboxNav({
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
     };
-  }, [onNext, onPrev]);
+  }, [onNext, onPrev, disableSwipe]);
 
   return (
     <div className="pointer-events-none">
