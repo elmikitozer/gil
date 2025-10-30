@@ -19,6 +19,7 @@ export default function Lightbox() {
   const lastX = useRef<number | null>(null);
   const incomingFrom = useRef<number | null>(null);
   const [neighborIndex, setNeighborIndex] = useState<number | null>(null);
+  const [renderIndex, setRenderIndex] = useState<number>(index);
   const [viewportWidth, setViewportWidth] = useState<number>(
     typeof window !== 'undefined' ? window.innerWidth : 1000
   );
@@ -62,7 +63,7 @@ export default function Lightbox() {
   if (!mounted || !isOpen) return null;
 
   // Typage explicite : pas de `any`
-  const it: Item | undefined = items[index];
+  const it: Item | undefined = items[renderIndex];
 
   return createPortal(
     <div
@@ -88,12 +89,10 @@ export default function Lightbox() {
           const dx = e.clientX - startX.current;
           setDragX(dx);
           lastX.current = e.clientX;
-          const dir = dx < 0 ? 1 : -1; // 1 => next, -1 => prev
-          const candidate = index + dir;
-          if (candidate >= 0 && candidate < items.length) {
-            setNeighborIndex(candidate);
-          } else {
-            setNeighborIndex(null);
+          if (items.length > 1) {
+            const dir = dx < 0 ? 1 : -1; // 1 => next, -1 => prev
+            const wrapped = (index + dir + items.length) % items.length;
+            setNeighborIndex(wrapped);
           }
         }}
         onPointerUp={(e) => {
@@ -108,7 +107,8 @@ export default function Lightbox() {
           if (shouldSwipe) {
             const direction = dx > 0 ? 1 : -1; // 1 => go prev, -1 => go next
             const candidate = index - direction;
-            if (candidate >= 0 && candidate < items.length) setNeighborIndex(candidate);
+            const wrapped = (candidate + items.length) % items.length;
+            if (items.length > 1) setNeighborIndex(wrapped);
             setDragX(direction * viewportWidth);
             setTimeout(() => {
               if (direction > 0) {
@@ -119,10 +119,11 @@ export default function Lightbox() {
               setDisableTransition(true);
               setDragX(0);
               requestAnimationFrame(() => {
+                setRenderIndex(wrapped);
                 setNeighborIndex(null);
                 setDisableTransition(false);
               });
-            }, 180);
+            }, 260);
           } else {
             setDragX(0);
             setNeighborIndex(null);
@@ -146,7 +147,7 @@ export default function Lightbox() {
             transition:
               isDragging || disableTransition
                 ? 'none'
-                : 'transform 180ms cubic-bezier(0.4,0.8,0.4,1)',
+                : 'transform 260ms cubic-bezier(0.4,0.8,0.4,1)',
             willChange: 'transform',
             touchAction: 'pan-y',
           }}
@@ -245,7 +246,7 @@ export default function Lightbox() {
                 transition:
                   isDragging || disableTransition
                     ? 'none'
-                    : 'transform 180ms cubic-bezier(0.4,0.8,0.4,1)',
+                    : 'transform 260ms cubic-bezier(0.4,0.8,0.4,1)',
                 willChange: 'transform',
               }}
             >
@@ -354,34 +355,34 @@ export default function Lightbox() {
       {/* Flèches visibles + clavier */}
       <LightboxNav
         onNext={() => {
-          const candidate = index + 1;
-          if (candidate >= items.length) return;
-          setNeighborIndex(candidate);
+          const candidate = (index + 1) % items.length;
+          if (items.length > 1) setNeighborIndex(candidate);
           setDragX(-viewportWidth);
           setTimeout(() => {
             next();
             setDisableTransition(true);
             setDragX(0);
             requestAnimationFrame(() => {
+              setRenderIndex(candidate);
               setNeighborIndex(null);
               setDisableTransition(false);
             });
-          }, 180);
+          }, 260);
         }}
         onPrev={() => {
-          const candidate = index - 1;
-          if (candidate < 0) return;
-          setNeighborIndex(candidate);
+          const candidate = (index - 1 + items.length) % items.length;
+          if (items.length > 1) setNeighborIndex(candidate);
           setDragX(viewportWidth);
           setTimeout(() => {
             prev();
             setDisableTransition(true);
             setDragX(0);
             requestAnimationFrame(() => {
+              setRenderIndex(candidate);
               setNeighborIndex(null);
               setDisableTransition(false);
             });
-          }, 180);
+          }, 260);
         }}
       />
     </div>,
