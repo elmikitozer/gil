@@ -73,7 +73,7 @@ export default function Lightbox() {
     >
       {/* Contenu principal */}
       <div
-        className="flex-1 flex items-center justify-center relative pb-20"
+        className="flex-1 flex items-center justify-center relative pb-0 md:pb-24"
         onPointerDown={(e) => {
           // Only start dragging with the primary pointer (touch/mouse), not pen/others
           if (e.pointerType && e.pointerType !== 'touch' && e.pointerType !== 'mouse') return;
@@ -294,7 +294,7 @@ export default function Lightbox() {
 
       {/* Miniatures en mode carrousel */}
       {items.length > 1 && (
-        <div className="absolute bottom-0 left-0 right-0 z-10 flex justify-center py-4 bg-transparent h-24">
+        <div className="absolute bottom-0 left-0 right-0 z-10 hidden md:flex justify-center py-4 bg-transparent h-24">
           <div className="flex gap-2 max-w-full overflow-x-auto">
             {items.map((item, i) => (
               <button
