@@ -1,7 +1,7 @@
 import ZoomableImage from '@/app/components/ZoomableImage';
 import { storyblokEditable } from '@storyblok/react/rsc';
 import { getAssetBump, versionUrl } from '@/lib/asset-version';
-import type { ImageItem } from '@/app/components/ui/gallery/GalleryContext';
+import type { Item } from '@/app/components/ui/gallery/GalleryContext';
 
 export default async function MediaItem({ blok }: any) {
   const file = blok?.media?.filename;
@@ -10,18 +10,35 @@ export default async function MediaItem({ blok }: any) {
 
   const bump = await getAssetBump();
 
-  // Traitement des photos d'album depuis Storyblok
-  let albumPhotos: ImageItem[] | undefined;
+  // Traitement des photos/vidéos d'album depuis Storyblok
+  let albumPhotos: Item[] | undefined;
   if (blok?.album_photos && Array.isArray(blok.album_photos)) {
     albumPhotos = blok.album_photos
       .filter((photo: any) => photo?.filename)
-      .map((photo: any) => ({
-        kind: 'image' as const,
-        src: versionUrl(photo.filename, bump),
-        alt: photo.alt || '',
-        title: photo.title || '',
-        caption: photo.caption || '',
-      }));
+      .map((photo: any) => {
+        const filename = photo.filename;
+        const isVideo = filename.endsWith('.mp4') || filename.endsWith('.webm') || filename.endsWith('.mov');
+        
+        if (isVideo) {
+          // C'est une vidéo
+          return {
+            kind: 'video' as const,
+            srcMp4: versionUrl(filename, bump),
+            poster: photo.poster ? versionUrl(photo.poster, bump) : undefined,
+            alt: photo.alt || '',
+            title: photo.title || '',
+          };
+        } else {
+          // C'est une image
+          return {
+            kind: 'image' as const,
+            src: versionUrl(filename, bump),
+            alt: photo.alt || '',
+            title: photo.title || '',
+            caption: photo.caption || '',
+          };
+        }
+      });
   }
 
   const isCoverPhoto = blok?.is_cover_photo === true;

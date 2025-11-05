@@ -41,6 +41,11 @@ export default function Lightbox() {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
+  // Synchronize renderIndex with index when it changes from outside (like openAt)
+  useEffect(() => {
+    setRenderIndex(index);
+  }, [index]);
+
   // After index changes (next/prev), if we swiped, animate the new media from the opposite side
   useEffect(() => {
     if (!mounted) return;
@@ -73,7 +78,11 @@ export default function Lightbox() {
     >
       {/* Contenu principal */}
       <div
-        className="flex-1 flex items-center justify-center relative pb-0 md:pb-24"
+        className="flex-1 flex items-center justify-center relative"
+        style={{
+          paddingTop: items.length > 1 ? '0rem' : '0',
+          paddingBottom: items.length > 1 ? '5rem' : '0',
+        }}
         onPointerDown={(e) => {
           // Only start dragging with the primary pointer (touch/mouse), not pen/others
           if (e.pointerType && e.pointerType !== 'touch' && e.pointerType !== 'mouse') return;
@@ -141,7 +150,7 @@ export default function Lightbox() {
         }}
       >
         <div
-          className="relative h-full w-full"
+          className="relative h-full w-full flex items-center justify-center"
           style={{
             transform: `translateX(${dragX}px)`,
             transition:
@@ -153,18 +162,18 @@ export default function Lightbox() {
           }}
         >
           {it?.kind === 'image' ? (
-            <div className="relative h-full w-full md:h-[90vh] md:w-[90vw]">
+            <div className="relative h-[80vh] w-[80vw]">
               <Image
                 src={it.src}
                 alt={it.alt ?? ''}
                 fill
-                sizes="90vw"
+                sizes="80vw"
                 className="object-contain"
                 priority
               />
             </div>
           ) : it?.kind === 'video' ? (
-            <div className="relative h-full w-full md:h-[90vh] md:w-[90vw]">
+            <div className="relative h-[80vh] w-[80vw]">
               <video
                 key={it.srcMp4} // Force re-render when video changes
                 className="h-full w-full object-contain"
@@ -203,7 +212,7 @@ export default function Lightbox() {
                 </div>
               ) : (
                 // Fallback : afficher le MP4 si vimeoId invalide
-                <div className="relative h-full w-full md:h-[90vh] md:w-[90vw]">
+                <div className="relative h-[80vh] w-[80vw]">
                   <video
                     key={it.srcMp4}
                     className="h-full w-full object-contain"
@@ -255,7 +264,7 @@ export default function Lightbox() {
                 if (!nit) return null;
                 if (nit.kind === 'image') {
                   return (
-                    <div className="relative h-full w-full md:h-[90vh] md:w-[90vw]">
+                    <div className="relative h-[80vh] w-[80vw]">
                       <Image
                         src={nit.src}
                         alt={nit.alt ?? ''}
@@ -269,7 +278,7 @@ export default function Lightbox() {
                 }
                 if (nit.kind === 'video' || nit.kind === 'hybrid') {
                   return (
-                    <div className="relative h-full w-full md:h-[90vh] md:w-[90vw]">
+                    <div className="relative h-[80vh] w-[80vw]">
                       <div className="h-full w-full bg-black/60 flex items-center justify-center text-white/70 text-sm">
                         {nit.title ?? 'Media'}
                       </div>
@@ -300,7 +309,12 @@ export default function Lightbox() {
               <button
                 key={`${i}-${item.kind}-${'src' in item ? item.src : item.title ?? 'no-src'}`}
                 type="button"
-                onClick={() => openAt(i)}
+                onClick={() => {
+                  setDragX(0);
+                  setNeighborIndex(null);
+                  setDisableTransition(false);
+                  openAt(i);
+                }}
                 className={`flex-shrink-0 w-16 h-16 rounded overflow-hidden border-2 transition-all ${
                   i === index
                     ? 'border-white scale-110'
@@ -315,17 +329,56 @@ export default function Lightbox() {
                     height={64}
                     className="w-full h-full object-cover"
                   />
-                ) : item.kind === 'video' || item.kind === 'hybrid' ? (
-                  <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
+                ) : item.kind === 'video' ? (
+                  <div className="relative w-full h-full bg-gray-800">
+                    {item.poster ? (
+                      <Image
+                        src={item.poster}
+                        alt={item.title ?? 'Vidéo'}
+                        width={64}
+                        height={64}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : null}
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                      <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </div>
+                  </div>
+                ) : item.kind === 'hybrid' ? (
+                  <div className="relative w-full h-full bg-gray-800">
+                    {item.poster ? (
+                      <Image
+                        src={item.poster}
+                        alt={item.title ?? 'Vidéo'}
+                        width={64}
+                        height={64}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : null}
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                      <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </div>
                   </div>
                 ) : item.kind === 'vimeo' ? (
-                  <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
+                  <div className="relative w-full h-full bg-gray-800">
+                    {item.poster ? (
+                      <Image
+                        src={item.poster}
+                        alt={item.title ?? 'Vimeo'}
+                        width={64}
+                        height={64}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : null}
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                      <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </div>
                   </div>
                 ) : null}
               </button>
