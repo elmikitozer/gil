@@ -127,10 +127,10 @@ export default async function MediaItem({ blok }: any) {
             };
           }
         }
-        
+
         return null;
       });
-    
+
     // Filtrer les null et typer correctement
     albumPhotos = mapped.filter((item): item is Item => item !== null);
   }

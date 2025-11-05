@@ -41,18 +41,71 @@ type GridMasonryBlok = SbBlokData & {
 export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
   const items: Item[] = (blok.items ?? []).reduce<Item[]>((acc, c) => {
     if (c?.component === 'media_item' && c?.media?.filename) {
-      // Traitement des photos d'album
-      let albumPhotos: ImageItem[] | undefined;
+      // Traitement des photos d'album et vidéos
+      let albumPhotos: Item[] | undefined;
+      
+      // Fusionner album_photos (Multi-Assets) et album_videos (Blocks video_item)
+      const allMedia: any[] = [];
+      
+      // Ajouter les photos du Multi-Assets
       if (c.album_photos && Array.isArray(c.album_photos)) {
-        albumPhotos = c.album_photos
-          .filter((photo: { filename?: string }) => photo?.filename)
-          .map((photo: { filename?: string; alt?: string; title?: string; caption?: string }) => ({
-            kind: 'image' as const,
-            src: photo.filename!,
-            alt: photo.alt || '',
-            title: photo.title || '',
-            caption: photo.caption || '',
-          }));
+        allMedia.push(...c.album_photos);
+      }
+      
+      // Ajouter les vidéos du champ album_videos (blocs video_item)
+      if ((c as any).album_videos && Array.isArray((c as any).album_videos)) {
+        allMedia.push(...(c as any).album_videos);
+      }
+      
+      if (allMedia.length > 0) {
+        const mapped = allMedia
+          .filter((photo: any) => photo?.filename || photo?.srcMp4 || photo?.vimeoId)
+          .map((photo: any): Item | null => {
+            // Bloc video_item (HYBRID)
+            if (photo.component === 'video_item' && photo.srcMp4 && photo.vimeoId) {
+              return {
+                kind: 'hybrid' as const,
+                srcMp4: photo.srcMp4,
+                vimeoId: photo.vimeoId,
+                poster: photo.poster?.filename,
+                alt: photo.alt,
+                title: photo.title,
+              };
+            }
+            // Bloc video_item (Vimeo seul)
+            if (photo.component === 'video_item' && photo.vimeoId && !photo.srcMp4) {
+              return {
+                kind: 'vimeo' as const,
+                vimeoId: photo.vimeoId,
+                poster: photo.poster?.filename,
+                alt: photo.alt,
+                title: photo.title,
+              };
+            }
+            // Bloc video_item (Cloudinary/MP4 seul)
+            if (photo.component === 'video_item' && photo.srcMp4 && !photo.vimeoId) {
+              return {
+                kind: 'video' as const,
+                srcMp4: photo.srcMp4,
+                poster: photo.poster?.filename,
+                alt: photo.alt,
+                title: photo.title,
+              };
+            }
+            // Image normale
+            if (photo.filename) {
+              return {
+                kind: 'image' as const,
+                src: photo.filename,
+                alt: photo.alt || '',
+                title: photo.title || '',
+                caption: photo.caption || '',
+              };
+            }
+            return null;
+          });
+        
+        albumPhotos = mapped.filter((item): item is Item => item !== null);
       }
 
       const item: ImageItem = {

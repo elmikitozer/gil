@@ -17,8 +17,8 @@ export type ImageItem = {
   title?: string;
   caption?: string;
   blok?: SbBlokData;
-  // Props pour l'album
-  albumPhotos?: ImageItem[];
+  // Props pour l'album (peut contenir images + vidéos)
+  albumPhotos?: Item[];
   isCoverPhoto?: boolean;
 };
 export type VideoItem = {
@@ -175,7 +175,7 @@ function MasonryColumn({
                   if (item.albumPhotos && item.albumPhotos.length > 0) {
                     // Trouver l'index de cette photo dans l'album
                     const albumIndex = item.albumPhotos.findIndex(
-                      (photo) => photo.src === item.src
+                      (photo) => photo.kind === 'image' && photo.src === item.src
                     );
                     openAlbum(item.albumPhotos, albumIndex >= 0 ? albumIndex : 0);
                   } else {
