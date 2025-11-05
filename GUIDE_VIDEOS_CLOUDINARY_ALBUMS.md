@@ -15,18 +15,19 @@ Pour chaque item que vous ajoutez dans `album_photos`, vous pouvez maintenant ut
 
 #### Champs disponibles (optionnels selon le type) :
 
-| Champ | Type | Description | Obligatoire pour |
-|-------|------|-------------|------------------|
-| `cloudinary_url` | Text | URL complète Cloudinary | Vidéo Cloudinary / Hybrid |
-| `vimeo_id` | Text | ID de la vidéo Vimeo | Vidéo Vimeo / Hybrid |
-| `poster` | Asset | Image thumbnail | Optionnel (recommandé) |
-| `title` | Text | Titre du média | Optionnel |
-| `alt` | Text | Texte alternatif | Optionnel |
-| `filename` | Asset | Image ou vidéo Storyblok | Images / Vidéos assets |
+| Champ            | Type  | Description              | Obligatoire pour          |
+| ---------------- | ----- | ------------------------ | ------------------------- |
+| `cloudinary_url` | Text  | URL complète Cloudinary  | Vidéo Cloudinary / Hybrid |
+| `vimeo_id`       | Text  | ID de la vidéo Vimeo     | Vidéo Vimeo / Hybrid      |
+| `poster`         | Asset | Image thumbnail          | Optionnel (recommandé)    |
+| `title`          | Text  | Titre du média           | Optionnel                 |
+| `alt`            | Text  | Texte alternatif         | Optionnel                 |
+| `filename`       | Asset | Image ou vidéo Storyblok | Images / Vidéos assets    |
 
 ### Étape 2 : Types de médias supportés
 
 #### Type 1 : Image (classique)
+
 ```
 album_photos: [
   {
@@ -38,6 +39,7 @@ album_photos: [
 ```
 
 #### Type 2 : Vidéo Cloudinary seule
+
 ```
 album_photos: [
   {
@@ -50,6 +52,7 @@ album_photos: [
 ```
 
 #### Type 3 : Vidéo Hybrid (Cloudinary + Vimeo) 🏆
+
 **Le meilleur mode pour le plan gratuit !**
 
 ```
@@ -65,10 +68,12 @@ album_photos: [
 ```
 
 **Comment ça marche :**
+
 - Dans le **carrousel** (miniatures) : Affiche le preview Cloudinary
 - Dans le **lightbox** (plein écran) : Charge la vidéo complète Vimeo
 
 #### Type 4 : Vidéo Vimeo seule
+
 ```
 album_photos: [
   {
@@ -81,6 +86,7 @@ album_photos: [
 ```
 
 #### Type 5 : Vidéo depuis assets Storyblok
+
 ```
 album_photos: [
   {
@@ -146,6 +152,7 @@ Puis uploadez le preview sur Cloudinary.
 ### 4. Configurer dans Storyblok
 
 Dans `album_photos`, ajoutez un nouvel item avec :
+
 - `cloudinary_url` : URL du preview court Cloudinary
 - `vimeo_id` : ID Vimeo de la vidéo complète
 - `poster` : Screenshot de la vidéo (optionnel)
@@ -153,20 +160,24 @@ Dans `album_photos`, ajoutez un nouvel item avec :
 ## ⚙️ Nouvelles fonctionnalités du carrousel
 
 ### Touche Échap
+
 Appuyez sur **Échap** pour fermer le lightbox/carrousel instantanément.
 
 ### Transitions améliorées
+
 - ✅ Plus de bugs de mauvaise image affichée
 - ✅ Synchronisation corrigée entre les miniatures et l'affichage principal
 - ✅ Transitions fluides entre images et vidéos
 
 ### Miniatures vidéo
+
 - Les vidéos affichent maintenant leur `poster` dans les miniatures
 - Icône "play" superposée pour indiquer que c'est une vidéo
 
 ## 🚨 Limites du plan gratuit
 
 ### Cloudinary Free
+
 - **Bande passante** : 25 GB/mois
 - **Stockage** : 25 GB
 - **Transformations** : 25 crédits/mois
@@ -174,6 +185,7 @@ Appuyez sur **Échap** pour fermer le lightbox/carrousel instantanément.
 **Astuce** : Utilisez des previews courts (10s, basse qualité) pour économiser !
 
 ### Vimeo Free
+
 - **Stockage** : 5 GB total
 - **Upload** : 500 MB/semaine
 
@@ -183,26 +195,29 @@ Appuyez sur **Échap** pour fermer le lightbox/carrousel instantanément.
 
 Exemple pour 10 projets avec vidéo chacun :
 
-| Type | Taille | Cloudinary | Vimeo |
-|------|--------|------------|-------|
-| Preview 10s (480p) | 5 MB | 50 MB | 0 MB |
-| Vidéo complète (1080p) | 200 MB | 0 MB | 2 GB |
-| **Total** | — | **50 MB** | **2 GB** |
+| Type                   | Taille | Cloudinary | Vimeo    |
+| ---------------------- | ------ | ---------- | -------- |
+| Preview 10s (480p)     | 5 MB   | 50 MB      | 0 MB     |
+| Vidéo complète (1080p) | 200 MB | 0 MB       | 2 GB     |
+| **Total**              | —      | **50 MB**  | **2 GB** |
 
 ✅ Largement dans les limites gratuites !
 
 ## 🐛 Dépannage
 
 ### La vidéo ne se charge pas
+
 1. Vérifiez l'URL Cloudinary (doit être publique)
 2. Testez l'URL directement dans un nouvel onglet
 3. Vérifiez la console du navigateur pour les erreurs CORS
 
 ### La miniature n'apparaît pas
+
 1. Ajoutez un champ `poster` avec une image
 2. Vérifiez que l'image est bien uploadée dans Storyblok
 
 ### La vidéo lag dans le carrousel
+
 1. Réduisez la durée du preview Cloudinary (8-10s max)
 2. Réduisez la qualité : `q_auto:low` dans l'URL
 3. Exemple : `https://res.cloudinary.com/.../q_auto:low/v123/video.mp4`
@@ -210,6 +225,7 @@ Exemple pour 10 projets avec vidéo chacun :
 ## 📝 Notes techniques
 
 ### Détection automatique du type
+
 Le code détecte automatiquement le type en fonction des champs présents :
 
 1. `cloudinary_url` + `vimeo_id` → **Hybrid**
@@ -219,7 +235,9 @@ Le code détecte automatiquement le type en fonction des champs présents :
 5. `filename` (autre) → **Image**
 
 ### Ordre de priorité
+
 Si plusieurs types sont détectés, l'ordre est :
+
 1. Hybrid (préféré)
 2. Vimeo
 3. Cloudinary
@@ -236,4 +254,3 @@ Si plusieurs types sont détectés, l'ordre est :
 ✅ **Plan gratuit optimisé** avec previews courts
 
 🎉 Profitez de votre carrousel multimédia complet !
-

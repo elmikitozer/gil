@@ -3,6 +3,7 @@
 ## ✅ Ce qui a été implémenté
 
 Le système détecte maintenant **automatiquement** le type de média dans `album_photos` :
+
 - **Images** (assets Storyblok)
 - **Vidéos MP4** (assets Storyblok)
 - **Vidéos Cloudinary** (lien externe)

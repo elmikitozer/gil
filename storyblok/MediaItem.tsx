@@ -12,11 +12,59 @@ export default async function MediaItem({ blok }: any) {
 
   // Traitement des photos/vidéos d'album depuis Storyblok
   let albumPhotos: Item[] | undefined;
+  
+  // Fusionner album_photos (Multi-Assets) et album_videos (Blocks video_item)
+  const allMedia: any[] = [];
+  
+  // Ajouter les photos du Multi-Assets
   if (blok?.album_photos && Array.isArray(blok.album_photos)) {
-    albumPhotos = blok.album_photos
-      .filter((photo: any) => photo?.filename || photo?.cloudinary_url || photo?.vimeo_id)
+    allMedia.push(...blok.album_photos);
+  }
+  
+  // Ajouter les vidéos du champ album_videos (blocs video_item)
+  if (blok?.album_videos && Array.isArray(blok.album_videos)) {
+    allMedia.push(...blok.album_videos);
+  }
+  
+  if (allMedia.length > 0) {
+    albumPhotos = allMedia
+      .filter((photo: any) => photo?.filename || photo?.cloudinary_url || photo?.vimeo_id || photo?.srcMp4 || photo?.vimeoId)
       .map((photo: any) => {
-        // HYBRID : Vidéo avec Cloudinary preview + Vimeo fullscreen
+        // Bloc video_item avec srcMp4 et vimeoId (HYBRID)
+        if (photo.component === 'video_item' && photo.srcMp4 && photo.vimeoId) {
+          return {
+            kind: 'hybrid' as const,
+            srcMp4: photo.srcMp4,
+            vimeoId: photo.vimeoId,
+            poster: photo.poster?.filename ? versionUrl(photo.poster.filename, bump) : undefined,
+            alt: photo.alt || '',
+            title: photo.title || '',
+          };
+        }
+        
+        // Bloc video_item avec vimeoId uniquement
+        if (photo.component === 'video_item' && photo.vimeoId && !photo.srcMp4) {
+          return {
+            kind: 'vimeo' as const,
+            vimeoId: photo.vimeoId,
+            poster: photo.poster?.filename ? versionUrl(photo.poster.filename, bump) : undefined,
+            alt: photo.alt || '',
+            title: photo.title || '',
+          };
+        }
+        
+        // Bloc video_item avec srcMp4 uniquement
+        if (photo.component === 'video_item' && photo.srcMp4 && !photo.vimeoId) {
+          return {
+            kind: 'video' as const,
+            srcMp4: photo.srcMp4,
+            poster: photo.poster?.filename ? versionUrl(photo.poster.filename, bump) : undefined,
+            alt: photo.alt || '',
+            title: photo.title || '',
+          };
+        }
+        
+        // HYBRID : Vidéo avec Cloudinary preview + Vimeo fullscreen (champs directs)
         if (photo.cloudinary_url && photo.vimeo_id) {
           return {
             kind: 'hybrid' as const,
@@ -28,7 +76,7 @@ export default async function MediaItem({ blok }: any) {
           };
         }
         
-        // VIMEO uniquement
+        // VIMEO uniquement (champs directs)
         if (photo.vimeo_id && !photo.cloudinary_url) {
           return {
             kind: 'vimeo' as const,
@@ -39,7 +87,7 @@ export default async function MediaItem({ blok }: any) {
           };
         }
         
-        // VIDEO Cloudinary uniquement
+        // VIDEO Cloudinary uniquement (champs directs)
         if (photo.cloudinary_url && !photo.vimeo_id) {
           return {
             kind: 'video' as const,
@@ -49,7 +97,7 @@ export default async function MediaItem({ blok }: any) {
             title: photo.title || '',
           };
         }
-        
+
         // Video depuis assets Storyblok
         if (photo.filename) {
           const filename = photo.filename;
@@ -74,7 +122,7 @@ export default async function MediaItem({ blok }: any) {
             };
           }
         }
-        
+
         return null;
       })
       .filter((item): item is Item => item !== null);
