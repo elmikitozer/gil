@@ -2,7 +2,12 @@
 
 ## ✅ Ce qui a été implémenté
 
-Le système détecte maintenant **automatiquement** si un fichier dans `album_photos` est une vidéo ou une image, et l'affiche correctement dans le carrousel avec les miniatures.
+Le système détecte maintenant **automatiquement** le type de média dans `album_photos` :
+- **Images** (assets Storyblok)
+- **Vidéos MP4** (assets Storyblok)
+- **Vidéos Cloudinary** (lien externe)
+- **Vidéos Vimeo** (via ID)
+- **Vidéos Hybrid** (Cloudinary preview + Vimeo fullscreen)
 
 ## 📋 Comment faire dans Storyblok
 
@@ -15,6 +20,7 @@ Vous avez déjà le champ `album_photos` (Multi-asset). Il accepte maintenant **
 Quand vous configurez un `media_item` :
 
 1. **Sélectionnez les médias** dans `album_photos` :
+
    - Photos (`.jpg`, `.png`, `.webp`, etc.)
    - **Vidéos** (`.mp4`, `.webm`, `.mov`)
 
@@ -28,6 +34,7 @@ Quand vous configurez un `media_item` :
 #### Exemple 1 : Album mixte photos + vidéos
 
 **MediaItem 1 :**
+
 - `media` : photo_couverture.jpg
 - `album_photos` :
   - photo1.jpg
@@ -42,6 +49,7 @@ Quand vous configurez un `media_item` :
 #### Exemple 2 : Album 100% vidéos
 
 **MediaItem 2 :**
+
 - `media` : thumbnail_reel.jpg (image de couverture)
 - `album_photos` :
   - clip1.mp4
@@ -54,15 +62,19 @@ Quand vous configurez un `media_item` :
 ## 🎨 Fonctionnalités automatiques
 
 ### Détection automatique
+
 Le code détecte le type de fichier par son extension :
+
 - `.mp4`, `.webm`, `.mov` → Vidéo
 - Tout le reste → Image
 
 ### Miniatures vidéo
+
 - Si vous avez un champ `poster` dans votre asset Storyblok, il sera utilisé comme vignette
 - Sinon, une icône "play" apparaît sur fond gris
 
 ### Lecture dans le carrousel
+
 - Les vidéos s'ouvrent avec les contrôles natifs
 - Lecture automatique (`autoPlay`)
 - Possibilité de mettre en pleine écran
@@ -73,19 +85,21 @@ Le code détecte le type de fichier par son extension :
 Si vous voulez améliorer l'affichage des vidéos, vous pouvez ajouter ces champs à vos assets :
 
 ### Champ `poster` (Asset)
+
 - Une image statique qui s'affiche avant la lecture
 - Utilisée aussi pour la miniature dans le carrousel
 
 ### Champ `title` (Text)
+
 - Titre de la vidéo
 - Affiché si la vidéo ne charge pas
 
 ## 📝 Types de médias supportés dans les albums
 
-| Type | Extension | Affichage | Miniature |
-|------|-----------|-----------|-----------|
-| Image | `.jpg`, `.png`, `.webp`, `.gif` | Next.js Image | Thumbnail de l'image |
-| Vidéo | `.mp4`, `.webm`, `.mov` | `<video>` natif avec contrôles | Poster ou icône play |
+| Type  | Extension                       | Affichage                      | Miniature            |
+| ----- | ------------------------------- | ------------------------------ | -------------------- |
+| Image | `.jpg`, `.png`, `.webp`, `.gif` | Next.js Image                  | Thumbnail de l'image |
+| Vidéo | `.mp4`, `.webm`, `.mov`         | `<video>` natif avec contrôles | Poster ou icône play |
 
 ## ⚠️ Limitations actuelles
 
@@ -95,8 +109,8 @@ Si vous voulez améliorer l'affichage des vidéos, vous pouvez ajouter ces champ
 ## 🚀 Pour aller plus loin
 
 Si tu veux supporter les vidéos Vimeo dans les albums, il faudrait :
+
 1. Ajouter un champ `vimeo_id` dans les assets Storyblok
 2. Modifier le code de détection dans `MediaItem.tsx`
 
 Veux-tu que je l'implémente ?
-

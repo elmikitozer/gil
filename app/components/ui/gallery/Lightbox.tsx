@@ -43,8 +43,26 @@ export default function Lightbox() {
 
   // Synchronize renderIndex with index when it changes from outside (like openAt)
   useEffect(() => {
-    setRenderIndex(index);
-  }, [index]);
+    if (!mounted) return;
+    // Only update renderIndex if it's significantly different (not during transitions)
+    if (Math.abs(renderIndex - index) > 0 && !isDragging) {
+      setRenderIndex(index);
+      setDragX(0);
+      setNeighborIndex(null);
+    }
+  }, [index, mounted, isDragging, renderIndex]);
+
+  // Escape key to close lightbox
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        close();
+      }
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isOpen, close]);
 
   // After index changes (next/prev), if we swiped, animate the new media from the opposite side
   useEffect(() => {
