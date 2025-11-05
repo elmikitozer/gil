@@ -15,26 +15,26 @@ export default async function MediaItem({ blok }: any) {
 
   // Fusionner album_photos (Multi-Assets) et album_videos (Blocks video_item)
   const allMedia: any[] = [];
-  
+
   // Ajouter les photos du Multi-Assets
   if (blok?.album_photos && Array.isArray(blok.album_photos)) {
     console.log('📸 album_photos:', blok.album_photos.length, 'items');
     allMedia.push(...blok.album_photos);
   }
-  
+
   // Ajouter les vidéos du champ album_videos (blocs video_item)
   if (blok?.album_videos && Array.isArray(blok.album_videos)) {
     console.log('🎬 album_videos:', blok.album_videos.length, 'items');
     console.log('🎬 Premier item:', blok.album_videos[0]);
     allMedia.push(...blok.album_videos);
   }
-  
+
   console.log('📦 Total allMedia:', allMedia.length, 'items');
 
   if (allMedia.length > 0) {
-    albumPhotos = allMedia
+    const mapped = allMedia
       .filter((photo: any) => photo?.filename || photo?.cloudinary_url || photo?.vimeo_id || photo?.srcMp4 || photo?.vimeoId)
-      .map((photo: any) => {
+      .map((photo: any): Item | null => {
         // Bloc video_item avec srcMp4 et vimeoId (HYBRID)
         if (photo.component === 'video_item' && photo.srcMp4 && photo.vimeoId) {
           return {
@@ -127,10 +127,12 @@ export default async function MediaItem({ blok }: any) {
             };
           }
         }
-
+        
         return null;
-      })
-      .filter((item): item is Item => item !== null);
+      });
+    
+    // Filtrer les null et typer correctement
+    albumPhotos = mapped.filter((item): item is Item => item !== null);
   }
 
   const isCoverPhoto = blok?.is_cover_photo === true;
