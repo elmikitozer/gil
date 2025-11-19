@@ -79,7 +79,7 @@ export default function Lightbox() {
           // Custom rendering for videos
           if (item.kind === 'video') {
             return (
-              <div className="flex items-center justify-center w-full h-full">
+              <div className="flex items-center justify-center w-full h-full relative">
                 <video
                   key={item.srcMp4}
                   className="max-h-[80vh] max-w-[80vw] object-contain"
@@ -94,6 +94,11 @@ export default function Lightbox() {
                   {item.srcWebm ? <source src={item.srcWebm} type="video/webm" /> : null}
                   <source src={item.srcMp4} type="video/mp4" />
                 </video>
+                {item.title && (
+                  <div className="absolute bottom-4 left-4 text-xs text-black dark:text-white pointer-events-none">
+                    {item.title}
+                  </div>
+                )}
               </div>
             );
           }
@@ -102,7 +107,7 @@ export default function Lightbox() {
           if (item.kind === 'vimeo' || item.kind === 'hybrid') {
             const vimeoId = extractVimeoId(item.vimeoId);
             return (
-              <div className="flex items-center justify-center w-full h-full">
+              <div className="flex items-center justify-center w-full h-full relative">
                 <div className="relative w-[min(90vw,160vh)] h-[min(90vh,50.625vw)]">
                   <iframe
                     key={vimeoId}
@@ -114,11 +119,32 @@ export default function Lightbox() {
                     title={item.title || 'Vidéo'}
                   />
                 </div>
+                {item.title && (
+                  <div className="absolute bottom-4 left-4 text-xs text-black dark:text-white pointer-events-none">
+                    {item.title}
+                  </div>
+                )}
               </div>
             );
           }
 
-          // For images, return undefined to use default rendering
+          // For images, add title overlay if present
+          if (item.kind === 'image' && item.title) {
+            return (
+              <div className="relative w-full h-full flex items-center justify-center">
+                <img
+                  src={item.src}
+                  alt={item.alt ?? ''}
+                  className="max-h-[80vh] max-w-[80vw] object-contain"
+                />
+                <div className="absolute bottom-4 left-4 text-xs text-black dark:text-white pointer-events-none">
+                  {item.title}
+                </div>
+              </div>
+            );
+          }
+
+          // For images without title, use default rendering
           return undefined;
         },
       }}
