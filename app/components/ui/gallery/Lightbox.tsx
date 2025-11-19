@@ -1,221 +1,109 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import Image from 'next/image';
+import React, { useMemo } from 'react';
+import YARLightbox, { SlideImage } from 'yet-another-react-lightbox';
+import Thumbnails from 'yet-another-react-lightbox/plugins/thumbnails';
+import 'yet-another-react-lightbox/styles.css';
+import 'yet-another-react-lightbox/plugins/thumbnails.css';
+import './lightbox-custom.css';
 import { useGallery } from './GalleryContext';
-import type { Item } from './GalleryContext';
-import { LightboxNav } from './LightboxNav';
 import { extractVimeoId } from '@/app/utils/vimeo';
 
 export default function Lightbox() {
-  const { isOpen, close, items, index, next, prev, openAt } = useGallery();
-  const [mounted, setMounted] = useState(false);
-  const [dragX, setDragX] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const [disableTransition, setDisableTransition] = useState(false);
-  const startX = useRef<number | null>(null);
-  const startTime = useRef<number | null>(null);
-  const lastX = useRef<number | null>(null);
-  const incomingFrom = useRef<number | null>(null);
-  const [neighborIndex, setNeighborIndex] = useState<number | null>(null);
-  const [renderIndex, setRenderIndex] = useState<number>(index);
-  const [viewportWidth, setViewportWidth] = useState<number>(
-    typeof window !== 'undefined' ? window.innerWidth : 1000
-  );
-  useEffect(() => setMounted(true), []);
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      (window as Window & { __LB_DISABLE_SWIPE?: boolean }).__LB_DISABLE_SWIPE = true;
-    }
-    return () => {
-      if (typeof window !== 'undefined') {
-        (window as Window & { __LB_DISABLE_SWIPE?: boolean }).__LB_DISABLE_SWIPE = false;
+  const { isOpen, close, items, index, openAt } = useGallery();
+
+  // Convert our Item types to yet-another-react-lightbox format
+  const slides = useMemo((): SlideImage[] => {
+    return items.map((item) => {
+      if (item.kind === 'image') {
+        return {
+          src: item.src,
+          alt: item.alt ?? '',
+          title: item.title,
+        };
       }
-    };
-  }, []);
-  useEffect(() => {
-    const onResize = () =>
-      setViewportWidth(typeof window !== 'undefined' ? window.innerWidth : 1000);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
 
-  // Synchronize renderIndex with index when it changes from outside (like openAt)
-  useEffect(() => {
-    if (!mounted) return;
-    // Update renderIndex immediately when index changes (from clicking thumbnails)
-    if (renderIndex !== index) {
-      setRenderIndex(index);
-    }
-  }, [index, mounted, renderIndex]);
+      // For videos and vimeo, use poster as thumbnail or transparent pixel
+      const thumbnailSrc =
+        (item.kind === 'video' || item.kind === 'hybrid' || item.kind === 'vimeo') && item.poster
+          ? item.poster
+          : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
-  // Escape key to close lightbox
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        close();
-      }
-    };
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [isOpen, close]);
-
-  // After index changes (next/prev), if we swiped, animate the new media from the opposite side
-  useEffect(() => {
-    if (!mounted) return;
-    if (incomingFrom.current == null) return;
-    const dir = incomingFrom.current; // 1 if previous, -1 if next
-    const width = typeof window !== 'undefined' ? window.innerWidth : 1000;
-    // Place new media just off-screen on the opposite side, without transition
-    setDisableTransition(true);
-    setDragX(-dir * width);
-    requestAnimationFrame(() => {
-      // Re-enable transition and slide into place
-      setDisableTransition(false);
-      requestAnimationFrame(() => {
-        setDragX(0);
-        incomingFrom.current = null;
-      });
+      return {
+        src: thumbnailSrc,
+        alt: item.alt ?? '',
+        title: item.title,
+      };
     });
-  }, [index, mounted]);
+  }, [items]);
 
-  if (!mounted || !isOpen) return null;
-
-  // Typage explicite : pas de `any`
-  const it: Item | undefined = items[renderIndex];
-
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[60] bg-white dark:bg-black flex flex-col p-0 lb-anim-fade"
-      role="dialog"
-      aria-modal="true"
-    >
-      {/* Contenu principal */}
-      <div
-        className="flex-1 flex items-center justify-center relative"
-        style={{
-          paddingTop: items.length > 1 ? '0rem' : '0',
-          paddingBottom: items.length > 1 ? '5rem' : '0',
-        }}
-        onPointerDown={(e) => {
-          // Only start dragging with the primary pointer (touch/mouse), not pen/others
-          if (e.pointerType && e.pointerType !== 'touch' && e.pointerType !== 'mouse') return;
-          const target = e.target as HTMLElement;
-          if (target.closest('video, iframe')) return;
-          setIsDragging(true);
-          startX.current = e.clientX;
-          lastX.current = e.clientX;
-          startTime.current = e.timeStamp;
-        }}
-        onPointerMove={(e) => {
-          if (!isDragging || startX.current == null) return;
-          const dx = e.clientX - startX.current;
-          setDragX(dx);
-          lastX.current = e.clientX;
-          if (items.length > 1) {
-            const dir = dx < 0 ? 1 : -1; // 1 => next, -1 => prev
-            const wrapped = (index + dir + items.length) % items.length;
-            setNeighborIndex(wrapped);
+  return (
+    <YARLightbox
+      open={isOpen}
+      close={close}
+      slides={slides}
+      index={index}
+      plugins={[Thumbnails]}
+      on={{
+        view: ({ index: newIndex }) => {
+          if (newIndex !== index) {
+            openAt(newIndex);
           }
-        }}
-        onPointerUp={(e) => {
-          if (!isDragging || startX.current == null || lastX.current == null) return;
-          const dx = lastX.current - startX.current;
-          const dt = startTime.current != null ? e.timeStamp - startTime.current : 1;
-          const velocity = dx / Math.max(dt, 1); // px per ms
-          const THRESHOLD = 64;
-          const VELOCITY_MIN = 0.5; // px/ms
-          const shouldSwipe = Math.abs(dx) > THRESHOLD || Math.abs(velocity) > VELOCITY_MIN;
-          setIsDragging(false);
-          if (shouldSwipe) {
-            const direction = dx > 0 ? 1 : -1; // 1 => go prev, -1 => go next
-            const candidate = index - direction;
-            const wrapped = (candidate + items.length) % items.length;
-            if (items.length > 1) setNeighborIndex(wrapped);
-            setDragX(direction * viewportWidth);
-            setTimeout(() => {
-              if (direction > 0) {
-                prev();
-              } else {
-                next();
-              }
-              setDisableTransition(true);
-              setDragX(0);
-              requestAnimationFrame(() => {
-                setRenderIndex(wrapped);
-                setNeighborIndex(null);
-                setDisableTransition(false);
-              });
-            }, 260);
-          } else {
-            setDragX(0);
-            setNeighborIndex(null);
+        },
+      }}
+      carousel={{
+        finite: false,
+        preload: 2,
+      }}
+      animation={{
+        fade: 250,
+        swipe: 300,
+      }}
+      controller={{
+        closeOnBackdropClick: true,
+      }}
+      thumbnails={{
+        position: 'bottom',
+        width: 64,
+        height: 64,
+        border: 2,
+        borderRadius: 4,
+        padding: 8,
+        gap: 8,
+      }}
+      render={{
+        slide: () => {
+          const item = items[index];
+          if (!item) return undefined;
+
+          // Custom rendering for videos
+          if (item.kind === 'video') {
+            return (
+              <div className="flex items-center justify-center w-full h-full">
+                <video
+                  key={item.srcMp4}
+                  className="max-h-[80vh] max-w-[80vw] object-contain"
+                  controls
+                  autoPlay
+                  playsInline
+                  muted={false}
+                  loop
+                  preload="auto"
+                  poster={item.poster ?? undefined}
+                >
+                  {item.srcWebm ? <source src={item.srcWebm} type="video/webm" /> : null}
+                  <source src={item.srcMp4} type="video/mp4" />
+                </video>
+              </div>
+            );
           }
-          startX.current = null;
-          lastX.current = null;
-          startTime.current = null;
-        }}
-        onPointerCancel={() => {
-          setIsDragging(false);
-          setDragX(0);
-          startX.current = null;
-          lastX.current = null;
-          startTime.current = null;
-        }}
-      >
-        <div
-          className="relative h-full w-full flex items-center justify-center"
-          style={{
-            transform: `translateX(${dragX}px)`,
-            transition:
-              isDragging || disableTransition
-                ? 'none'
-                : 'transform 260ms cubic-bezier(0.4,0.8,0.4,1)',
-            willChange: 'transform',
-            touchAction: 'pan-y',
-          }}
-        >
-          {it?.kind === 'image' ? (
-            <div className="relative h-[80vh] w-[80vw]">
-              <Image
-                src={it.src}
-                alt={it.alt ?? ''}
-                fill
-                sizes="80vw"
-                className="object-contain"
-                priority
-              />
-            </div>
-          ) : it?.kind === 'video' ? (
-            <div className="relative h-[80vh] w-[80vw]">
-              <video
-                key={it.srcMp4} // Force re-render when video changes
-                className="h-full w-full object-contain"
-                controls
-                autoPlay
-                playsInline
-                muted={false}
-                loop
-                preload="auto"
-                poster={it.poster ?? undefined}
-                onError={(e) => {
-                  if (process.env.NODE_ENV === 'development') {
-                    console.error('Erreur vidéo lightbox:', it.srcMp4, e);
-                  }
-                }}
-              >
-                {it.srcWebm ? <source src={it.srcWebm} type="video/webm" /> : null}
-                <source src={it.srcMp4} type="video/mp4" />
-              </video>
-            </div>
-          ) : it?.kind === 'hybrid' ? (
-            // HYBRIDE : Affiche la vidéo Vimeo complète dans la lightbox
-            (() => {
-              const vimeoId = extractVimeoId(it.vimeoId);
-              return vimeoId ? (
-                <div className="relative h-[min(90vh,50.625vw)] w-[min(90vw,160vh)]">
+
+          // Custom rendering for vimeo/hybrid
+          if (item.kind === 'vimeo' || item.kind === 'hybrid') {
+            const vimeoId = extractVimeoId(item.vimeoId);
+            return (
+              <div className="flex items-center justify-center w-full h-full">
+                <div className="relative w-[min(90vw,160vh)] h-[min(90vh,50.625vw)]">
                   <iframe
                     key={vimeoId}
                     src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1&loop=1&title=0&byline=0&portrait=0`}
@@ -223,243 +111,23 @@ export default function Lightbox() {
                     frameBorder="0"
                     allow="autoplay; fullscreen; picture-in-picture"
                     allowFullScreen
-                    title={it.title || 'Vidéo complète'}
+                    title={item.title || 'Vidéo'}
                   />
                 </div>
-              ) : (
-                // Fallback : afficher le MP4 si vimeoId invalide
-                <div className="relative h-[80vh] w-[80vw]">
-                  <video
-                    key={it.srcMp4}
-                    className="h-full w-full object-contain"
-                    controls
-                    autoPlay
-                    playsInline
-                    muted={false}
-                    loop
-                    preload="auto"
-                  >
-                    <source src={it.srcMp4} type="video/mp4" />
-                  </video>
-                </div>
-              );
-            })()
-          ) : it?.kind === 'vimeo' ? (
-            (() => {
-              const vimeoId = extractVimeoId(it.vimeoId);
-              return vimeoId ? (
-                <div className="relative h-[min(90vh,50.625vw)] w-[min(90vw,160vh)]">
-                  <iframe
-                    key={vimeoId}
-                    src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1&loop=1&title=0&byline=0&portrait=0`}
-                    className="w-full h-full"
-                    frameBorder="0"
-                    allow="autoplay; fullscreen; picture-in-picture"
-                    allowFullScreen
-                    title={it.title || 'Vidéo Vimeo'}
-                  />
-                </div>
-              ) : null;
-            })()
-          ) : null}
+              </div>
+            );
+          }
 
-          {neighborIndex != null ? (
-            <div
-              className="pointer-events-none absolute inset-0 flex items-center justify-center"
-              style={{
-                transform: `translateX(${dragX < 0 ? viewportWidth : -viewportWidth}px)`,
-                transition:
-                  isDragging || disableTransition
-                    ? 'none'
-                    : 'transform 260ms cubic-bezier(0.4,0.8,0.4,1)',
-                willChange: 'transform',
-              }}
-            >
-              {(() => {
-                const nit: Item | undefined = items[neighborIndex];
-                if (!nit) return null;
-                if (nit.kind === 'image') {
-                  return (
-                    <div className="relative h-[80vh] w-[80vw]">
-                      <Image
-                        src={nit.src}
-                        alt={nit.alt ?? ''}
-                        fill
-                        sizes="90vw"
-                        className="object-contain"
-                        priority
-                      />
-                    </div>
-                  );
-                }
-                if (nit.kind === 'video' || nit.kind === 'hybrid') {
-                  return (
-                    <div className="relative h-[80vh] w-[80vw]">
-                      <div className="h-full w-full bg-black/60 flex items-center justify-center text-white/70 text-sm">
-                        {nit.title ?? 'Media'}
-                      </div>
-                    </div>
-                  );
-                }
-                if (nit.kind === 'vimeo') {
-                  return (
-                    <div className="relative h-[min(90vh,50.625vw)] w-[min(90vw,160vh)]">
-                      <div className="h-full w-full bg-black/60 flex items-center justify-center text-white/70 text-sm">
-                        Vimeo
-                      </div>
-                    </div>
-                  );
-                }
-                return null;
-              })()}
-            </div>
-          ) : null}
-        </div>
-      </div>
-
-      {/* Miniatures en mode carrousel */}
-      {items.length > 1 && (
-        <div className="absolute bottom-0 left-0 right-0 z-10 hidden md:flex justify-center py-4 bg-transparent h-24">
-          <div className="flex gap-2 max-w-full overflow-x-auto">
-            {items.map((item, i) => (
-              <button
-                key={`${i}-${item.kind}-${'src' in item ? item.src : item.title ?? 'no-src'}`}
-                type="button"
-                onClick={() => {
-                  // Clean state before switching
-                  setIsDragging(false);
-                  setDragX(0);
-                  setNeighborIndex(null);
-                  setDisableTransition(false);
-                  startX.current = null;
-                  lastX.current = null;
-                  incomingFrom.current = null;
-                  openAt(i);
-                }}
-                className={`flex-shrink-0 w-16 h-16 rounded overflow-hidden border-2 transition-all ${
-                  i === index
-                    ? 'border-white scale-110'
-                    : 'border-transparent hover:border-white/50'
-                }`}
-              >
-                {item.kind === 'image' ? (
-                  <Image
-                    src={item.src}
-                    alt={item.alt ?? ''}
-                    width={64}
-                    height={64}
-                    className="w-full h-full object-cover"
-                  />
-                ) : item.kind === 'video' ? (
-                  <div className="relative w-full h-full bg-gray-800">
-                    {item.poster ? (
-                      <Image
-                        src={item.poster}
-                        alt={item.title ?? 'Vidéo'}
-                        width={64}
-                        height={64}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : null}
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                      <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                    </div>
-                  </div>
-                ) : item.kind === 'hybrid' ? (
-                  <div className="relative w-full h-full bg-gray-800">
-                    {item.poster ? (
-                      <Image
-                        src={item.poster}
-                        alt={item.title ?? 'Vidéo'}
-                        width={64}
-                        height={64}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : null}
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                      <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                    </div>
-                  </div>
-                ) : item.kind === 'vimeo' ? (
-                  <div className="relative w-full h-full bg-gray-800">
-                    {item.poster ? (
-                      <Image
-                        src={item.poster}
-                        alt={item.title ?? 'Vimeo'}
-                        width={64}
-                        height={64}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : null}
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                      <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                    </div>
-                  </div>
-                ) : null}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Close en haut à droite (tes classes) */}
-      <button
-        type="button"
-        aria-label="Fermer"
-        title="Fermer"
-        onClick={close}
-        className="lb-close text-neutral-900 dark:text-white"
-      >
-        <svg viewBox="0 0 24 24" className="lb-close__icon" aria-hidden="true">
-          <path
-            d="M6 6L18 18M6 18L18 6"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </svg>
-      </button>
-
-      {/* Flèches visibles + clavier */}
-      <LightboxNav
-        onNext={() => {
-          const candidate = (index + 1) % items.length;
-          if (items.length > 1) setNeighborIndex(candidate);
-          setDragX(-viewportWidth);
-          setTimeout(() => {
-            next();
-            setDisableTransition(true);
-            setDragX(0);
-            requestAnimationFrame(() => {
-              setRenderIndex(candidate);
-              setNeighborIndex(null);
-              setDisableTransition(false);
-            });
-          }, 260);
-        }}
-        onPrev={() => {
-          const candidate = (index - 1 + items.length) % items.length;
-          if (items.length > 1) setNeighborIndex(candidate);
-          setDragX(viewportWidth);
-          setTimeout(() => {
-            prev();
-            setDisableTransition(true);
-            setDragX(0);
-            requestAnimationFrame(() => {
-              setRenderIndex(candidate);
-              setNeighborIndex(null);
-              setDisableTransition(false);
-            });
-          }, 260);
-        }}
-      />
-    </div>,
-    document.body
+          // For images, return undefined to use default rendering
+          return undefined;
+        },
+      }}
+      styles={{
+        container: {
+          backgroundColor: 'var(--yarl__color_backdrop, rgb(255, 255, 255))',
+        },
+      }}
+      className="dark:bg-black bg-white"
+    />
   );
 }

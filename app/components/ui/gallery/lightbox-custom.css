@@ -1,0 +1,30 @@
+/* Custom styles for yet-another-react-lightbox */
+
+/* Thumbnails background - adapt to theme */
+.yarl__thumbnails {
+  background-color: rgb(255, 255, 255);
+}
+
+:root.dark .yarl__thumbnails {
+  background-color: rgb(0, 0, 0);
+}
+
+/* Thumbnail container background */
+.yarl__thumbnails_container {
+  background-color: transparent;
+}
+
+/* Individual thumbnail background */
+.yarl__thumbnail {
+  background-color: transparent;
+}
+
+/* Active thumbnail border color */
+.yarl__thumbnail_active {
+  border-color: rgb(0, 0, 0);
+}
+
+:root.dark .yarl__thumbnail_active {
+  border-color: rgb(255, 255, 255);
+}
+
