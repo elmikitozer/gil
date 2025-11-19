@@ -166,7 +166,7 @@ export default function Lightbox() {
         }}
       >
         <div
-          className="relative h-full w-full flex items-center justify-center"
+          className="absolute inset-0 flex items-center justify-center"
           style={{
             transform: `translateX(${dragX}px)`,
             transition:
