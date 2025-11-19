@@ -86,3 +86,17 @@
   background-color: transparent !important;
 }
 
+/* Remove gradient fade on thumbnail edges */
+.yarl__thumbnails_vignette {
+  display: none !important;
+}
+
+/* Remove any pseudo-elements that create gradients */
+.yarl__thumbnails::before,
+.yarl__thumbnails::after,
+.yarl__thumbnails_track::before,
+.yarl__thumbnails_track::after {
+  display: none !important;
+  background: none !important;
+}
+
