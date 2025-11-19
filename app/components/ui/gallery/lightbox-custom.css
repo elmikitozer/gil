@@ -1,6 +1,33 @@
 /* Custom styles for yet-another-react-lightbox */
 
-/* Thumbnails background - adapt to theme */
+/* Main container - force white background */
+.yarl__root {
+  background-color: rgb(255, 255, 255) !important;
+}
+
+:root.dark .yarl__root {
+  background-color: rgb(0, 0, 0) !important;
+}
+
+/* Container */
+.yarl__container {
+  background-color: rgb(255, 255, 255) !important;
+}
+
+:root.dark .yarl__container {
+  background-color: rgb(0, 0, 0) !important;
+}
+
+/* Slides background */
+.yarl__slide {
+  background-color: rgb(255, 255, 255) !important;
+}
+
+:root.dark .yarl__slide {
+  background-color: rgb(0, 0, 0) !important;
+}
+
+/* Thumbnails wrapper - force white */
 .yarl__thumbnails {
   background-color: rgb(255, 255, 255) !important;
 }
@@ -15,6 +42,24 @@
 }
 
 :root.dark .yarl__thumbnails_container {
+  background-color: rgb(0, 0, 0) !important;
+}
+
+/* Thumbnails track (the scrollable area) */
+.yarl__thumbnails_track {
+  background-color: rgb(255, 255, 255) !important;
+}
+
+:root.dark .yarl__thumbnails_track {
+  background-color: rgb(0, 0, 0) !important;
+}
+
+/* Individual thumbnail wrapper */
+.yarl__thumbnails_thumbnail {
+  background-color: rgb(255, 255, 255) !important;
+}
+
+:root.dark .yarl__thumbnails_thumbnail {
   background-color: rgb(0, 0, 0) !important;
 }
 
@@ -36,9 +81,8 @@
   border-color: rgb(255, 255, 255) !important;
 }
 
-/* Remove any gradient backgrounds */
-.yarl__slide,
-.yarl__container {
-  background: none !important;
+/* Toolbar background */
+.yarl__toolbar {
+  background-color: transparent !important;
 }
 
