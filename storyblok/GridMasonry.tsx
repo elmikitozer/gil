@@ -43,20 +43,20 @@ export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
     if (c?.component === 'media_item' && c?.media?.filename) {
       // Traitement des photos d'album et vidéos
       let albumPhotos: Item[] | undefined;
-      
+
       // Fusionner album_photos (Multi-Assets) et album_videos (Blocks video_item)
       const allMedia: any[] = [];
-      
+
       // Ajouter les photos du Multi-Assets
       if (c.album_photos && Array.isArray(c.album_photos)) {
         allMedia.push(...c.album_photos);
       }
-      
+
       // Ajouter les vidéos du champ album_videos (blocs video_item)
       if ((c as any).album_videos && Array.isArray((c as any).album_videos)) {
         allMedia.push(...(c as any).album_videos);
       }
-      
+
       if (allMedia.length > 0) {
         const mapped = allMedia
           .filter((photo: any) => photo?.filename || photo?.srcMp4 || photo?.vimeoId)
@@ -104,7 +104,7 @@ export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
             }
             return null;
           });
-        
+
         albumPhotos = mapped.filter((item): item is Item => item !== null);
       }
 

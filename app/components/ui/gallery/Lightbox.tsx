@@ -44,13 +44,11 @@ export default function Lightbox() {
   // Synchronize renderIndex with index when it changes from outside (like openAt)
   useEffect(() => {
     if (!mounted) return;
-    // Only update renderIndex if it's significantly different (not during transitions)
-    if (Math.abs(renderIndex - index) > 0 && !isDragging) {
+    // Update renderIndex immediately when index changes (from clicking thumbnails)
+    if (renderIndex !== index) {
       setRenderIndex(index);
-      setDragX(0);
-      setNeighborIndex(null);
     }
-  }, [index, mounted, isDragging, renderIndex]);
+  }, [index, mounted, renderIndex]);
 
   // Escape key to close lightbox
   useEffect(() => {
@@ -328,9 +326,14 @@ export default function Lightbox() {
                 key={`${i}-${item.kind}-${'src' in item ? item.src : item.title ?? 'no-src'}`}
                 type="button"
                 onClick={() => {
+                  // Clean state before switching
+                  setIsDragging(false);
                   setDragX(0);
                   setNeighborIndex(null);
                   setDisableTransition(false);
+                  startX.current = null;
+                  lastX.current = null;
+                  incomingFrom.current = null;
                   openAt(i);
                 }}
                 className={`flex-shrink-0 w-16 h-16 rounded overflow-hidden border-2 transition-all ${
