@@ -58,6 +58,7 @@ export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
       }
 
       if (allMedia.length > 0) {
+        const mediaItemTitle = c.title || ''; // Titre du media_item
         const mapped = allMedia
           .filter((photo: any) => photo?.filename || photo?.srcMp4 || photo?.vimeoId)
           .map((photo: any): Item | null => {
@@ -69,7 +70,7 @@ export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
                 vimeoId: photo.vimeoId,
                 poster: photo.poster?.filename,
                 alt: photo.alt,
-                title: photo.title,
+                title: photo.title || mediaItemTitle,
               };
             }
             // Bloc video_item (Vimeo seul)
@@ -79,7 +80,7 @@ export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
                 vimeoId: photo.vimeoId,
                 poster: photo.poster?.filename,
                 alt: photo.alt,
-                title: photo.title,
+                title: photo.title || mediaItemTitle,
               };
             }
             // Bloc video_item (Cloudinary/MP4 seul)
@@ -89,7 +90,7 @@ export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
                 srcMp4: photo.srcMp4,
                 poster: photo.poster?.filename,
                 alt: photo.alt,
-                title: photo.title,
+                title: photo.title || mediaItemTitle,
               };
             }
             // Image normale
@@ -98,7 +99,7 @@ export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
                 kind: 'image' as const,
                 src: photo.filename,
                 alt: photo.alt || '',
-                title: photo.title || '',
+                title: photo.title || mediaItemTitle,
                 caption: photo.caption || '',
               };
             }

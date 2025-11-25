@@ -6,6 +6,7 @@ import type { Item } from '@/app/components/ui/gallery/GalleryContext';
 export default async function MediaItem({ blok }: any) {
   const file = blok?.media?.filename;
   const alt = blok?.alt || '';
+  const mediaItemTitle = blok?.title || ''; // Titre du media_item
   if (!file) return null;
 
   const bump = await getAssetBump();
@@ -18,14 +19,11 @@ export default async function MediaItem({ blok }: any) {
 
   // Ajouter les photos du Multi-Assets
   if (blok?.album_photos && Array.isArray(blok.album_photos)) {
-    console.log('📸 album_photos:', blok.album_photos.length, 'items');
     allMedia.push(...blok.album_photos);
   }
 
   // Ajouter les vidéos du champ album_videos (blocs video_item)
   if (blok?.album_videos && Array.isArray(blok.album_videos)) {
-    console.log('🎬 album_videos:', blok.album_videos.length, 'items');
-    console.log('🎬 Premier item:', blok.album_videos[0]);
     allMedia.push(...blok.album_videos);
   }
 
@@ -33,7 +31,14 @@ export default async function MediaItem({ blok }: any) {
 
   if (allMedia.length > 0) {
     const mapped = allMedia
-      .filter((photo: any) => photo?.filename || photo?.cloudinary_url || photo?.vimeo_id || photo?.srcMp4 || photo?.vimeoId)
+      .filter(
+        (photo: any) =>
+          photo?.filename ||
+          photo?.cloudinary_url ||
+          photo?.vimeo_id ||
+          photo?.srcMp4 ||
+          photo?.vimeoId
+      )
       .map((photo: any): Item | null => {
         // Bloc video_item avec srcMp4 et vimeoId (HYBRID)
         if (photo.component === 'video_item' && photo.srcMp4 && photo.vimeoId) {
@@ -43,7 +48,7 @@ export default async function MediaItem({ blok }: any) {
             vimeoId: photo.vimeoId,
             poster: photo.poster?.filename ? versionUrl(photo.poster.filename, bump) : undefined,
             alt: photo.alt || '',
-            title: photo.title || '',
+            title: photo.title || mediaItemTitle,
           };
         }
 
@@ -88,7 +93,7 @@ export default async function MediaItem({ blok }: any) {
             vimeoId: photo.vimeo_id,
             poster: photo.poster?.filename ? versionUrl(photo.poster.filename, bump) : undefined,
             alt: photo.alt || '',
-            title: photo.title || '',
+            title: photo.title || mediaItemTitle,
           };
         }
 
@@ -99,14 +104,15 @@ export default async function MediaItem({ blok }: any) {
             srcMp4: photo.cloudinary_url,
             poster: photo.poster?.filename ? versionUrl(photo.poster.filename, bump) : undefined,
             alt: photo.alt || '',
-            title: photo.title || '',
+            title: photo.title || mediaItemTitle,
           };
         }
 
         // Video depuis assets Storyblok
         if (photo.filename) {
           const filename = photo.filename;
-          const isVideo = filename.endsWith('.mp4') || filename.endsWith('.webm') || filename.endsWith('.mov');
+          const isVideo =
+            filename.endsWith('.mp4') || filename.endsWith('.webm') || filename.endsWith('.mov');
 
           if (isVideo) {
             return {
@@ -114,7 +120,7 @@ export default async function MediaItem({ blok }: any) {
               srcMp4: versionUrl(filename, bump),
               poster: photo.poster?.filename ? versionUrl(photo.poster.filename, bump) : undefined,
               alt: photo.alt || '',
-              title: photo.title || '',
+              title: photo.title || mediaItemTitle,
             };
           } else {
             // C'est une image
@@ -122,7 +128,7 @@ export default async function MediaItem({ blok }: any) {
               kind: 'image' as const,
               src: versionUrl(filename, bump),
               alt: photo.alt || '',
-              title: photo.title || '',
+              title: photo.title || mediaItemTitle,
               caption: photo.caption || '',
             };
           }

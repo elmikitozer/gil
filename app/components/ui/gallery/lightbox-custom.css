@@ -111,3 +111,17 @@
   padding: 2rem !important;
 }
 
+/* Reduce shadow on close button and navigation arrows */
+.yarl__button svg,
+.yarl__icon_close svg,
+.yarl__navigation_prev svg,
+.yarl__navigation_next svg {
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.3)) !important;
+}
+
+:root.dark .yarl__button svg,
+:root.dark .yarl__icon_close svg,
+:root.dark .yarl__navigation_prev svg,
+:root.dark .yarl__navigation_next svg {
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.3)) !important;
+}

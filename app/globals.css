@@ -81,7 +81,7 @@ a {
   /* icône de la croix avec une petite ombre BLANCHE (sur l’icône, pas sur le bouton) */
   .lb-close__icon {
     @apply w-5 h-5 md:w-6 md:h-6 pointer-events-none;
-    filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.85))
+    filter: drop-shadow(0 0 0px rgba(255, 255, 255, 0.85))
       drop-shadow(0 0 3px rgba(255, 255, 255, 0.55));
   }
   .lb-close--lg .lb-close__icon {
