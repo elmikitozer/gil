@@ -12,6 +12,9 @@ import { extractVimeoId } from '@/app/utils/vimeo';
 export default function Lightbox() {
   const { isOpen, close, items, index, openAt } = useGallery();
 
+  // Hide carousel controls when there's only one item
+  const isSingleItem = items.length === 1;
+
   // Convert our Item types to yet-another-react-lightbox format
   const slides = useMemo((): SlideImage[] => {
     return items.map((item) => {
@@ -43,7 +46,7 @@ export default function Lightbox() {
       close={close}
       slides={slides}
       index={index}
-      plugins={[Thumbnails]}
+      plugins={isSingleItem ? [] : [Thumbnails]}
       on={{
         view: ({ index: newIndex }) => {
           if (newIndex !== index) {
@@ -52,7 +55,7 @@ export default function Lightbox() {
         },
       }}
       carousel={{
-        finite: false,
+        finite: isSingleItem ? true : false,
         preload: 2,
       }}
       animation={{
@@ -62,14 +65,23 @@ export default function Lightbox() {
       controller={{
         closeOnBackdropClick: true,
       }}
-      thumbnails={{
-        position: 'bottom',
-        width: 64,
-        height: 64,
-        border: 2,
-        borderRadius: 4,
-        padding: 8,
-        gap: 8,
+      thumbnails={
+        isSingleItem
+          ? undefined
+          : {
+              position: 'bottom',
+              width: 64,
+              height: 64,
+              border: 2,
+              borderRadius: 4,
+              padding: 8,
+              gap: 8,
+            }
+      }
+      toolbar={{
+        buttons: isSingleItem
+          ? ['close']
+          : ['close'],
       }}
       render={{
         slide: () => {
@@ -78,27 +90,32 @@ export default function Lightbox() {
 
           // Custom rendering for videos
           if (item.kind === 'video') {
+            const maxHeight = isSingleItem ? '90vh' : '80vh';
+            const maxWidth = isSingleItem ? '90vw' : '80vw';
             return (
-              <div className="flex items-center justify-center w-full h-full relative">
-                <video
-                  key={item.srcMp4}
-                  className="max-h-[80vh] max-w-[80vw] object-contain"
-                  controls
-                  autoPlay
-                  playsInline
-                  muted={false}
-                  loop
-                  preload="auto"
-                  poster={item.poster ?? undefined}
-                >
-                  {item.srcWebm ? <source src={item.srcWebm} type="video/webm" /> : null}
-                  <source src={item.srcMp4} type="video/mp4" />
-                </video>
-                {item.title && (
-                  <div className="absolute bottom-4 left-4 text-xs text-black dark:text-white pointer-events-none">
-                    {item.title}
-                  </div>
-                )}
+              <div className="flex items-center justify-center w-full h-full">
+                <div className="relative flex flex-col items-start">
+                  <video
+                    key={item.srcMp4}
+                    className={`object-contain`}
+                    style={{ maxHeight, maxWidth }}
+                    controls
+                    autoPlay
+                    playsInline
+                    muted={false}
+                    loop
+                    preload="auto"
+                    poster={item.poster ?? undefined}
+                  >
+                    {item.srcWebm ? <source src={item.srcWebm} type="video/webm" /> : null}
+                    <source src={item.srcMp4} type="video/mp4" />
+                  </video>
+                  {item.title && (
+                    <div className="mt-2 text-sm text-black dark:text-white pointer-events-none">
+                      {item.title}
+                    </div>
+                  )}
+                </div>
               </div>
             );
           }
@@ -106,45 +123,68 @@ export default function Lightbox() {
           // Custom rendering for vimeo/hybrid
           if (item.kind === 'vimeo' || item.kind === 'hybrid') {
             const vimeoId = extractVimeoId(item.vimeoId);
+            const maxVW = isSingleItem ? '90vw' : '90vw';
+            const maxVH = isSingleItem ? '90vh' : '90vh';
             return (
-              <div className="flex items-center justify-center w-full h-full relative">
-                <div className="relative w-[min(90vw,160vh)] h-[min(90vh,50.625vw)]">
-                  <iframe
-                    key={vimeoId}
-                    src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1&loop=1&title=0&byline=0&portrait=0`}
-                    className="w-full h-full"
-                    frameBorder="0"
-                    allow="autoplay; fullscreen; picture-in-picture"
-                    allowFullScreen
-                    title={item.title || 'Vidéo'}
-                  />
-                </div>
-                {item.title && (
-                  <div className="absolute bottom-4 left-4 text-xs text-black dark:text-white pointer-events-none">
-                    {item.title}
+              <div className="flex items-center justify-center w-full h-full">
+                <div className="flex flex-col items-start">
+                  <div className={`relative w-[min(${maxVW},160vh)] h-[min(${maxVH},50.625vw)]`}>
+                    <iframe
+                      key={vimeoId}
+                      src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1&loop=1&title=0&byline=0&portrait=0`}
+                      className="w-full h-full"
+                      frameBorder="0"
+                      allow="autoplay; fullscreen; picture-in-picture"
+                      allowFullScreen
+                      title={item.title || 'Vidéo'}
+                    />
                   </div>
-                )}
+                  {item.title && (
+                    <div className="mt-2 text-sm text-black dark:text-white pointer-events-none">
+                      {item.title}
+                    </div>
+                  )}
+                </div>
               </div>
             );
           }
 
-          // For images, add title overlay if present
-          if (item.kind === 'image' && item.title) {
+          // For images, add title below if present
+          if (item.kind === 'image') {
+            const maxHeight = isSingleItem ? '90vh' : '80vh';
+            const maxWidth = isSingleItem ? '90vw' : '80vw';
+
+            if (item.title) {
+              return (
+                <div className="flex items-center justify-center w-full h-full">
+                  <div className="flex flex-col items-start">
+                    <img
+                      src={item.src}
+                      alt={item.alt ?? ''}
+                      className="object-contain"
+                      style={{ maxHeight, maxWidth }}
+                    />
+                    <div className="mt-2 text-sm text-black dark:text-white pointer-events-none">
+                      {item.title}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            // No title - use default rendering with adjusted size
             return (
-              <div className="relative w-full h-full flex items-center justify-center">
+              <div className="flex items-center justify-center w-full h-full">
                 <img
                   src={item.src}
                   alt={item.alt ?? ''}
-                  className="max-h-[80vh] max-w-[80vw] object-contain"
+                  className="object-contain"
+                  style={{ maxHeight, maxWidth }}
                 />
-                <div className="absolute bottom-4 left-4 text-xs text-black dark:text-white pointer-events-none">
-                  {item.title}
-                </div>
               </div>
             );
           }
 
-          // For images without title, use default rendering
           return undefined;
         },
       }}

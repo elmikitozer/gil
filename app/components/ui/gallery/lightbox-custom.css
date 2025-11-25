@@ -100,3 +100,14 @@
   background: none !important;
 }
 
+/* Hide navigation arrows when disabled (for single item) */
+.yarl__navigation_prev:disabled,
+.yarl__navigation_next:disabled {
+  display: none !important;
+}
+
+/* Reduce padding for single item lightbox */
+.yarl__slide:only-child {
+  padding: 2rem !important;
+}
+
