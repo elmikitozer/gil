@@ -111,7 +111,7 @@ export default function Lightbox() {
                     <source src={item.srcMp4} type="video/mp4" />
                   </video>
                   {item.title && (
-                    <div className="mt-2 text-sm text-black dark:text-white pointer-events-none">
+                    <div className="mt-2 text-lg text-black dark:text-white pointer-events-none">
                       {item.title}
                     </div>
                   )}
@@ -140,7 +140,7 @@ export default function Lightbox() {
                     />
                   </div>
                   {item.title && (
-                    <div className="mt-2 text-sm text-black dark:text-white pointer-events-none">
+                    <div className="mt-2 text-lg text-black dark:text-white pointer-events-none">
                       {item.title}
                     </div>
                   )}
@@ -164,7 +164,7 @@ export default function Lightbox() {
                       className="object-contain"
                       style={{ maxHeight, maxWidth }}
                     />
-                    <div className="mt-2 text-sm text-black dark:text-white pointer-events-none">
+                    <div className="mt-2 text-lg text-black dark:text-white pointer-events-none">
                       {item.title}
                     </div>
                   </div>
