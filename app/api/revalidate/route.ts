@@ -27,7 +27,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     action = body?.action || body?.event || "unknown";
-  } catch (_) {}
+  } catch {}
 
   // 1) Revalider la home (et autres si besoin)
   revalidatePath("/");

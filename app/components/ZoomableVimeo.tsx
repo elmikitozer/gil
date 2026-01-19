@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import Image from 'next/image';
 import HoverCover from '@/app/components/ui/HoverCover';
 import LightboxClose from './ui/LightboxClose';
 import { extractVimeoId } from '@/app/utils/vimeo';
@@ -67,11 +68,13 @@ export default function ZoomableVimeo({
       >
         {/* Thumbnail avec lazy loading */}
         {thumbnailUrl && (
-          <img
+          <Image
             src={thumbnailUrl}
             alt="Vimeo thumbnail"
-            loading="lazy"
-            className="absolute inset-0 w-full h-full object-cover"
+            fill
+            sizes={`${width}px`}
+            className="object-cover"
+            unoptimized
           />
         )}
 
