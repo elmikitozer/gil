@@ -6,7 +6,7 @@ export default function ContactPage() {
     <section className="mx-auto max-w-6xl px-4 py-[clamp(32px,10vh,96px)]">
       <div className="flex flex-col md:flex-row md:gap-12 lg:gap-16 items-start">
         {/* Vidéo à gauche */}
-        <div className="w-full md:w-1/2 mb-8 md:mb-0">
+        <div className="w-full mt-8 md:w-1/2 mb-8 md:mb-0">
           <video
             autoPlay
             muted
