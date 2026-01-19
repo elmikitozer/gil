@@ -104,7 +104,7 @@ export default function MasonryColumns({ items, gap = 0 }: { items: Item[]; gap?
 
     let gi = 0; // index global dans la liste
     for (const item of items) {
-      const key =
+      const baseKey =
         item.kind === 'image'
           ? `img:${item.src}`
           : item.kind === 'video'
@@ -112,6 +112,7 @@ export default function MasonryColumns({ items, gap = 0 }: { items: Item[]; gap?
           : item.kind === 'hybrid'
           ? `hybrid:${item.srcMp4}:${item.vimeoId}`
           : `vimeo:${item.vimeoId}`;
+      const key = `${gi}:${baseKey}`;
       const override =
         item.kind === 'video' || item.kind === 'vimeo' || item.kind === 'hybrid'
           ? parseRatio(item.ratio)

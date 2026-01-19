@@ -111,17 +111,29 @@
   padding: 2rem !important;
 }
 
-/* Reduce shadow on close button and navigation arrows */
-.yarl__button svg,
-.yarl__icon_close svg,
-.yarl__navigation_prev svg,
-.yarl__navigation_next svg {
-  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.3)) !important;
+/* Remove ALL shadows from yet-another-react-lightbox buttons */
+.yarl__button,
+.yarl__navigation_prev,
+.yarl__navigation_next,
+.yarl__toolbar button,
+.yarl__toolbar .yarl__button,
+button[class*='yarl'] {
+  box-shadow: none !important;
 }
 
-:root.dark .yarl__button svg,
-:root.dark .yarl__icon_close svg,
-:root.dark .yarl__navigation_prev svg,
-:root.dark .yarl__navigation_next svg {
-  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.3)) !important;
+.yarl__button svg,
+.yarl__navigation_prev svg,
+.yarl__navigation_next svg,
+.yarl__toolbar button svg,
+.yarl__toolbar .yarl__button svg,
+button[class*='yarl'] svg {
+  filter: none !important;
+}
+
+/* Force no shadow on navigation icons */
+.yarl__icon,
+.yarl__icon svg,
+svg[class*='yarl'] {
+  filter: none !important;
+  box-shadow: none !important;
 }

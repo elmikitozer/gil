@@ -30,6 +30,12 @@ a {
 }
 
 @layer utilities {
+  /* Texte justifié avec dernière ligne centrée */
+  .text-justify-center {
+    text-align: justify;
+    text-align-last: center;
+  }
+
   /* arrive de la droite, finit aligné à gauche (padding égal à --pad) */
   @keyframes slide-nav-bounce-basic-left {
     0% {
