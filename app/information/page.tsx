@@ -20,7 +20,7 @@ export default function ContactPage() {
         </div>
 
         {/* Texte à droite */}
-        <div className="w-full md:w-1/2 text-justify">
+        <div className="mt-auto mb-auto w-full md:w-1/2 text-justify">
           <h1 className="font-medium text-[clamp(18px,5vw,24px)]">
             Gil Anselmi is a Paris-based photographer and director.
           </h1>
