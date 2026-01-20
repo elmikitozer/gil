@@ -106,6 +106,14 @@
   display: none !important;
 }
 
+/* Hide navigation arrows on touch devices (swipe is available) */
+@media (pointer: coarse) {
+  .yarl__navigation_prev,
+  .yarl__navigation_next {
+    display: none !important;
+  }
+}
+
 /* Reduce padding for single item lightbox */
 .yarl__slide:only-child {
   padding: 2rem !important;
