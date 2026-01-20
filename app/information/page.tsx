@@ -4,9 +4,9 @@ export const metadata = { title: 'Informations — Gil Anselmi' };
 export default function ContactPage() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-[clamp(32px,10vh,96px)]">
-      <div className="flex flex-col md:flex-row md:gap-12 lg:gap-16 items-start">
+      <div className="flex flex-col md:flex-row gap-8 md:gap-16 items-start md:items-center md:justify-center md:min-h-[70vh]">
         {/* Vidéo à gauche */}
-        <div className="w-full mt-8 md:w-1/2 mb-8 md:mb-0">
+        <div className="w-full mt-8 md:w-[45%] md:max-w-md mb-8 md:mb-0">
           <video
             autoPlay
             muted
@@ -20,7 +20,7 @@ export default function ContactPage() {
         </div>
 
         {/* Texte à droite */}
-        <div className="mt-auto mb-auto w-full md:w-1/2">
+        <div className="mt-auto mb-auto w-full md:w-[45%] md:max-w-md">
           <h1 className="font-medium text-[clamp(18px,5vw,24px)] xl:whitespace-nowrap">
             Gil Anselmi is a Paris-based photographer and director.
           </h1>
