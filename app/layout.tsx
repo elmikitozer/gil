@@ -44,8 +44,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </main>
         <StoryblokBridgeLoader />
         <footer className="border-t border-neutral-200 mt-16">
-          <div className="container mx-auto px-4 py-8 text-sm text-neutral-500">
-            © {new Date().getFullYear()} Gil Anselmi
+          <div className="container mx-auto px-4 py-6 text-sm text-neutral-500 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+            <span>© {new Date().getFullYear()} Gil Anselmi. All rights reserved.</span>
+            <a
+              href="/mentions-legales"
+              className="hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
+            >
+              Mentions légales
+            </a>
           </div>
         </footer>
       </body>
