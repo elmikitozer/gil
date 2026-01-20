@@ -156,25 +156,39 @@ export default function Lightbox() {
             const current = index + 1;
 
             return (
-              <div className="flex flex-col w-full h-full px-4 pt-4 pb-10 md:pt-10">
-                {/* Top bar: title left, counter right */}
-                <div className="h-[10%] flex items-start justify-between pointer-events-none">
-                  <div className="text-base md:text-xl italic text-black dark:text-white">
+              <div className="flex flex-col w-full h-full px-4 pt-4 pb-4 md:pt-10 md:pb-10">
+                {/* Mobile: Top bar with title left, counter right */}
+                <div className="md:hidden h-[8%] flex items-start justify-between pointer-events-none">
+                  <div className="text-base italic text-black dark:text-white">
                     {item.title || ''}
                   </div>
                   {!isSingleItem && (
-                    <div className="text-base md:text-xl italic text-black dark:text-white">
+                    <div className="text-base italic text-black dark:text-white">
                       fig. {current} sur {total}
                     </div>
                   )}
                 </div>
-                {/* Image container - takes 90% of height */}
-                <div className="h-[90%] flex items-center justify-center">
+                {/* Image container */}
+                <div className="h-[92%] md:h-[90%] flex items-center justify-center">
                   <img
                     src={item.src}
                     alt={item.alt ?? ''}
                     className="object-contain max-w-full max-h-full"
                   />
+                </div>
+                {/* Desktop: Bottom bar with title left, counter center */}
+                <div className="hidden md:flex h-[10%] items-center justify-center">
+                  <div className="w-full flex items-center pointer-events-none">
+                    <div className="flex-1 text-xl italic text-black dark:text-white">
+                      {item.title || ''}
+                    </div>
+                    {!isSingleItem && (
+                      <div className="absolute left-1/2 -translate-x-1/2 text-xl italic text-black dark:text-white">
+                        fig. {current} sur {total}
+                      </div>
+                    )}
+                    <div className="flex-1" />
+                  </div>
                 </div>
               </div>
             );
