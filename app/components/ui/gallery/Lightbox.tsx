@@ -47,7 +47,7 @@ export default function Lightbox() {
       close={close}
       slides={slides}
       index={index}
-      plugins={isSingleItem ? [] : [Thumbnails]}
+      plugins={[]}
       on={{
         view: ({ index: newIndex }) => {
           if (newIndex !== index) {
@@ -150,38 +150,35 @@ export default function Lightbox() {
             );
           }
 
-          // For images, add title below if present
+          // For images - uniform height, symmetric padding top/bottom
           if (item.kind === 'image') {
-            const maxHeight = isSingleItem ? '90vh' : '80vh';
-            const maxWidth = isSingleItem ? '90vw' : '80vw';
+            const total = items.length;
+            const current = index + 1;
 
-            if (item.title) {
-              return (
-                <div className="flex items-center justify-center w-full h-full">
-                  <div className="flex flex-col items-start">
-                    <img
-                      src={item.src}
-                      alt={item.alt ?? ''}
-                      className="object-contain"
-                      style={{ maxHeight, maxWidth }}
-                    />
-                    <div className="mt-2 text-lg text-black dark:text-white pointer-events-none">
-                      {item.title}
+            return (
+              <div className="flex flex-col w-full h-full pt-10 px-4">
+                {/* Image container - takes 90% of height */}
+                <div className="h-[90%] flex items-center justify-center">
+                  <img
+                    src={item.src}
+                    alt={item.alt ?? ''}
+                    className="object-contain max-w-full max-h-full"
+                  />
+                </div>
+                {/* Bottom bar: title left, counter center - takes remaining 10% */}
+                <div className="h-[10%] flex items-center justify-center">
+                  <div className="w-full flex items-center pointer-events-none">
+                    <div className="flex-1 text-xl italic text-black dark:text-white">
+                      {item.title || ''}
                     </div>
+                    {!isSingleItem && (
+                      <div className="absolute left-1/2 -translate-x-1/2 text-xl italic text-black dark:text-white">
+                        fig. {current} sur {total}
+                      </div>
+                    )}
+                    <div className="flex-1" />
                   </div>
                 </div>
-              );
-            }
-
-            // No title - use default rendering with adjusted size
-            return (
-              <div className="flex items-center justify-center w-full h-full">
-                <img
-                  src={item.src}
-                  alt={item.alt ?? ''}
-                  className="object-contain"
-                  style={{ maxHeight, maxWidth }}
-                />
               </div>
             );
           }

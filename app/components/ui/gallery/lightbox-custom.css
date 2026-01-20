@@ -145,3 +145,43 @@ svg[class*='yarl'] {
   filter: none !important;
   box-shadow: none !important;
 }
+
+/* Replace arrow icons with dots */
+.yarl__navigation_prev .yarl__icon,
+.yarl__navigation_next .yarl__icon {
+  display: none !important;
+}
+
+.yarl__navigation_prev,
+.yarl__navigation_next {
+  filter: none !important;
+  box-shadow: none !important;
+}
+
+.yarl__navigation_prev::after,
+.yarl__navigation_next::after {
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgb(163, 163, 163);
+  transition: background-color 0.2s;
+  filter: none !important;
+  box-shadow: none !important;
+}
+
+.yarl__navigation_prev:hover::after,
+.yarl__navigation_next:hover::after {
+  background-color: rgb(0, 0, 0);
+}
+
+:root.dark .yarl__navigation_prev::after,
+:root.dark .yarl__navigation_next::after {
+  background-color: rgb(115, 115, 115);
+}
+
+:root.dark .yarl__navigation_prev:hover::after,
+:root.dark .yarl__navigation_next:hover::after {
+  background-color: rgb(255, 255, 255);
+}
