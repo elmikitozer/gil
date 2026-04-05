@@ -27,8 +27,6 @@ export default async function MediaItem({ blok }: any) {
     allMedia.push(...blok.album_videos);
   }
 
-  console.log('📦 Total allMedia:', allMedia.length, 'items');
-
   if (allMedia.length > 0) {
     const mapped = allMedia
       .filter(

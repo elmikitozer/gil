@@ -12,9 +12,7 @@ export default function StoryblokBridgeLoader() {
     script.async = true;
     document.head.appendChild(script);
 
-    script.onload = () => {
-      console.log('✅ Storyblok Bridge script loaded');
-    };
+    script.onload = () => {};
   }, []);
 
   return null;

@@ -21,7 +21,7 @@ export default function StoryRenderer({ story }: Props) {
     const sb = (window as Window & typeof globalThis).storyblok;
     if (!sb) return;
     const onChange = () => location.reload();
-    const onEnter = () => console.log('✍️ Storyblok editmode active');
+    const onEnter = () => {};
     sb.on?.(['change', 'published'], onChange);
     sb.on?.('enterEditmode', onEnter);
     return () => {

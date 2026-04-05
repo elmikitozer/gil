@@ -3,9 +3,7 @@
 
 import React, { useMemo } from 'react';
 import YARLightbox, { SlideImage } from 'yet-another-react-lightbox';
-import Thumbnails from 'yet-another-react-lightbox/plugins/thumbnails';
 import 'yet-another-react-lightbox/styles.css';
-import 'yet-another-react-lightbox/plugins/thumbnails.css';
 import './lightbox-custom.css';
 import { useGallery } from './GalleryContext';
 import { extractVimeoId } from '@/app/utils/vimeo';
@@ -56,7 +54,7 @@ export default function Lightbox() {
         },
       }}
       carousel={{
-        finite: isSingleItem ? true : false,
+        finite: isSingleItem,
         preload: 2,
       }}
       animation={{
@@ -66,23 +64,8 @@ export default function Lightbox() {
       controller={{
         closeOnBackdropClick: true,
       }}
-      thumbnails={
-        isSingleItem
-          ? undefined
-          : {
-              position: 'bottom',
-              width: 64,
-              height: 64,
-              border: 2,
-              borderRadius: 4,
-              padding: 8,
-              gap: 8,
-            }
-      }
       toolbar={{
-        buttons: isSingleItem
-          ? ['close']
-          : ['close'],
+        buttons: ['close'],
       }}
       render={{
         slide: ({ slide }) => {
@@ -125,8 +108,8 @@ export default function Lightbox() {
           // Custom rendering for vimeo/hybrid
           if (item.kind === 'vimeo' || item.kind === 'hybrid') {
             const vimeoId = extractVimeoId(item.vimeoId);
-            const maxVW = isSingleItem ? '90vw' : '90vw';
-            const maxVH = isSingleItem ? '90vh' : '90vh';
+            const maxVW = '90vw';
+            const maxVH = '90vh';
             return (
               <div className="flex items-center justify-center w-full h-full">
                 <div className="flex flex-col items-start">

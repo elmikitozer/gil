@@ -20,13 +20,9 @@ export default function StoryblokBridgeInner({ storyId, mutate }: Props) {
         ?.storyblok;
 
       if (sb || parentSb) {
-        console.log("✅ Bridge Storyblok détecté après", tries, "tentatives");
         clearInterval(timer);
       } else {
         tries++;
-        if (tries % 3 === 0) {
-          console.log("⏳ En attente du bridge Storyblok...");
-        }
       }
     }, 1000);
 
@@ -35,10 +31,7 @@ export default function StoryblokBridgeInner({ storyId, mutate }: Props) {
 
   // Hook toujours appelé (jamais conditionnel)
   useStoryblokBridge(storyId ?? 0, (story) => {
-    console.log("🔁 Storyblok Bridge TRIGGERED:", story);
     mutate?.(story);
   });
-
-  console.log("✅ StoryblokBridgeInner monté — storyId:", storyId);
   return null;
 }
