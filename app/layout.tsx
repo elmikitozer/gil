@@ -16,6 +16,7 @@ export const metadata: Metadata = {
     siteName: 'Gil Anselmi',
     images: [{ url: '/og.jpg', width: 1200, height: 630 }],
   },
+  alternates: { canonical: 'https://gilanselmi.com' },
   robots: { index: true, follow: true },
 };
 

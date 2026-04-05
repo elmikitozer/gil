@@ -1,9 +1,13 @@
 // app/api/revalidate/route.ts
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
+import { timingSafeEqual } from "crypto";
 
 function authorized(url: string) {
-  return new URL(url).searchParams.get("secret") === process.env.REVALIDATE_SECRET;
+  const provided = new URL(url).searchParams.get("secret") ?? "";
+  const expected = process.env.REVALIDATE_SECRET ?? "";
+  if (!expected || provided.length !== expected.length) return false;
+  return timingSafeEqual(Buffer.from(provided), Buffer.from(expected));
 }
 
 // ⛏️ util: patch Edge Config "assetBump"

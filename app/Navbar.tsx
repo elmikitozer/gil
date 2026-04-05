@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 import { bigCaslon } from '@/app/fonts/big-caslon';
 import Image from 'next/image';

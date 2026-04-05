@@ -27,13 +27,3 @@ export function ensureStoryblok() {
   });
   inited = true;
 }
-
-// lib/storyblok.ts (exporte les noms connus)
-export const KNOWN = new Set([
-  "grid_masonry",
-  "editorial_strip",
-  "media_item",
-  "video_item",
-  "hero_full_bleed",
-  // ...
-]);

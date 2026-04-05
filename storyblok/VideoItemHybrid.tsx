@@ -62,7 +62,7 @@ export default function VideoItemHybrid({ blok }: { blok: VideoItemHybridBlok })
               blok.autoplay ? 1 : 0
             }&loop=${blok.loop ? 1 : 0}&muted=${blok.muted ? 1 : 0}&title=0&byline=0&portrait=0`}
             className="absolute inset-0 w-full h-full"
-            frameBorder="0"
+            style={{ border: 'none' }}
             allow="autoplay; fullscreen; picture-in-picture"
             allowFullScreen
             title={blok.title || 'Vidéo'}

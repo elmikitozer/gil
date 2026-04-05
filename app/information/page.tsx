@@ -1,5 +1,14 @@
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'Informations — Gil Anselmi' };
+export const metadata = {
+  title: 'Informations — Gil Anselmi',
+  description: 'Informations de contact et à propos de Gil Anselmi, photographe basé à Paris.',
+  alternates: { canonical: 'https://gilanselmi.com/information' },
+  openGraph: {
+    title: 'Informations — Gil Anselmi',
+    description: 'Informations de contact et à propos de Gil Anselmi, photographe basé à Paris.',
+    url: 'https://gilanselmi.com/information',
+  },
+};
 
 export default function ContactPage() {
   return (

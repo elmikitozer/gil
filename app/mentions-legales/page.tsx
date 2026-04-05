@@ -1,5 +1,14 @@
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'Mentions légales — Gil Anselmi' };
+export const metadata = {
+  title: 'Mentions légales — Gil Anselmi',
+  description: 'Mentions légales du site de Gil Anselmi.',
+  alternates: { canonical: 'https://gilanselmi.com/mentions-legales' },
+  openGraph: {
+    title: 'Mentions légales — Gil Anselmi',
+    url: 'https://gilanselmi.com/mentions-legales',
+  },
+  robots: { index: false, follow: false },
+};
 
 export default function MentionsLegalesPage() {
   return (
