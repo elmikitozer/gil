@@ -88,7 +88,7 @@ export default function JustifiedGallery({
   }, [cw, images, ratios, targetH, gap]);
 
   // Lightbox minimaliste (zoom)
-  const [zoom, setZoom] = useState<string | null>(null);
+  const [zoom, setZoom] = useState<JGImage | null>(null);
   useEffect(() => {
     if (!zoom) return;
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setZoom(null);
@@ -109,7 +109,7 @@ export default function JustifiedGallery({
               <button
                 key={it.src + j}
                 type="button"
-                onClick={() => setZoom(it.src)}
+                onClick={() => setZoom(it)}
                 className="relative block focus:outline-none cursor-zoom-in" // ← ICI: 'relative'
                 style={{ width: it.w, height: it.h, lineHeight: 0 }}
               >
@@ -135,9 +135,10 @@ export default function JustifiedGallery({
           className="fixed inset-0 z-[100] bg-black/90 cursor-zoom-out flex items-center justify-center p-0"
           onClick={() => setZoom(null)}
           aria-modal="true"
+          aria-label={zoom.alt || 'Photo'}
           role="dialog"
         >
-          <Image src={zoom} alt="" fill className="object-contain" sizes="100vw" priority />
+          <Image src={zoom.src} alt={zoom.alt || ''} fill className="object-contain" sizes="100vw" priority />
         </div>
       )}
     </>

@@ -70,7 +70,7 @@ export default function ZoomableVimeo({
         {thumbnailUrl && (
           <Image
             src={thumbnailUrl}
-            alt="Vimeo thumbnail"
+            alt={hoverTitle || 'Vidéo'}
             fill
             sizes={`${width}px`}
             className="object-cover"
@@ -98,6 +98,7 @@ export default function ZoomableVimeo({
           className="fixed inset-0 z-[100] bg-white dark:bg-black flex items-center justify-center p-0 cursor-pointer"
           onClick={onClose}
           aria-modal="true"
+          aria-label={hoverTitle || 'Vidéo'}
           role="dialog"
         >
           <LightboxClose onClick={onClose} size="lg" />

@@ -144,6 +144,7 @@ export default function ZoomableVideo({
           className="fixed inset-0 z-[100] bg-white flex items-center justify-center p-0 cursor-pointer"
           onClick={onClose}
           aria-modal="true"
+          aria-label={hoverTitle || 'Vidéo'}
           role="dialog"
         >
           <LightboxClose onClick={onClose} size="lg" />
