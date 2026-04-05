@@ -1,7 +1,9 @@
 import { storyblokEditable, renderRichText } from "@storyblok/react/rsc";
+import DOMPurify from "isomorphic-dompurify";
 
 export default function EditorialStrip({ blok }: any) {
-  const html = blok?.text ? renderRichText(blok.text) : ""; // ← garde-fou
+  const raw = blok?.text ? renderRichText(blok.text) : "";
+  const html = raw ? DOMPurify.sanitize(raw) : "";
 
   return (
     <section {...storyblokEditable(blok)} className="mt-8 md:mt-12">
