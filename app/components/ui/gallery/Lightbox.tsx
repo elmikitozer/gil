@@ -85,8 +85,9 @@ export default function Lightbox() {
           : ['close'],
       }}
       render={{
-        slide: () => {
-          const item = items[index];
+        slide: ({ slide }) => {
+          const itemIndex = slides.findIndex((s) => s === slide);
+          const item = items[itemIndex];
           if (!item) return undefined;
 
           // Custom rendering for videos
@@ -153,7 +154,7 @@ export default function Lightbox() {
           // For images - uniform height, symmetric padding top/bottom
           if (item.kind === 'image') {
             const total = items.length;
-            const current = index + 1;
+            const current = itemIndex + 1;
 
             return (
               <div className="flex flex-col w-full h-full px-4 pt-4 pb-4 md:pt-10 md:pb-10">
