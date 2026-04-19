@@ -2,6 +2,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ['jsdom', 'isomorphic-dompurify'],
   // eslint: {
   //   ignoreDuringBuilds: true, // ✅ désactive le blocage ESLint sur Vercel
   // },
