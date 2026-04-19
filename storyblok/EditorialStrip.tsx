@@ -1,5 +1,6 @@
-import { storyblokEditable, renderRichText } from "@storyblok/react/rsc";
-import DOMPurify from "isomorphic-dompurify";
+"use client";
+import { storyblokEditable, renderRichText } from "@storyblok/react";
+import DOMPurify from "dompurify";
 
 export default function EditorialStrip({ blok }: any) {
   const raw = blok?.text ? renderRichText(blok.text) : "";
