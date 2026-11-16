@@ -8,3 +8,4 @@ out
 localhost*
 .md
 .vercel
+tsconfig.tsbuildinfo
