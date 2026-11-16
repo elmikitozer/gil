@@ -1,23 +1,18 @@
 "use client";
-import { storyblokEditable, renderRichText } from "@storyblok/react";
-import type { SbBlokData, StoryblokRichTextNode } from "@storyblok/react";
-import DOMPurify from "dompurify";
+import { storyblokEditable, StoryblokRichText } from "@storyblok/react";
+import type { SbBlokData, StoryblokRichTextProps } from "@storyblok/react";
 
 type EditorialStripBlok = SbBlokData & {
-  text?: StoryblokRichTextNode<string>;
+  text?: StoryblokRichTextProps["doc"];
   align?: string;
 };
 
 export default function EditorialStrip({ blok }: { blok: EditorialStripBlok }) {
-  const raw = blok.text ? renderRichText(blok.text) : "";
-  const html = raw ? DOMPurify.sanitize(raw) : "";
-
   return (
     <section {...storyblokEditable(blok)} className="mt-8 md:mt-12">
       <div className={`text-base md:text-lg ${blok.align === "center" ? "text-center" : ""}`}>
-        {html ? (
-          <div dangerouslySetInnerHTML={{ __html: html }} />
-        ) : null}
+        {/* Rendu en éléments React (pas de HTML injecté) : fonctionne au rendu serveur */}
+        {blok.text ? <StoryblokRichText doc={blok.text} /> : null}
       </div>
     </section>
   );
