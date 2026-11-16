@@ -27,11 +27,20 @@ const caslon = Libre_Caslon_Text({
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr">
+    <html lang="fr" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://a.storyblok.com" crossOrigin="" />
         <link rel="dns-prefetch" href="https://a.storyblok.com" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        {/* Largeur de la barre de défilement (0 avec les barres « overlay »), mesurée à l'apparition
+            de la page et à chaque redimensionnement, pour que la grille pleine largeur (.full-bleed)
+            ne dépasse pas de la fenêtre. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){var d=document.documentElement;function f(){var p=document.createElement('div');p.style.cssText='position:absolute;visibility:hidden;width:100vw;height:0';d.appendChild(p);var s=p.offsetWidth-d.clientWidth;d.removeChild(p);d.style.setProperty('--sbw',Math.max(0,s)+'px')}f();new ResizeObserver(f).observe(d)})()",
+          }}
+        />
       </head>
 
       <body

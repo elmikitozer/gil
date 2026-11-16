@@ -88,3 +88,13 @@ a {
   width: var(--colw);
   height: calc(var(--colw) / var(--r));
 }
+
+/* Pleine largeur de la fenêtre, barre de défilement exclue : 100vw l'inclut et
+   provoquait un défilement horizontal (--sbw est défini dans app/layout.tsx). */
+.full-bleed {
+  --vw: calc(100vw - var(--sbw, 0px));
+  position: relative;
+  left: 50%;
+  width: var(--vw);
+  margin-left: calc(var(--vw) / -2);
+}

@@ -183,7 +183,7 @@ export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
   return (
     <section
       {...storyblokEditable(blok)}
-      className="relative left-1/2 right-1/2 -mx-[50vw] w-screen px-[8px] md:px-[12px]"
+      className="full-bleed px-[8px] md:px-[12px]"
     >
       <MasonryColumns items={items} gap={10} />
     </section>
