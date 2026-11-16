@@ -1,41 +1,7 @@
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-
-export type ImageItem = {
-  kind: 'image';
-  src: string;
-  alt?: string;
-  title?: string;
-  caption?: string;
-};
-export type VideoItem = {
-  kind: 'video';
-  srcMp4: string;
-  srcWebm?: string;
-  poster?: string;
-  alt?: string;
-  title?: string;
-};
-export type VimeoVideoItem = {
-  kind: 'vimeo';
-  vimeoId: string;
-  poster?: string;
-  alt?: string;
-  title?: string;
-  ratio?: string;
-};
-export type HybridVideoItem = {
-  kind: 'hybrid';
-  srcMp4: string; // Pour la grille (preview Cloudinary)
-  vimeoId: string; // Pour la lightbox (vidéo complète Vimeo)
-  srcWebm?: string;
-  poster?: string;
-  alt?: string;
-  title?: string;
-  ratio?: string;
-};
-export type Item = ImageItem | VideoItem | VimeoVideoItem | HybridVideoItem;
+import type { Item } from './types';
 
 type GalleryAPI = {
   items: Item[];

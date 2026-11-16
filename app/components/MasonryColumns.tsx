@@ -5,9 +5,9 @@ import ZoomableImage from './ZoomableImage';
 import ZoomableVideo from './ZoomableVideo';
 import ZoomableVimeo from './ZoomableVimeo';
 import { storyblokEditable } from '@storyblok/react/rsc';
-import type { SbBlokData } from '@storyblok/react/rsc';
 
 import { GalleryProvider, useGallery } from './ui/gallery/GalleryContext';
+import type { Item } from './ui/gallery/types';
 import Lightbox from './ui/gallery/Lightbox';
 import {
   DEFAULT_RATIO,
@@ -16,54 +16,6 @@ import {
   tileVars,
   variantsCss,
 } from '@/lib/masonry';
-
-export type ImageItem = {
-  kind: 'image';
-  src: string;
-  alt?: string;
-  title?: string;
-  caption?: string;
-  blok?: SbBlokData;
-  // Props pour l'album (peut contenir images + vidéos)
-  albumPhotos?: Item[];
-  isCoverPhoto?: boolean;
-  /** Proportion connue d'avance (lue dans l'URL de l'asset Storyblok). */
-  ratio?: number;
-};
-export type VideoItem = {
-  kind: 'video';
-  srcMp4: string;
-  srcWebm?: string;
-  poster?: string;
-  alt?: string;
-  ratio?: string;
-  title?: string;
-  caption?: string;
-  blok?: SbBlokData;
-};
-export type VimeoVideoItem = {
-  kind: 'vimeo';
-  vimeoId: string;
-  poster?: string;
-  alt?: string;
-  ratio?: string;
-  title?: string;
-  caption?: string;
-  blok?: SbBlokData;
-};
-export type HybridVideoItem = {
-  kind: 'hybrid';
-  srcMp4: string; // Preview Cloudinary pour grille
-  vimeoId: string; // Vidéo complète Vimeo pour lightbox
-  srcWebm?: string;
-  poster?: string;
-  alt?: string;
-  ratio?: string;
-  title?: string;
-  caption?: string;
-  blok?: SbBlokData;
-};
-export type Item = ImageItem | VideoItem | VimeoVideoItem | HybridVideoItem;
 
 function parseRatio(r?: string): number | undefined {
   if (!r || r === 'auto') return;
