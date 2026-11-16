@@ -237,6 +237,7 @@ function MasonryTile({ item, gi, ratio, tileKey, eager, sizes, pxTile, vars, set
         poster={item.poster}
         width="100%"
         height="100%"
+        label={item.alt}
         hoverTitle={item.title}
         hoverCaption={item.caption}
         onLoaded={measure}
@@ -247,6 +248,7 @@ function MasonryTile({ item, gi, ratio, tileKey, eager, sizes, pxTile, vars, set
     content = (
       <ZoomableVimeo
         vimeoId={item.vimeoId}
+        alt={item.alt}
         width="100%"
         height="100%"
         hoverTitle={item.title}

@@ -16,6 +16,8 @@ type Props = {
   onLoaded?: (videoW: number, videoH: number) => void;
   onOpen: () => void;
   autoplayInViewport?: boolean;
+  /** Nom du bouton pour les lecteurs d'écran (texte alternatif ou titre de la vidéo). */
+  label?: string;
   hoverTitle?: string; // ✅
   hoverCaption?: string; // ✅
 };
@@ -32,6 +34,7 @@ export default function ZoomableVideo({
   onLoaded,
   onOpen,
   autoplayInViewport = true,
+  label,
   hoverTitle,
   hoverCaption,
 }: Props) {
@@ -93,6 +96,7 @@ export default function ZoomableVideo({
       <button
         ref={btnRef}
         type="button"
+        aria-label={label || 'Open video'}
         onClick={() => {
           // Ne pas ouvrir la lightbox dans l'éditeur Storyblok
           if (isStoryblokEditor) return;

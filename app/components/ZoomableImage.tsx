@@ -53,6 +53,8 @@ export default function ZoomableImage({
     <button
       type="button"
       onClick={handleClick}
+      // Sans texte alternatif, le bouton n'aurait pas de nom pour un lecteur d'écran
+      aria-label={alt ? undefined : 'Open image'}
       className={`group relative block w-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900 pressable ${
         pressed ? 'is-pressed' : ''
       } ${isEditor ? 'pointer-events-none' : 'cursor-pointer'}`}

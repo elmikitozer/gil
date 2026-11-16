@@ -26,7 +26,7 @@ export type VideoItemBlok = SbBlokData & {
 
 export type MediaItemBlok = SbBlokData & {
   component: 'media_item';
-  media?: { filename?: string };
+  media?: { filename?: string; alt?: string };
   alt?: string;
   title?: string;
   caption?: string;
@@ -55,11 +55,13 @@ function isVideoItemBlok(entry: AlbumEntry): entry is VideoItemBlok {
  */
 export function videoItemToItem(blok: VideoItemBlok, albumTitle?: string): Item | null {
   const isAlbumEntry = albumTitle !== undefined;
+  const title = isAlbumEntry ? blok.title || albumTitle : blok.title;
   const common = {
     poster: blok.poster?.filename,
-    alt: blok.alt,
+    // Texte alternatif : celui du bloc, à défaut le titre (sans les deux, le composant met un libellé)
+    alt: blok.alt || title || undefined,
     ratio: blok.ratio,
-    title: isAlbumEntry ? blok.title || albumTitle : blok.title,
+    title,
     caption: blok.caption,
     ...(isAlbumEntry ? {} : { blok }),
   };
@@ -82,11 +84,12 @@ export function videoItemToItem(blok: VideoItemBlok, albumTitle?: string): Item 
 function albumEntryToItem(entry: AlbumEntry, albumTitle: string): Item | null {
   if (isVideoItemBlok(entry)) return videoItemToItem(entry, albumTitle);
   if (!entry.filename) return null;
+  const title = entry.title || albumTitle;
   return {
     kind: 'image',
     src: entry.filename,
-    alt: entry.alt || '',
-    title: entry.title || albumTitle,
+    title,
+    alt: entry.alt || title,
     caption: entry.caption || '',
   };
 }
@@ -112,7 +115,8 @@ export function mediaItemToItem(blok: MediaItemBlok): ImageItem | null {
   return {
     kind: 'image',
     src,
-    alt: blok.alt,
+    // Texte alternatif : celui du bloc, puis celui de l'asset, puis le titre
+    alt: blok.alt || blok.media?.alt || blok.title || undefined,
     title: blok.title,
     caption: blok.caption,
     blok,

@@ -3,8 +3,8 @@ import type { SbBlokData } from "@storyblok/react/rsc";
 import Image from "next/image";
 
 type SplitDiptychBlok = SbBlokData & {
-  left?: { filename?: string };
-  right?: { filename?: string };
+  left?: { filename?: string; alt?: string };
+  right?: { filename?: string; alt?: string };
   gap?: string;
   align?: string;
 };
@@ -29,8 +29,8 @@ export default function SplitDiptych({ blok }: { blok: SplitDiptychBlok }) {
   if (!left && !right) return null;
   return (
     <section {...storyblokEditable(blok)} className={`grid ${gap} grid-cols-1 md:grid-cols-2 ${align} mt-10`}>
-      {left && <Image src={left} alt="" width={1600} height={1200} className="w-full h-auto object-cover" />}
-      {right && <Image src={right} alt="" width={1600} height={1200} className="w-full h-auto object-cover" />}
+      {left && <Image src={left} alt={blok.left?.alt ?? ""} width={1600} height={1200} className="w-full h-auto object-cover" />}
+      {right && <Image src={right} alt={blok.right?.alt ?? ""} width={1600} height={1200} className="w-full h-auto object-cover" />}
     </section>
   );
 }

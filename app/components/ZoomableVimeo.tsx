@@ -7,6 +7,8 @@ import useIsStoryblokEditor from './useIsStoryblokEditor';
 
 type Props = {
   vimeoId: string;
+  /** Texte alternatif de la vignette (CMS) ; à défaut, le titre. */
+  alt?: string;
   width: number | string;
   height: number | string;
   onOpen: () => void;
@@ -16,6 +18,7 @@ type Props = {
 
 export default function ZoomableVimeo({
   vimeoId,
+  alt,
   width,
   height,
   onOpen,
@@ -50,7 +53,7 @@ export default function ZoomableVimeo({
         {thumbnailUrl && (
           <Image
             src={thumbnailUrl}
-            alt={hoverTitle || 'Vidéo'}
+            alt={alt || hoverTitle || 'Video'}
             fill
             sizes="(min-width: 768px) 33vw, 50vw"
             className="object-cover"

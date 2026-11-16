@@ -3,7 +3,7 @@ import type { SbBlokData } from "@storyblok/react/rsc";
 import Image from "next/image";
 
 type HeroFullBleedBlok = SbBlokData & {
-  media?: { filename?: string };
+  media?: { filename?: string; alt?: string };
   title?: string;
 };
 
@@ -16,7 +16,7 @@ export default function HeroFullBleed({ blok }: { blok: HeroFullBleedBlok }) {
       {media && (
         <Image
           src={media}
-          alt={title || "Hero"}
+          alt={blok.media?.alt ?? ""}
           fill
           className="object-cover"
           priority

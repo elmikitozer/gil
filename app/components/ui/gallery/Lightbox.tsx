@@ -46,7 +46,7 @@ export default function Lightbox() {
 
       return {
         src: thumbnailSrc,
-        alt: item.alt ?? '',
+        alt: item.alt || item.title || '',
         title: item.title,
       };
     });
@@ -104,6 +104,7 @@ export default function Lightbox() {
                     muted={false}
                     loop
                     preload="auto"
+                    aria-label={item.alt || item.title || undefined}
                     poster={item.poster ?? undefined}
                   >
                     {item.srcWebm ? <source src={item.srcWebm} type="video/webm" /> : null}
@@ -133,7 +134,7 @@ export default function Lightbox() {
                       style={{ border: 'none' }}
                       allow="autoplay; fullscreen; picture-in-picture"
                       allowFullScreen
-                      title={item.title || 'Vidéo'}
+                      title={item.alt || item.title || 'Video'}
                     />
                   </div>
                   {item.title && (
