@@ -11,10 +11,10 @@ export default function Navbar() {
         'transition-colors',
       ].join(' ')}
     >
-      <div className="relative px-6 md:px-8 h-16 flex items-center">
+      <div className="relative px-4 sm:px-6 md:px-8 h-16 flex items-center">
         {/* LOGO animé à gauche — + padding-left pour le respir */}
         <div
-          className="absolute inset-0 z-10 flex items-center [--pad:24px] md:[--pad:32px] pl-6 md:pl-8"
+          className="absolute inset-0 z-10 flex items-center [--pad:16px] sm:[--pad:24px] md:[--pad:32px] pl-4 sm:pl-6 md:pl-8"
           aria-hidden="false"
         >
           <Link
@@ -28,14 +28,14 @@ export default function Navbar() {
               width={190} // adapte la taille
               height={120}
               priority // pour charger vite le logo
-              className="w-[120px] md:w-[160px] lg:w-[190px] h-auto"
-              sizes="(max-width: 640px) 120px, (max-width: 1024px) 160px, 190px"
+              className="w-[92px] min-[360px]:w-[120px] md:w-[160px] lg:w-[190px] h-auto"
+              sizes="(max-width: 359px) 92px, (max-width: 640px) 120px, (max-width: 1024px) 160px, 190px"
             />
           </Link>
         </div>
 
         {/* NAV à droite (cliquable) */}
-        <nav className="relative z-20 ml-auto flex items-center gap-4 text-[9px] sm:text-[11px] md:text-[12px] tracking-[0.22em] uppercase text-neutral-900">
+        <nav className="relative z-20 ml-auto flex items-center gap-[10px] sm:gap-4 text-[11px] md:text-[12px] tracking-[0.08em] sm:tracking-[0.22em] uppercase text-neutral-900">
           <Link
             href="/information"
             className={`${bigCaslon.className} hover:opacity-70 transition-opacity`}
