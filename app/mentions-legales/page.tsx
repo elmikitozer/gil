@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 export const metadata = {
   title: 'Mentions légales — Gil Anselmi',
   description: 'Mentions légales du site de Gil Anselmi.',

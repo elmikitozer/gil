@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 export const metadata = {
   title: 'Informations — Gil Anselmi',
   description: 'Informations de contact et à propos de Gil Anselmi, photographe basé à Paris.',
