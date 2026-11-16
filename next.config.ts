@@ -10,6 +10,21 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'a.storyblok.com' }, // images Storyblok
     ],
   },
+  async rewrites() {
+    return {
+      // L'éditeur visuel Storyblok charge « /?_storyblok=… » : on sert alors
+      // l'aperçu du brouillon, sans rendre la home publique dynamique.
+      beforeFiles: [
+        {
+          source: '/',
+          has: [{ type: 'query', key: '_storyblok' }],
+          destination: '/storyblok-preview',
+        },
+      ],
+      afterFiles: [],
+      fallback: [],
+    };
+  },
   async headers() {
     return [
       {

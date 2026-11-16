@@ -1,27 +1,11 @@
-import { getStoryblokApi } from '@storyblok/react/rsc';
-import { ensureStoryblok } from '@/lib/storyblok';
-import ClientStoryRenderer from './components/ClientStoryRenderer';
+import { StoryblokServerComponent } from '@storyblok/react/rsc';
+import { fetchStory } from '@/lib/storyblok';
+import '@/storyblok/registry.server';
 
-export const dynamic = 'force-dynamic'; // ⬅️ ajoute ceci tout en haut
-export const revalidate = 0;
+// Page statique : prérendue au build, puis régénérée uniquement quand le
+// webhook Storyblok appelle revalidatePath('/') (app/api/revalidate).
+export default async function HomePage() {
+  const story = await fetchStory('home', 'published');
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  ensureStoryblok();
-  const api = getStoryblokApi();
-
-  // In Visual Editor, Storyblok app adds _storyblok query param; always use draft when present
-  const sp = await searchParams;
-  const isEditor =
-    typeof sp._storyblok !== 'undefined' || typeof sp._storyblok_version !== 'undefined';
-  const version: 'published' | 'draft' =
-    isEditor || process.env.NODE_ENV !== 'production' ? 'draft' : 'published';
-
-  const { data } = await api.get('cdn/stories/home', { version });
-  const story = data?.story;
-
-  return <ClientStoryRenderer story={story} />;
+  return <StoryblokServerComponent blok={story.content} />;
 }
