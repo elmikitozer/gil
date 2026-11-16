@@ -10,20 +10,15 @@ import MasonryColumns, {
   type HybridVideoItem,
 } from '@/app/components/MasonryColumns';
 
-type MediaItemBlok = SbBlokData & {
-  component: 'media_item';
-  media?: { filename?: string };
+type StoryblokAsset = {
+  filename?: string;
   alt?: string;
   title?: string;
   caption?: string;
-  // Champs pour l'album
-  album_photos?: Array<{ filename?: string; alt?: string; title?: string; caption?: string }>;
-  is_cover_photo?: boolean;
 };
 
 type VideoItemBlok = SbBlokData & {
   component: 'video_item';
-  video_source?: 'mp4' | 'vimeo';
   vimeoId?: string;
   srcMp4?: string;
   srcWebm?: string;
@@ -34,9 +29,27 @@ type VideoItemBlok = SbBlokData & {
   caption?: string;
 };
 
+type MediaItemBlok = SbBlokData & {
+  component: 'media_item';
+  media?: { filename?: string };
+  alt?: string;
+  title?: string;
+  caption?: string;
+  // Champs pour l'album
+  album_photos?: StoryblokAsset[];
+  album_videos?: VideoItemBlok[];
+  is_cover_photo?: boolean;
+};
+
+type AlbumEntry = StoryblokAsset | VideoItemBlok;
+
 type GridMasonryBlok = SbBlokData & {
   items?: Array<MediaItemBlok | VideoItemBlok>;
 };
+
+function isVideoItemBlok(entry: AlbumEntry): entry is VideoItemBlok {
+  return 'component' in entry && entry.component === 'video_item';
+}
 
 export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
   const items: Item[] = (blok.items ?? []).reduce<Item[]>((acc, c) => {
@@ -45,66 +58,57 @@ export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
       let albumPhotos: Item[] | undefined;
 
       // Fusionner album_photos (Multi-Assets) et album_videos (Blocks video_item)
-      const allMedia: any[] = [];
+      const allMedia: AlbumEntry[] = [];
 
       // Ajouter les photos du Multi-Assets
-      if (c.album_photos && Array.isArray(c.album_photos)) {
+      if (Array.isArray(c.album_photos)) {
         allMedia.push(...c.album_photos);
       }
 
       // Ajouter les vidéos du champ album_videos (blocs video_item)
-      if ((c as any).album_videos && Array.isArray((c as any).album_videos)) {
-        allMedia.push(...(c as any).album_videos);
+      if (Array.isArray(c.album_videos)) {
+        allMedia.push(...c.album_videos);
       }
 
       if (allMedia.length > 0) {
         const mediaItemTitle = c.title || ''; // Titre du media_item
-        const mapped = allMedia
-          .filter((photo: any) => photo?.filename || photo?.srcMp4 || photo?.vimeoId)
-          .map((photo: any): Item | null => {
+        const mapped = allMedia.map((entry): Item | null => {
+          if (isVideoItemBlok(entry)) {
+            const poster = entry.poster?.filename;
+            const title = entry.title || mediaItemTitle;
             // Bloc video_item (HYBRID)
-            if (photo.component === 'video_item' && photo.srcMp4 && photo.vimeoId) {
+            if (entry.srcMp4 && entry.vimeoId) {
               return {
                 kind: 'hybrid' as const,
-                srcMp4: photo.srcMp4,
-                vimeoId: photo.vimeoId,
-                poster: photo.poster?.filename,
-                alt: photo.alt,
-                title: photo.title || mediaItemTitle,
+                srcMp4: entry.srcMp4,
+                vimeoId: entry.vimeoId,
+                poster,
+                alt: entry.alt,
+                title,
               };
             }
             // Bloc video_item (Vimeo seul)
-            if (photo.component === 'video_item' && photo.vimeoId && !photo.srcMp4) {
-              return {
-                kind: 'vimeo' as const,
-                vimeoId: photo.vimeoId,
-                poster: photo.poster?.filename,
-                alt: photo.alt,
-                title: photo.title || mediaItemTitle,
-              };
+            if (entry.vimeoId) {
+              return { kind: 'vimeo' as const, vimeoId: entry.vimeoId, poster, alt: entry.alt, title };
             }
             // Bloc video_item (Cloudinary/MP4 seul)
-            if (photo.component === 'video_item' && photo.srcMp4 && !photo.vimeoId) {
-              return {
-                kind: 'video' as const,
-                srcMp4: photo.srcMp4,
-                poster: photo.poster?.filename,
-                alt: photo.alt,
-                title: photo.title || mediaItemTitle,
-              };
-            }
-            // Image normale
-            if (photo.filename) {
-              return {
-                kind: 'image' as const,
-                src: photo.filename,
-                alt: photo.alt || '',
-                title: photo.title || mediaItemTitle,
-                caption: photo.caption || '',
-              };
+            if (entry.srcMp4) {
+              return { kind: 'video' as const, srcMp4: entry.srcMp4, poster, alt: entry.alt, title };
             }
             return null;
-          });
+          }
+          // Image normale
+          if (entry.filename) {
+            return {
+              kind: 'image' as const,
+              src: entry.filename,
+              alt: entry.alt || '',
+              title: entry.title || mediaItemTitle,
+              caption: entry.caption || '',
+            };
+          }
+          return null;
+        });
 
         albumPhotos = mapped.filter((item): item is Item => item !== null);
       }

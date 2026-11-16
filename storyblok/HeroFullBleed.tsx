@@ -1,10 +1,16 @@
 import { storyblokEditable } from "@storyblok/react/rsc";
+import type { SbBlokData } from "@storyblok/react/rsc";
 import Image from "next/image";
 import { getAssetBump, versionUrl } from "@/lib/asset-version";
 
-export default async function HeroFullBleed({ blok }: any) {
-  const media = blok?.media?.filename;
-  const title = blok?.title;
+type HeroFullBleedBlok = SbBlokData & {
+  media?: { filename?: string };
+  title?: string;
+};
+
+export default async function HeroFullBleed({ blok }: { blok: HeroFullBleedBlok }) {
+  const media = blok.media?.filename;
+  const title = blok.title;
   const bump = await getAssetBump();
 
   return (
