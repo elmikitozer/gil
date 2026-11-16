@@ -1,10 +1,10 @@
 export const metadata = {
-  title: 'Informations — Gil Anselmi',
-  description: 'Informations de contact et à propos de Gil Anselmi, photographe basé à Paris.',
+  title: 'Information — Gil Anselmi',
+  description: 'Contact and about information for Gil Anselmi, photographer based in Paris.',
   alternates: { canonical: 'https://gilanselmi.com/information' },
   openGraph: {
-    title: 'Informations — Gil Anselmi',
-    description: 'Informations de contact et à propos de Gil Anselmi, photographe basé à Paris.',
+    title: 'Information — Gil Anselmi',
+    description: 'Contact and about information for Gil Anselmi, photographer based in Paris.',
     url: 'https://gilanselmi.com/information',
   },
 };

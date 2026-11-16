@@ -6,11 +6,11 @@ import CurrentYear from './components/CurrentYear';
 
 export const metadata: Metadata = {
   title: 'Gil Anselmi — Photographer',
-  description: 'Portfolio de Gil Anselmi — photographer & film.',
+  description: 'Portfolio of Gil Anselmi — photographer & film.',
   metadataBase: new URL('https://gilanselmi.com'),
   openGraph: {
     title: 'Gil Anselmi — Photographer',
-    description: 'Portfolio de Gil Anselmi — photographer & film.',
+    description: 'Portfolio of Gil Anselmi — photographer & film.',
     url: 'https://gilanselmi.com',
     siteName: 'Gil Anselmi',
     images: [{ url: '/og.jpg', width: 1200, height: 630 }],
@@ -27,7 +27,7 @@ const caslon = Libre_Caslon_Text({
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://a.storyblok.com" crossOrigin="" />
         <link rel="dns-prefetch" href="https://a.storyblok.com" />
@@ -57,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </span>
             <a
               href="/mentions-legales"
+              lang="fr"
               className="hover:text-neutral-700 transition-colors"
             >
               Mentions légales

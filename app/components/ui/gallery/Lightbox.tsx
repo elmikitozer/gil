@@ -162,7 +162,7 @@ export default function Lightbox() {
                     {item.title || ''}
                   </div>
                   {!isSingleItem && (
-                    <div className="text-base italic text-black">
+                    <div lang="fr" className="text-base italic text-black">
                       fig. {current} sur {total}
                     </div>
                   )}
@@ -188,7 +188,7 @@ export default function Lightbox() {
                       {item.title || ''}
                     </div>
                     {!isSingleItem && (
-                      <div className="absolute left-1/2 -translate-x-1/2 text-xl italic text-black">
+                      <div lang="fr" className="absolute left-1/2 -translate-x-1/2 text-xl italic text-black">
                         fig. {current} sur {total}
                       </div>
                     )}
