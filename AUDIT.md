@@ -1,7 +1,7 @@
 # Audit et corrections — gilanselmi.com
 
-Dernière mise à jour : 2026-11-16, fin du lot 4, partie A.
-Branche de travail : `fix/audit` (32 commits de correction depuis `15fbdd8`, plus ceux de ce document ; **rien n'est poussé ni déployé**).
+Dernière mise à jour : 2026-11-16, fin du lot 4, partie B.
+Branche de travail : `fix/audit` (53 commits depuis `15fbdd8`, documents compris ; **rien n'est poussé ni déployé**).
 Projet Vercel : `gil` (domaine `gilanselmi.com`). Le dossier local est lié par erreur au projet vide `anselmi`.
 
 Ce document est mis à jour à la fin de chaque lot.
@@ -14,8 +14,8 @@ Ce document est mis à jour à la fin de chaque lot.
 | 1 | Rendu et coût serveur : pages statiques, home rendue côté serveur et mise en cache, webhook | **Fait**, validé, testé sur la preview Vercel |
 | 2 | Sécurité : Next.js, jeton côté serveur, aperçu signé, webhook | **Fait**, validé, testé sur la preview Vercel |
 | 3 | Nettoyage : code, CSS, mode sombre, Edge Config, fichiers publics | **Fait**, validé |
-| 4A | Grille et images : rendu serveur, lightbox, débordement | **Fait**, en attente de votre validation |
-| 4B | Accessibilité, SEO, qualité, factorisation | **À faire** |
+| 4A | Grille et images : rendu serveur, lightbox, débordement | **Fait**, validé (ajustement : 1 image voisine préchargée) |
+| 4B | Accessibilité, SEO, qualité, factorisation | **Fait**, en attente de votre validation |
 
 ### Vérifications à la fin du lot 3
 
@@ -32,6 +32,21 @@ Ce document est mis à jour à la fin de chaque lot.
 | Arbre de travail | propre ; `next.config.ts` identique au commit |
 
 Les tests ont été faits en local (`next start`) et, pour les lots 1 et 2, par vos soins sur la preview Vercel. Les tests de panne utilisent un simulateur local (aucun appel au vrai Storyblok n'a été coupé).
+
+### Vérifications à la fin du lot 4B
+
+| Vérification | Résultat |
+|---|---|
+| Typecheck, lint | 0 erreur, 0 warning |
+| Build (Next 16.4.6) | passe ; `/`, `/information`, `/mentions-legales`, `/api/ping`, `/robots.txt`, `/sitemap.xml` en statique (○) ; `tsconfig.json` non réécrit par Next |
+| Tests du lot 1 rejoués (simulateur de panne reconstruit : wrapper de `fetch` préchargé, mode `ok`/`down`/`500`) | pages en cache (`x-nextjs-cache: HIT`), 0 appel Storyblok pour les servir, réchauffement après webhook, home servie en 200 avec Storyblok coupé puis en erreur 500 |
+| Tests du lot 2 rejoués | webhook GET/PUT/DELETE 405 ; secret absent ou faux 401 ; bon secret 200 ; aperçu : signature valide 200, fausse/expirée/absente 404 ; `/storyblok-preview` direct 404 |
+| Jeton absent du JavaScript public | 0 fichier sur 27 dans `.next/static`, 0 sur 313 dans `.next/server`, 0 dans le HTML de la home |
+| Avant/après navigateur (Chrome sans interface, 320/390/1440 px, `/`, `/information`, `/mentions-legales`, 404) | styles calculés comparés élément par élément : seuls écarts, la navigation mobile (voulu), les balises de titres (voulu) ; positions, tailles, couleurs, polices réellement utilisées identiques ; 0 erreur console ; 0 débordement horizontal |
+| Lightbox | exactement 3 images chargées à l'ouverture d'un album, aux 5 tailles d'écran testées |
+| Noms accessibles de la grille | 77 boutons, 0 sans nom (1 utilise le libellé de secours « Open image ») |
+
+Les tests sont locaux (`next start`) ; le comportement sur Vercel n'a pas été rejoué par mes soins.
 
 ## 2. Lots et commits
 
@@ -106,6 +121,14 @@ Le message de `f9d415e` a été corrigé après coup (cinq vidéos supprimées :
 | `b00ceb6` | Débordement horizontal de la grille corrigé |
 | `8cc9528` | Lightbox : netteté sur écran Retina (qualité WebP 90, `sizes` adapté, largeurs 1600/2560/3200) |
 
+Ajustement après validation :
+
+| Commit | Objet |
+|---|---|
+| `4ae041e` | Lightbox : une seule image voisine préchargée de chaque côté (3 images à l'ouverture au lieu de 5) |
+
+La qualité reste à 90 (`DEFAULT_QUALITY`). Poids des 3 images, qualité 90 / 95 : mobile 0,24 / 0,43 Mo ; tablette 1,52 / 2,29 ; ordinateur 1x 0,36 / 0,63 ; ordinateur Retina 1,62 / 2,53 ; 1920 Retina 3,19 / 4,61 (+45 à +78 %). La qualité 95 avec 3 images pèse à peu près autant que la qualité 90 avec 5 images validée en 4A : c'est un changement d'une ligne si vous la voulez.
+
 **Principe de la grille.** Le placement (« colonne la plus courte d'abord ») dépend de la largeur du conteneur. Le serveur le calcule pour toutes les largeurs de 200 à 4000 px, regroupe les largeurs qui donnent le même placement (24 variantes avec le contenu actuel) et écrit, dans le HTML, une seule liste de vignettes avec une feuille de style qui choisit le placement par requête de conteneur (`lib/masonry.ts`). Les vignettes et leurs images sont dans le HTML ; rien ne bouge à l'hydratation. Dès qu'un ratio mesuré dans le navigateur change (vidéos), le calcul exact en pixels, identique à l'ancien, reprend la main.
 
 **Preuves** (Chrome sans interface, build de production local, mobile 390 px, tablette 834 px, ordinateur 1440 px) :
@@ -143,6 +166,50 @@ Poids du HTML de la home (`/`) : 271 Ko brut / 20 Ko gzip avant ; 679 Ko brut / 
 - **Champ « Ratio » de `media_item`** : valeur `auto` sur les 91 blocs, aucun effet. Avis : le supprimer du schéma (le faire fonctionner recadrerait les photos à un ratio imposé, donc changerait l'ordre et l'apparence). Non touché, décision à vous. Le champ « Ratio » de `video_item`, lui, est utile.
 - Les premières vignettes (4) sont chargées sans attendre (`priority`) ; les autres restent paresseuses.
 
+### Lot 4, partie B — Accessibilité, SEO, qualité
+
+| Commit | Objet |
+|---|---|
+| `09268bc` | Types de la galerie dans un module partagé (`app/components/ui/gallery/types.ts`) ; conversion des blocs Storyblok en une seule fonction (`lib/gallery-items.ts`) |
+| `6c6d90f` | `GalleryContext` : liste dérivée de la prop (plus de `useState(items)` figé) |
+| `9602397` | Contour de focus clavier visible sur les vignettes (tracé à l'extérieur, dans l'espace entre photos) |
+| `22e2414` | Noms accessibles et `alt` issus du CMS |
+| `2035730` | Navigation à 11 px minimum sur mobile |
+| `6ab2212` | `h2`/`h3` réservés aux vrais titres ; texte courant en `p` |
+| `85c0f52` | Plus de `main` imbriqué (`error.tsx`, `not-found.tsx`) |
+| `2512ea2` | `lang` cohérent avec le contenu |
+| `1f32bbd` | `app/sitemap.ts`, `app/robots.ts` |
+| `5ea8b43` | Pages d'information : mise en page factorisée (`InfoLayout`), vidéo avec affiche (`LoopVideo`) |
+| `d876e01` | Police Big Caslon en woff2 |
+| `46da13f` | `--font-sans` |
+| `3007187` | `ignoreDeprecations` retiré |
+| `b8dd2e8`, `ddd365d` | Neuf notes `.md` déplacées dans `docs/` ; ligne `.md` de `.gitignore` retirée |
+| `93e9719` | `/api/ping` statique |
+
+**Conversion des albums.** Ancien et nouveau code exécutés sur le contenu réel (77 éléments, 433 entrées d'album) puis comparés champ par champ : 0 écart sur les éléments de premier niveau ; les 2 vidéos d'album gagnent `srcWebm`, `caption` (vides) et `ratio` (`auto`), ce que le chemin de premier niveau portait déjà. Aucun effet sur l'affichage. Cas limites (titre vide, vidéo sans source, album vide) : 0 écart. La fonction n'est pas `server-only` : l'aperçu de l'éditeur s'en sert dans le navigateur.
+
+**Alt.** Chaîne : `alt` du bloc → `alt` de l'asset → titre ; sans rien, libellé de secours sur le bouton. Contenu actuel : 22 `media_item` sur 91 sans `alt` (le titre prend le relais pour 21), aucun asset ni aucune des 500 photos d'album n'a d'`alt` (la photo d'album reprend son titre ou celui de l'album). **Hero, diptyque, vignettes Vimeo seules : absents du contenu actuel** (la home n'a qu'une grille et un texte vide), leurs corrections ne sont donc pas observables aujourd'hui. Hero et diptyque utilisent l'`alt` de l'asset, sans repli (vide = décoratif : renseignez-le dans Storyblok).
+
+**Navigation mobile.** À 11 px, le texte touchait le logo (il le chevauchait déjà de 33 px à 320 px à 9 px). Sous 640 px : marges 16 px, interlettrage 0,08 em (0,22 em à partir de 640 px, inchangé), logo 92 px sous 360 px. Dégagement texte/logo : 10 px à 320 px, 22 px à 360 px, 52 px à 390 px. Au-delà de 640 px, rien ne change.
+
+**Titres.** Les `h2`/`h3` du CSS global imposaient police, interlignes et tailles : les remplacements portent des classes explicites. Styles calculés avant/après identiques. Sur `/mentions-legales`, les `h3` passent en `h2` (ils sautaient un niveau) ; sur `/information`, « GENERAL INQUIRIES » devient `h2`, la citation et « Commercial portfolio upon request » deviennent des `p`. `global-error.tsx` garde son `main` (il remplace tout le layout).
+
+**Langue.** `<html lang="en">` ; `lang="fr"` sur `/mentions-legales`, le lien du pied de page, les pages 404 et d'erreur, `global-error` et le compteur « fig. x sur y » de la lightbox. Titres et descriptions de la home et de `/information` passés en anglais (ils étaient en français pour un contenu en anglais) : à relire.
+
+**SEO.** `/sitemap.xml` : `/` et `/information` (pas `/mentions-legales`, en « noindex », ni l'aperçu). `/robots.txt` : tout autorisé sauf `/api/` et `/storyblok-preview`, avec l'adresse du plan du site.
+
+**Vidéo des pages d'information.** `autoPlay` fait ignorer `preload` aux navigateurs : le fichier (5,5 Mo en WebM) était téléchargé dans tous les cas. Maintenant : affiche (JPEG 136 Ko tiré de la première image, pas de saut visuel), place carrée réservée, `preload="none"`, lecture déclenchée quand la vidéo apparaît à 25 %, pause quand elle sort ; avec « réduire les animations », seule l'affiche s'affiche (0 octet de vidéo mesuré). **Quand la vidéo est visible (cas normal sur ces deux pages), le poids reste celui d'avant (5,5 à 6 Mo).** Le vrai gain est dans le fichier : la vidéo fait 1440×1440 pour un affichage de 448 px au plus ; un essai de réencodage en 900×900 sans piste audio donne environ 1,7 Mo (MP4 et WebM). Non appliqué : décision et fichier source à vous.
+
+**Police.** `fonnts.com-Big_Caslon_CC.otf` (105 Ko) → `big-caslon.woff2` (59 Ko) ; les 736 contours, la table de caractères et le crénage sont identiques (le seul écart de tables est la signature numérique `DSIG`, retirée par la conversion). **Licence à vérifier** : la police est « Big Caslon CC » de The Type Founders, avec un contrat Typekit/Adobe Fonts dans ses métadonnées et un drapeau d'incorporation « aperçu et impression » (`fsType` 4) ; le nom du fichier suggère un téléchargement sur un site tiers. Je ne peux pas vérifier que l'hébergement de la police sur le site est autorisé.
+
+**`--font-sans`.** La variable n'a jamais été définie : `var(--font-sans), system-ui…` est alors invalide en entier et le navigateur affichait sa police serif par défaut (Times) pour tout le texte hors titres, y compris le pied de page, les mentions et le menu de la 404. Constaté dans le navigateur (CDP). Le rendu est conservé tel quel : `sans: ["serif"]` dans `tailwind.config.ts`, avec explication. Si vous voulez une vraie sans-serif ou Caslon pour le texte courant, c'est une ligne ; ce serait un changement visible.
+
+**`ignoreDeprecations`.** Retiré : typecheck et build passent (TypeScript 5.9). Il ne masquait plus rien. `baseUrl` sera obsolète en TypeScript 6 : à traiter si vous montez de version.
+
+**`/api/ping`.** Dynamique (ƒ) jusqu'ici ; maintenant statique. Le champ `time` aurait été l'heure du build, il est retiré (`{"ok":true}`). Elle prouve que le site répond depuis le CDN, pas que Storyblok ou une fonction fonctionnent.
+
+**Notes.** Neuf notes de travail dans `docs/` (`git mv`, historique conservé). `README.md` (modèle create-next-app, jamais personnalisé) et `AUDIT.md` restent à la racine.
+
 ## 3. Décisions prises
 
 1. **Webhook par secret d'URL.** Le plan Storyblok gratuit n'offre ni « Webhook secret » ni en-têtes personnalisés ; la vérification de signature (`91adacb`) a donc été remplacée (`63c6943`). Conservés : POST uniquement, comparaison en temps constant, variable `STORYBLOK_WEBHOOK_SECRET`, réchauffement de la home. Limite assumée : le secret peut apparaître dans des journaux d'accès ; l'enjeu reste faible (il permet seulement de déclencher une régénération). En cas de doute, le changer dans Vercel puis dans l'URL du webhook.
@@ -164,36 +231,27 @@ Poids du HTML de la home (`/`) : 271 Ko brut / 20 Ko gzip avant ; 679 Ko brut / 
 - **Compte Vercel** : plus bloqué au 2026-11-16 (blocage `FAIR_USE_LIMITS_EXCEEDED` levé).
 - **`.vercel/project.json` local** pointe vers `anselmi` (projet vide) au lieu de `gil`.
 - **`NEXT_PUBLIC_STORYBLOK_VERSION`** existe sur Vercel mais n'est plus lue par le code.
+- **Vignettes de la grille : optimiseur d'images de Vercel** (loader par défaut de `next/image` ; seule la lightbox passe par Storyblok). `deviceSizes` s'applique à toutes les images sans loader : 18 largeurs dans le `srcset` au lieu de 15. Mesure (11 configurations d'écran, défilement complet, 62 photos) : un écran demande une seule largeur par photo. Les largeurs ajoutées servent presque jamais : 1600 est choisie seulement sur 2560 px de large en Retina ; 2560 et 3200 jamais (la plus grande colonne est ~950 px, 1920 à 2x). Maximum théorique : +186 variantes (62 × 3). Mesuré : +62 variantes, pour les seuls visiteurs sur très grand écran Retina. L'ensemble des 11 configurations donne 372 variantes distinctes ; en pratique 6 à 8 par photo, soit 400 à 500 pour la home.
 - **Home non présente dans le HTML serveur** : la grille était construite côté navigateur. Corrigé en 4A (la grille est maintenant dans le HTML).
 
-## 5. Lot 4 — partie B à faire
+## 5. Lot 4
 
-Partie A faite (voir § 2). Contenu prévu de la partie B :
-
-- `focus-visible` sur les vignettes (`ZoomableImage`, `ZoomableVideo`, `ZoomableVimeo`).
-- `alt` issus du CMS (hero, diptyque, vignettes Vimeo, pixel transparent des diapositives vidéo).
-- Taille du texte de navigation (9 px sur mobile).
-- Balises `<main>` imbriquées (`error.tsx`, `not-found.tsx`) et niveaux de titres (`/information`).
-- `app/sitemap.ts`, `app/robots.ts`, attribut `lang` cohérent avec le contenu (`lang="fr"` pour un contenu en anglais).
-- Factorisation de la conversion des albums (aujourd'hui dans `GridMasonry`) et des types `Item` (déclarés dans `MasonryColumns` et `GalleryContext`).
+Parties A et B faites (voir § 2).
 
 ## 6. Points du rapport initial non planifiés
 
-À décider (aucun n'est prévu dans un lot) :
+Traités en 4B : `/api/ping`, vidéos des pages d'information (poster et préchargement ; le poids du fichier reste), police en woff2, `GalleryProvider`, notes à la racine, `ignoreDeprecations`. Restent :
 
-| Point | Fichier | Remarque |
+| Point | Fichier | Avis avant la mise en production |
 |---|---|---|
-| `/api/ping` | `app/api/ping/route.ts` | Conservée : un moniteur externe l'utilise peut-être |
-| Vidéos de `/information` et `/mentions-legales` | `app/information/page.tsx`, `app/mentions-legales/page.tsx` | 5-6 Mo en lecture automatique, sans poster, mise en page copiée-collée |
-| Politique CSP incomplète | `next.config.ts` | Seul `frame-ancestors` est défini |
-| Police Big Caslon en `.otf` | `app/fonts/` | À convertir en `.woff2` ; `--font-sans` jamais définie |
-| Miniatures Vimeo | `ZoomableVimeo.tsx` | Dépendent du service tiers `vumbnail.com` |
-| `GalleryProvider` | `GalleryContext.tsx` | `useState(items)` fige la liste |
-| Notes à la racine | dix fichiers `.md`, `.gitignore` | La ligne `.md` n'ignore rien |
-| `ignoreDeprecations` | `tsconfig.json` | Masque des avertissements TypeScript |
-| Tests et intégration continue | — | Aucun ; au minimum typecheck et build en CI |
-| Dépendances Storyblok | `package.json` | `@storyblok/react` 5 → 7 : seule montée risquée ; les avis restants (`markdown-it`, `linkify-it`) en dépendent |
-| Clé privée dans l'historique git | commits `52368ee`, `9239e66` | `localhost-key.pem` (certificat local, risque faible) : régénérer le certificat |
+| Licence de la police Big Caslon | `app/fonts/` | **À vérifier avant la production** (voir § 2, lot 4B). Si l'hébergement n'est pas autorisé, il faut une version licenciée ou une autre police. |
+| Poids de la vidéo des pages d'information | `public/videos/` | **Vaut la peine** : 5,5 à 6 Mo pour un affichage de 448 px ; ~1,7 Mo après réencodage. Fichier source à vous. |
+| Servir aussi la grille par Storyblok | `MasonryColumns`, `ZoomableImage` | Voir § 4. **Recommandé, avant la production** si vous visez le plan gratuit de Vercel (5 000 transformations/mois, 402 au-delà ; votre compte a déjà été bloqué pour usage excessif) : ~400 à 500 transformations pour la home seule, à chaque expiration de cache. Contrepartie : ce trafic passerait sur le quota de Storyblok (100 Go/mois au plan gratuit ; la page tarifaire ne dit pas si les images y comptent). Il faudrait aussi fixer `quality={75}` pour garder les poids actuels. |
+| Politique CSP incomplète | `next.config.ts` | Utile mais **pas avant la mise en ligne** : elle exige `unsafe-inline` (scripts inline de Next et de la page), les domaines Vimeo, Storyblok, R2 ; risque de casser l'éditeur ou les vidéos. Si vous la voulez : d'abord en `Content-Security-Policy-Report-Only`, après la mise en ligne. |
+| Miniatures Vimeo | `ZoomableVimeo.tsx` | **Sans objet aujourd'hui** : la home ne contient aucune vidéo Vimeo seule (les 13 vidéos de la grille sont des MP4). À traiter le jour où vous en ajoutez (utiliser l'affiche Storyblok plutôt que `vumbnail.com`). |
+| Tests et intégration continue | — | Peu utile avant la mise en production : Vercel exécute déjà le build (et le typecheck) à chaque déploiement. Une CI avec lint et typecheck est un plus après, mais elle devra connaître `STORYBLOK_PREVIEW_TOKEN`. |
+| Dépendances Storyblok | `package.json` | **Après la mise en production** : `@storyblok/react` 5 → 7 est la seule montée risquée (éditeur visuel). |
+| Clé privée dans l'historique git | commits `52368ee`, `9239e66` | Risque faible (certificat local). Le dépôt est sur GitHub (`elmikitozer/gil`) : si le dépôt est public ou le devient, régénérer le certificat local (ne sert à rien d'autre). Réécrire l'historique n'est pas nécessaire. |
 
 ## 7. À faire de votre côté pour la mise en production
 
@@ -215,7 +273,7 @@ Ne pas supprimer les variables ou jetons avant d'avoir déployé : la version ac
 ### Juste après le déploiement
 
 5. Storyblok → Settings → Webhooks : URL `https://gilanselmi.com/api/revalidate?secret=<STORYBLOK_WEBHOOK_SECRET>`. Entre le déploiement et ce changement, les publications ne rafraîchissent pas le site (l'ancien secret est refusé).
-6. Tester : publier une modification et recharger la home ; ouvrir l'éditeur visuel (aperçu, clic sur un bloc, édition en direct) ; vérifier que `/?_storyblok=1` renvoie 404 en accès public ; vérifier l'affichage des images et des vidéos.
+6. Tester : publier une modification et recharger la home ; ouvrir l'éditeur visuel (aperçu, clic sur un bloc, édition en direct) ; vérifier que `/?_storyblok=1` renvoie 404 en accès public ; vérifier l'affichage des images et des vidéos ; ouvrir un album dans la lightbox ; vérifier `/robots.txt`, `/sitemap.xml` (deux adresses) et `/api/ping` (`{"ok":true}`) ; si un moniteur externe surveillait `/api/ping`, vérifier qu'il n'attend plus le champ `time`.
 
 ### Une fois les tests concluants
 
@@ -235,10 +293,11 @@ Variables à conserver : `STORYBLOK_PREVIEW_TOKEN`, `STORYBLOK_WEBHOOK_SECRET`.
 
 ## 8. Limites de l'audit
 
-- Le comportement sur Vercel (cache, réchauffement, réécriture) a été testé par vos soins sur une preview ; je ne l'ai pas vérifié moi-même.
+- Le comportement sur Vercel (cache, réchauffement, réécriture) a été testé par vos soins sur une preview pour les lots 1 et 2 ; je ne l'ai pas vérifié moi-même, et les lots 3 et 4 n'ont été testés qu'en local.
 - Les signatures Storyblok ont été testées avec des valeurs calculées en local selon la documentation, et validées par vos tests sur la preview.
 - Le contenu Storyblok a été lu via l'API de lecture (stories `home` et `contact`) ; la configuration de l'espace (schémas des blocs, plan, webhooks) n'a pas été consultée.
 - Aucun score de performance réel n'a été mesuré (Lighthouse, Core Web Vitals).
+- Accessibilité vérifiée par mesures dans le navigateur (noms, focus, titres, langue), pas avec un lecteur d'écran. Chrome uniquement ; Safari et Firefox non testés (notamment `:focus-visible` et la lecture automatique de la vidéo).
 
 ## 9. Journal des mises à jour
 
@@ -246,3 +305,4 @@ Variables à conserver : `STORYBLOK_PREVIEW_TOKEN`, `STORYBLOK_WEBHOOK_SECRET`.
 |---|---|
 | 2026-11-16 | Création du document ; lots 0 à 3 documentés ; lot 4 listé |
 | 2026-11-16 | Lot 4, partie A : grille rendue côté serveur, lightbox via Storyblok, débordement corrigé |
+| 2026-11-16 | Lot 4, partie A validée (préchargement réduit à 1 voisine) ; lot 4, partie B : accessibilité, SEO, factorisation, police, `/api/ping` ; § 6 et § 7 mis à jour |
