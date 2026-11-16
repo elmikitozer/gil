@@ -1,7 +1,7 @@
 # Audit et corrections — gilanselmi.com
 
-Dernière mise à jour : 2026-11-16, fin du lot 3.
-Branche de travail : `fix/audit` (29 commits de correction depuis `15fbdd8`, plus celui de ce document ; **rien n'est poussé ni déployé**).
+Dernière mise à jour : 2026-11-16, fin du lot 4, partie A.
+Branche de travail : `fix/audit` (32 commits de correction depuis `15fbdd8`, plus ceux de ce document ; **rien n'est poussé ni déployé**).
 Projet Vercel : `gil` (domaine `gilanselmi.com`). Le dossier local est lié par erreur au projet vide `anselmi`.
 
 Ce document est mis à jour à la fin de chaque lot.
@@ -13,8 +13,9 @@ Ce document est mis à jour à la fin de chaque lot.
 | 0 | Base de référence : un seul lockfile (pnpm), lint réparé | **Fait** |
 | 1 | Rendu et coût serveur : pages statiques, home rendue côté serveur et mise en cache, webhook | **Fait**, validé, testé sur la preview Vercel |
 | 2 | Sécurité : Next.js, jeton côté serveur, aperçu signé, webhook | **Fait**, validé, testé sur la preview Vercel |
-| 3 | Nettoyage : code, CSS, mode sombre, Edge Config, fichiers publics | **Fait**, en attente de votre validation |
-| 4 | Galerie, accessibilité, SEO, factorisation | **À faire** |
+| 3 | Nettoyage : code, CSS, mode sombre, Edge Config, fichiers publics | **Fait**, validé |
+| 4A | Grille et images : rendu serveur, lightbox, débordement | **Fait**, en attente de votre validation |
+| 4B | Accessibilité, SEO, qualité, factorisation | **À faire** |
 
 ### Vérifications à la fin du lot 3
 
@@ -96,6 +97,45 @@ Chaque suppression a été précédée d'une recherche prouvant l'absence d'impo
 
 Le message de `f9d415e` a été corrigé après coup (cinq vidéos supprimées : `Ugg_Mad_2`, `InstaGilHorizontal`, `BeautyProject/*` ×3) ; son ancien hash était `de75834`.
 
+### Lot 4, partie A — Grille et images
+
+| Commit | Objet |
+|---|---|
+| `581e3ea` | Grille rendue côté serveur ; ratios lus dans l'URL des assets Storyblok |
+| `658ba8a` | Lightbox servie par le service d'images Storyblok ; `eslint-disable` retiré |
+| `b00ceb6` | Débordement horizontal de la grille corrigé |
+
+**Principe de la grille.** Le placement (« colonne la plus courte d'abord ») dépend de la largeur du conteneur. Le serveur le calcule pour toutes les largeurs de 200 à 4000 px, regroupe les largeurs qui donnent le même placement (24 variantes avec le contenu actuel) et écrit, dans le HTML, une seule liste de vignettes avec une feuille de style qui choisit le placement par requête de conteneur (`lib/masonry.ts`). Les vignettes et leurs images sont dans le HTML ; rien ne bouge à l'hydratation. Dès qu'un ratio mesuré dans le navigateur change (vidéos), le calcul exact en pixels, identique à l'ancien, reprend la main.
+
+**Preuves** (Chrome sans interface, build de production local, mobile 390 px, tablette 834 px, ordinateur 1440 px) :
+
+| Vérification | Résultat |
+|---|---|
+| Colonnes et ordre des 77 vignettes, avant/après, une fois tout chargé | identiques aux trois largeurs |
+| Placement servi par le HTML + CSS seuls (JavaScript bloqué) comparé à l'algorithme, 88 largeurs de 320 à 3840 px, seuils compris | 0 écart |
+| Hauteur des vignettes | à 1 px près (le ratio vient de l'URL et non de l'image redimensionnée, arrondie) ; hauteur totale de la grille +0,1 % (7496 → 7505, 7214 → 7225, 7073 → 7080 px) |
+| Largeur des colonnes | fractionnaire (à moins de 1 px de l'ancienne largeur arrondie) |
+| Console du navigateur | 0 erreur, 0 avertissement (pas d'écart d'hydratation) |
+| Poids de la home | HTML 648 Ko (52 Ko compressé) contre 271 Ko, 65 balises img dans le HTML contre 1 |
+
+**Poids des images** (réseau, cache désactivé ; « ouverture » = 6 s après le chargement, sans défilement) :
+
+| | Ouverture de la home, avant | après | Album ouvert (5 images), avant | après |
+|---|---|---|---|---|
+| Mobile | 508 Ko | 329 Ko | 32,7 Mo | 0,24 Mo |
+| Tablette | 1 414 Ko | 910 Ko | 32,7 Mo | 2,4 Mo |
+| Ordinateur | 589 Ko | 367 Ko | 32,7 Mo | 0,27 Mo |
+
+Après défilement complet, le poids des vignettes est inchangé (même optimiseur d'images). Le gain est surtout dans la lightbox. Les captures avant/après sont dans le dossier de travail temporaire de la session ; elles ont aussi été envoyées dans la conversation.
+
+**Débordement horizontal.** Reproduit avec des barres de défilement de 15 px : défilement horizontal de 8 px et grille décalée de 7,5 px à gauche. Corrigé (largeur de la grille = fenêtre moins la barre, mesurée par un script dans `<head>`) : plus de débordement, grille de 0 à la largeur visible. Sans effet avec les barres « overlay » (macOS, mobiles).
+
+**Constats de la partie A.**
+- **Une image a des dimensions fausses dans son URL** : `doc156_v2.jpg` (URL 2894×1060, soit 2,73 ; fichier réel 3,05). Le code compare le ratio de l'URL à l'image chargée et prend la mesure si l'écart dépasse 3 %, donc l'affichage reste celui d'aujourd'hui ; seul cet élément se replace après son chargement. Ré-importer cette image dans Storyblok supprime ce cas.
+- **Les 12 vidéos de la grille ont un ratio « auto » et ne sont pas des assets Storyblok** (fichiers sur Cloudflare R2 ou `/videos`) : leurs dimensions ne sont connues qu'au chargement de leurs métadonnées, comme avant. Elles restent donc la seule source de réorganisation de la grille (une fois la vidéo vue). Renseigner le champ « Ratio » de ces blocs `video_item` dans Storyblok la supprimerait (action de votre côté).
+- **Champ « Ratio » de `media_item`** : valeur `auto` sur les 91 blocs, aucun effet. Avis : le supprimer du schéma (le faire fonctionner recadrerait les photos à un ratio imposé, donc changerait l'ordre et l'apparence). Non touché, décision à vous. Le champ « Ratio » de `video_item`, lui, est utile.
+- Les premières vignettes (4) sont chargées sans attendre (`priority`) ; les autres restent paresseuses.
+
 ## 3. Décisions prises
 
 1. **Webhook par secret d'URL.** Le plan Storyblok gratuit n'offre ni « Webhook secret » ni en-têtes personnalisés ; la vérification de signature (`91adacb`) a donc été remplacée (`63c6943`). Conservés : POST uniquement, comparaison en temps constant, variable `STORYBLOK_WEBHOOK_SECRET`, réchauffement de la home. Limite assumée : le secret peut apparaître dans des journaux d'accès ; l'enjeu reste faible (il permet seulement de déclencher une régénération). En cas de doute, le changer dans Vercel puis dans l'URL du webhook.
@@ -117,22 +157,18 @@ Le message de `f9d415e` a été corrigé après coup (cinq vidéos supprimées :
 - **Compte Vercel** : plus bloqué au 2026-11-16 (blocage `FAIR_USE_LIMITS_EXCEEDED` levé).
 - **`.vercel/project.json` local** pointe vers `anselmi` (projet vide) au lieu de `gil`.
 - **`NEXT_PUBLIC_STORYBLOK_VERSION`** existe sur Vercel mais n'est plus lue par le code.
-- **Home non présente dans le HTML serveur** : la structure de la page l'est, mais la grille est construite côté navigateur (lot 4).
+- **Home non présente dans le HTML serveur** : la grille était construite côté navigateur. Corrigé en 4A (la grille est maintenant dans le HTML).
 
-## 5. Lot 4 — à faire
+## 5. Lot 4 — partie B à faire
 
-Contenu prévu :
+Partie A faite (voir § 2). Contenu prévu de la partie B :
 
-- Ratios de la grille lus dans l'URL des assets Storyblok (qui contient les dimensions) ; décider du sort du champ « Ratio » de `media_item`.
-- Images de la lightbox via le service d'images Storyblok (aujourd'hui : originaux non optimisés, deux précédents et suivants préchargés).
 - `focus-visible` sur les vignettes (`ZoomableImage`, `ZoomableVideo`, `ZoomableVimeo`).
 - `alt` issus du CMS (hero, diptyque, vignettes Vimeo, pixel transparent des diapositives vidéo).
 - Taille du texte de navigation (9 px sur mobile).
 - Balises `<main>` imbriquées (`error.tsx`, `not-found.tsx`) et niveaux de titres (`/information`).
 - `app/sitemap.ts`, `app/robots.ts`, attribut `lang` cohérent avec le contenu (`lang="fr"` pour un contenu en anglais).
 - Factorisation de la conversion des albums (aujourd'hui dans `GridMasonry`) et des types `Item` (déclarés dans `MasonryColumns` et `GalleryContext`).
-
-À ne pas oublier au lot 4 : la grille dans le HTML serveur (point § 4), et le retrait du `eslint-disable` de `Lightbox.tsx`.
 
 ## 6. Points du rapport initial non planifiés
 
@@ -144,7 +180,6 @@ Contenu prévu :
 | Vidéos de `/information` et `/mentions-legales` | `app/information/page.tsx`, `app/mentions-legales/page.tsx` | 5-6 Mo en lecture automatique, sans poster, mise en page copiée-collée |
 | Politique CSP incomplète | `next.config.ts` | Seul `frame-ancestors` est défini |
 | Police Big Caslon en `.otf` | `app/fonts/` | À convertir en `.woff2` ; `--font-sans` jamais définie |
-| Débordement horizontal probable | `storyblok/GridMasonry.tsx` | `w-screen` avec `-mx-[50vw]` |
 | Miniatures Vimeo | `ZoomableVimeo.tsx` | Dépendent du service tiers `vumbnail.com` |
 | `GalleryProvider` | `GalleryContext.tsx` | `useState(items)` fige la liste |
 | Notes à la racine | dix fichiers `.md`, `.gitignore` | La ligne `.md` n'ignore rien |
@@ -203,3 +238,4 @@ Variables à conserver : `STORYBLOK_PREVIEW_TOKEN`, `STORYBLOK_WEBHOOK_SECRET`.
 | Date | Mise à jour |
 |---|---|
 | 2026-11-16 | Création du document ; lots 0 à 3 documentés ; lot 4 listé |
+| 2026-11-16 | Lot 4, partie A : grille rendue côté serveur, lightbox via Storyblok, débordement corrigé |
