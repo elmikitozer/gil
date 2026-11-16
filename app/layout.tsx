@@ -35,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
 
       <body
-        className={`${caslon.variable} antialiased text-neutral-900 bg-bg text-fg dark:bg-darkbg dark:text-darkfg`}
+        className={`${caslon.variable} antialiased text-neutral-900 bg-bg text-fg`}
       >
         <Navbar />
         <main className="container mx-auto px-4 pb-12 pt-3">
@@ -48,7 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </span>
             <a
               href="/mentions-legales"
-              className="hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
+              className="hover:text-neutral-700 transition-colors"
             >
               Mentions légales
             </a>

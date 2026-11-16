@@ -96,7 +96,7 @@ export default function Lightbox() {
                     <source src={item.srcMp4} type="video/mp4" />
                   </video>
                   {item.title && (
-                    <div className="mt-2 text-lg text-black dark:text-white pointer-events-none">
+                    <div className="mt-2 text-lg text-black pointer-events-none">
                       {item.title}
                     </div>
                   )}
@@ -123,7 +123,7 @@ export default function Lightbox() {
                     />
                   </div>
                   {item.title && (
-                    <div className="mt-2 text-lg text-black dark:text-white pointer-events-none">
+                    <div className="mt-2 text-lg text-black pointer-events-none">
                       {item.title}
                     </div>
                   )}
@@ -141,11 +141,11 @@ export default function Lightbox() {
               <div className="flex flex-col w-full h-full px-4 pt-4 pb-4 md:pt-10 md:pb-10">
                 {/* Mobile: Top bar with title left, counter right */}
                 <div className="md:hidden h-[8%] flex items-start justify-between pointer-events-none">
-                  <div className="text-base italic text-black dark:text-white">
+                  <div className="text-base italic text-black">
                     {item.title || ''}
                   </div>
                   {!isSingleItem && (
-                    <div className="text-base italic text-black dark:text-white">
+                    <div className="text-base italic text-black">
                       fig. {current} sur {total}
                     </div>
                   )}
@@ -161,11 +161,11 @@ export default function Lightbox() {
                 {/* Desktop: Bottom bar with title left, counter center */}
                 <div className="hidden md:flex h-[10%] items-center justify-center">
                   <div className="w-full flex items-center pointer-events-none">
-                    <div className="flex-1 text-xl italic text-black dark:text-white">
+                    <div className="flex-1 text-xl italic text-black">
                       {item.title || ''}
                     </div>
                     {!isSingleItem && (
-                      <div className="absolute left-1/2 -translate-x-1/2 text-xl italic text-black dark:text-white">
+                      <div className="absolute left-1/2 -translate-x-1/2 text-xl italic text-black">
                         fig. {current} sur {total}
                       </div>
                     )}
@@ -184,7 +184,7 @@ export default function Lightbox() {
           backgroundColor: 'var(--yarl__color_backdrop, rgb(255, 255, 255))',
         },
       }}
-      className="dark:bg-black bg-white"
+      className="bg-white"
     />
   );
 }

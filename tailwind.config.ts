@@ -1,6 +1,5 @@
 import type { Config } from "tailwindcss";
 export default {
-  darkMode: "class",
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -19,9 +18,6 @@ export default {
         muted: "#555555",
         border: "rgba(0,0,0,0.08)",
         accent: "#D6B37F",
-        darkbg: "#0A0A0A",
-        darkfg: "#F5F5F2",
-        darkmuted: "#B5B5B5",
       },
       container: { center: true, padding: "1rem" },
     },

@@ -34,9 +34,9 @@ export default function HoverCover({
     ["--hc-ov"]: String(overlayOpacity),
   };
 
-  const bgClass = "bg-white dark:bg-black";
-  const titleColor = "text-neutral-900 dark:text-white";
-  const captionColor = "text-neutral-800 dark:text-neutral-100";
+  const bgClass = "bg-white";
+  const titleColor = "text-neutral-900";
+  const captionColor = "text-neutral-800";
   const borderClass = bordered ? "border-[1.5px] border-neutral-900" : "";
 
   return (

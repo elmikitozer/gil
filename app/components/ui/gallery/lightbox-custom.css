@@ -5,17 +5,9 @@
   background-color: rgb(255, 255, 255) !important;
 }
 
-:root.dark .yarl__root {
-  background-color: rgb(0, 0, 0) !important;
-}
-
 /* Container */
 .yarl__container {
   background-color: rgb(255, 255, 255) !important;
-}
-
-:root.dark .yarl__container {
-  background-color: rgb(0, 0, 0) !important;
 }
 
 /* Slides background */
@@ -23,17 +15,9 @@
   background-color: rgb(255, 255, 255) !important;
 }
 
-:root.dark .yarl__slide {
-  background-color: rgb(0, 0, 0) !important;
-}
-
 /* Thumbnails wrapper - force white */
 .yarl__thumbnails {
   background-color: rgb(255, 255, 255) !important;
-}
-
-:root.dark .yarl__thumbnails {
-  background-color: rgb(0, 0, 0) !important;
 }
 
 /* Thumbnail container background */
@@ -41,17 +25,9 @@
   background-color: rgb(255, 255, 255) !important;
 }
 
-:root.dark .yarl__thumbnails_container {
-  background-color: rgb(0, 0, 0) !important;
-}
-
 /* Thumbnails track (the scrollable area) */
 .yarl__thumbnails_track {
   background-color: rgb(255, 255, 255) !important;
-}
-
-:root.dark .yarl__thumbnails_track {
-  background-color: rgb(0, 0, 0) !important;
 }
 
 /* Individual thumbnail wrapper */
@@ -59,26 +35,14 @@
   background-color: rgb(255, 255, 255) !important;
 }
 
-:root.dark .yarl__thumbnails_thumbnail {
-  background-color: rgb(0, 0, 0) !important;
-}
-
 /* Individual thumbnail background - white/black solid */
 .yarl__thumbnail {
   background-color: rgb(255, 255, 255) !important;
 }
 
-:root.dark .yarl__thumbnail {
-  background-color: rgb(0, 0, 0) !important;
-}
-
 /* Active thumbnail border color */
 .yarl__thumbnail_active {
   border-color: rgb(0, 0, 0) !important;
-}
-
-:root.dark .yarl__thumbnail_active {
-  border-color: rgb(255, 255, 255) !important;
 }
 
 /* Toolbar background */
@@ -176,12 +140,3 @@ svg[class*='yarl'] {
   background-color: rgb(0, 0, 0);
 }
 
-:root.dark .yarl__navigation_prev::after,
-:root.dark .yarl__navigation_next::after {
-  background-color: rgb(115, 115, 115);
-}
-
-:root.dark .yarl__navigation_prev:hover::after,
-:root.dark .yarl__navigation_next:hover::after {
-  background-color: rgb(255, 255, 255);
-}
