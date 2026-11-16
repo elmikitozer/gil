@@ -6,7 +6,6 @@ out
 .sass-cache
 *.log
 localhost*
-.md
 .vercel
 tsconfig.tsbuildinfo
 next-env.d.ts
