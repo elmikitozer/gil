@@ -104,6 +104,7 @@ Le message de `f9d415e` a été corrigé après coup (cinq vidéos supprimées :
 | `581e3ea` | Grille rendue côté serveur ; ratios lus dans l'URL des assets Storyblok |
 | `658ba8a` | Lightbox servie par le service d'images Storyblok ; `eslint-disable` retiré |
 | `b00ceb6` | Débordement horizontal de la grille corrigé |
+| `8cc9528` | Lightbox : netteté sur écran Retina (qualité WebP 90, `sizes` adapté, largeurs 1600/2560/3200) |
 
 **Principe de la grille.** Le placement (« colonne la plus courte d'abord ») dépend de la largeur du conteneur. Le serveur le calcule pour toutes les largeurs de 200 à 4000 px, regroupe les largeurs qui donnent le même placement (24 variantes avec le contenu actuel) et écrit, dans le HTML, une seule liste de vignettes avec une feuille de style qui choisit le placement par requête de conteneur (`lib/masonry.ts`). Les vignettes et leurs images sont dans le HTML ; rien ne bouge à l'hydratation. Dès qu'un ratio mesuré dans le navigateur change (vidéos), le calcul exact en pixels, identique à l'ancien, reprend la main.
 
@@ -118,15 +119,21 @@ Le message de `f9d415e` a été corrigé après coup (cinq vidéos supprimées :
 | Console du navigateur | 0 erreur, 0 avertissement (pas d'écart d'hydratation) |
 | Poids de la home | HTML 648 Ko (52 Ko compressé) contre 271 Ko, 65 balises img dans le HTML contre 1 |
 
-**Poids des images** (réseau, cache désactivé ; « ouverture » = 6 s après le chargement, sans défilement) :
+**Poids des images** (réseau, cache désactivé ; « ouverture » = 6 s après le chargement, sans défilement). Home : 508 → 329 Ko (mobile), 1 414 → 910 Ko (tablette), 589 → 367 Ko (ordinateur 1x). Après défilement complet, le poids des vignettes est inchangé (même optimiseur d'images).
 
-| | Ouverture de la home, avant | après | Album ouvert (5 images), avant | après |
-|---|---|---|---|---|
-| Mobile | 508 Ko | 329 Ko | 32,7 Mo | 0,24 Mo |
-| Tablette | 1 414 Ko | 910 Ko | 32,7 Mo | 2,4 Mo |
-| Ordinateur | 589 Ko | 367 Ko | 32,7 Mo | 0,27 Mo |
+**Lightbox** : 5 images chargées à l'ouverture d'un album (image courante et deux voisines de chaque côté). Avant : les originaux, 32,7 Mo dans tous les cas. Après (WebP qualité 90, largeur choisie par le navigateur selon la taille d'affichage et `devicePixelRatio`) :
 
-Après défilement complet, le poids des vignettes est inchangé (même optimiseur d'images). Le gain est surtout dans la lightbox. Les captures avant/après sont dans le dossier de travail temporaire de la session ; elles ont aussi été envoyées dans la conversation.
+| Écran | Largeur demandée | Poids des 5 images | Pixels livrés / pixels d'écran |
+|---|---|---|---|
+| Mobile 390 px, 2x | 750 | 0,49 Mo | 1,15 |
+| Tablette 834 px, 2x | 1600 | 3,1 Mo | 1,04 |
+| Ordinateur 1440 px, 1x | 640 (portrait) ou 1080 | 0,52 Mo | 1,09 |
+| Ordinateur 1440 px, Retina 2x | 1080 (portrait) ou 2048 | 2,2 Mo | 1,03 |
+| Grand écran 1920 px, 2x | 1600 ou 2560 | 4,7 Mo | 1,05 |
+
+Qualité : une première version (WebP 80) donnait 0,27 Mo sur ordinateur 1x mais lissait le grain des photos (SSIM 0,91 contre un plafond de 0,99 dû au rééchantillonnage ; 0,96 à qualité 90, 0,98 à 95 pour +44 % de poids). Elle affichait en outre l'image à 72 % de sa taille sur écran Retina (corrigé). La qualité est la constante `DEFAULT_QUALITY` de `lib/storyblok-image.ts` si vous voulez 95.
+
+Poids du HTML de la home (`/`) : 271 Ko brut / 20 Ko gzip avant ; 679 Ko brut / 52,5 Ko gzip après. CSS externe : 25,8 Ko brut / 6,6 Ko gzip, inchangé. Nouveau `<style>` dans le HTML (placements) : 14 Ko brut / 2,3 Ko gzip ; variables de placement dans les 77 vignettes : 56,6 Ko brut / 12,7 Ko gzip. Hors de la plage 200–4000 px de largeur de conteneur : la plus petite plage s'applique à toute largeur inférieure (2 colonnes, placement calculé à 200 px) et la plus grande à toute largeur supérieure (4 colonnes, placement calculé à 4000 px). Au-dessus de 4000 : 0 écart avec l'algorithme exact testé jusqu'à 10 000 px ; au-dessous de 200 px (aucun appareil réel : le plus petit mobile fait 304 px de conteneur), le placement diffère de l'exact pour la plupart des largeurs, sans casser l'affichage.
 
 **Débordement horizontal.** Reproduit avec des barres de défilement de 15 px : défilement horizontal de 8 px et grille décalée de 7,5 px à gauche. Corrigé (largeur de la grille = fenêtre moins la barre, mesurée par un script dans `<head>`) : plus de débordement, grille de 0 à la largeur visible. Sans effet avec les barres « overlay » (macOS, mobiles).
 
