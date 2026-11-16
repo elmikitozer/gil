@@ -1,23 +1,21 @@
 import { storyblokEditable } from "@storyblok/react/rsc";
 import type { SbBlokData } from "@storyblok/react/rsc";
 import Image from "next/image";
-import { getAssetBump, versionUrl } from "@/lib/asset-version";
 
 type HeroFullBleedBlok = SbBlokData & {
   media?: { filename?: string };
   title?: string;
 };
 
-export default async function HeroFullBleed({ blok }: { blok: HeroFullBleedBlok }) {
+export default function HeroFullBleed({ blok }: { blok: HeroFullBleedBlok }) {
   const media = blok.media?.filename;
   const title = blok.title;
-  const bump = await getAssetBump();
 
   return (
     <section {...storyblokEditable(blok)} className="relative w-full min-h-[70vh] md:min-h-screen ">
       {media && (
         <Image
-          src={versionUrl(media, bump)}
+          src={media}
           alt={title || "Hero"}
           fill
           className="object-cover"
@@ -26,7 +24,7 @@ export default async function HeroFullBleed({ blok }: { blok: HeroFullBleedBlok 
       )}
       {title && (
         <div className="absolute inset-0 flex items-end p-6 md:p-10">
-          <h1 className="text-4xl md:text-6xl font-serif bg-[rgba(0,0,0,0.0)] text-[--color-fg]">
+          <h1 className="text-4xl md:text-6xl font-serif text-fg">
             {title}
           </h1>
         </div>

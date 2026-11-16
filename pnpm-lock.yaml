@@ -8,18 +8,9 @@ importers:
 
   .:
     dependencies:
-      '@storyblok/js':
-        specifier: ^4.3.1
-        version: 4.3.1
       '@storyblok/react':
         specifier: ^5.4.3
         version: 5.4.5(next@16.4.6(@babel/core@7.28.6)(@types/node@20.19.19)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@vercel/edge-config':
-        specifier: ^1.4.0
-        version: 1.4.0
-      image-size:
-        specifier: ^2.0.2
-        version: 2.0.2
       next:
         specifier: 16.4.6
         version: 16.4.6(@babel/core@7.28.6)(@types/node@20.19.19)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -466,9 +457,6 @@ packages:
   '@storyblok/js@4.2.5':
     resolution: {integrity: sha512-oeZPAzNcI3H43ak83S24E6d7Kf28rvBTAPv8sml3RVtwS7CesF6uySFp+Q3THyu+TzBYScxOwOIFYMsOLz6BkQ==}
 
-  '@storyblok/js@4.3.1':
-    resolution: {integrity: sha512-6aPhjGuHWrObLfhW4/RPl9X/T/CdahDiEzbV6TKcYm0lseDq1XvMb8S3c5HmwVJNL3vsk4AiYuc51Ko4fAhOmg==}
-
   '@storyblok/react@5.4.5':
     resolution: {integrity: sha512-pID7NlrVaOIXvifvjcYaryFW4IA5GBLC41O2bJkJT+G9JhttZjUGhdBQiVzfxfRBfh9W/m3SBlUkJdFkbvVhSw==}
     peerDependencies:
@@ -481,9 +469,6 @@ packages:
 
   '@storyblok/richtext@3.7.0':
     resolution: {integrity: sha512-TAk7v7RUMV2uL942AErdDjsInJB0HsKXJIZBIU+M8W014kf4xbF2Qg0b/WAHEf4jfnjdJpGEglLEktHe/tLmcw==}
-
-  '@storyblok/richtext@3.8.1':
-    resolution: {integrity: sha512-G4TJjjill8F2SICXOkGyhSv4fecwqRX16gReh7PHIQm8+WX7Sw0l5MDHyP08TZU5ukVjgMR7KZL3l3EjvGaqUA==}
 
   '@swc/helpers@0.5.23':
     resolution: {integrity: sha512-5lSsMOTXURePglDfvuAQUqkGek9Hg2kksOYay2m0+XR++b2NWYL/4sWyuvVBIs8oKnJaxkdi9whaL/sqN13afw==}
@@ -664,18 +649,6 @@ packages:
     resolution: {integrity: sha512-lrW200hZdbfRtztbygyaq/6jP6AKE8qQN2KvPcJ+x7wiD038YtnYtZ82IMNJ69GJibV7bwL3y9FgK+5w/pYt6g==}
     cpu: [x64]
     os: [win32]
-
-  '@vercel/edge-config-fs@0.1.0':
-    resolution: {integrity: sha512-NRIBwfcS0bUoUbRWlNGetqjvLSwgYH/BqKqDN7vK1g32p7dN96k0712COgaz6VFizAm9b0g6IG6hR6+hc0KCPg==}
-
-  '@vercel/edge-config@1.4.0':
-    resolution: {integrity: sha512-69Wg5gw9DzwnyUmnjToSeLRm1nm8mCPgN0kflX8EHRHyqvzH80wPem5A8rI2LXPb2Y9tJNoqN3vXPcQhS2Wh5g==}
-    engines: {node: '>=14.6'}
-    peerDependencies:
-      '@opentelemetry/api': ^1.7.0
-    peerDependenciesMeta:
-      '@opentelemetry/api':
-        optional: true
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -1332,11 +1305,6 @@ packages:
     resolution: {integrity: sha512-Hs59xBNfUIunMFgWAbGX5cq6893IbWg4KnrjbYwX3tx0ztorVgTDA6B2sxf8ejHJ4wz8BqGUMYlnzNBer5NvGg==}
     engines: {node: '>= 4'}
 
-  image-size@2.0.2:
-    resolution: {integrity: sha512-IRqXKlaXwgSMAMtpNzZa1ZAe8m+Sa1770Dhk8VkSsP9LS+iHD62Zd8FQKs8fbPiagBE7BzoFX23cxFnwshpV6w==}
-    engines: {node: '>=16.x'}
-    hasBin: true
-
   import-fresh@3.3.1:
     resolution: {integrity: sha512-TR3KfrTZTYLPB6jUjfx6MF9WcWrHL9su5TObK4ZkYgBdWKPOFoSoQIdEuTuR82pmtxH2spWG9h6etwfr1pLBqQ==}
     engines: {node: '>=6'}
@@ -1961,9 +1929,6 @@ packages:
 
   storyblok-js-client@7.1.4:
     resolution: {integrity: sha512-8U/l4HcWBhyurjOYh9xlhQ+TLN48DxBovzIXwXArbH0muJx/kqYlU/XHnwpmGZJuxTRgRdhWGjpZkthpXpYeaw==}
-
-  storyblok-js-client@7.1.5:
-    resolution: {integrity: sha512-N+DWilPdbXfnb54O3jbJ7IfPyQMs+Jn7KrTCO3lpS8JAEfb+BXQH3sLPri3qzy+tyk0IhXj+8ao4wOX1z89FNg==}
 
   string-width@4.2.3:
     resolution: {integrity: sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==}
@@ -2592,11 +2557,6 @@ snapshots:
       '@storyblok/richtext': 3.7.0
       storyblok-js-client: 7.1.4
 
-  '@storyblok/js@4.3.1':
-    dependencies:
-      '@storyblok/richtext': 3.8.1
-      storyblok-js-client: 7.1.5
-
   '@storyblok/react@5.4.5(next@16.4.6(@babel/core@7.28.6)(@types/node@20.19.19)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@storyblok/js': 4.2.5
@@ -2606,12 +2566,6 @@ snapshots:
       next: 16.4.6(@babel/core@7.28.6)(@types/node@20.19.19)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
 
   '@storyblok/richtext@3.7.0':
-    dependencies:
-      markdown-it: 14.1.0
-      markdown-it-github: 0.5.0
-      node-html-parser: 7.0.1
-
-  '@storyblok/richtext@3.8.1':
     dependencies:
       markdown-it: 14.1.0
       markdown-it-github: 0.5.0
@@ -2793,12 +2747,6 @@ snapshots:
 
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
-
-  '@vercel/edge-config-fs@0.1.0': {}
-
-  '@vercel/edge-config@1.4.0':
-    dependencies:
-      '@vercel/edge-config-fs': 0.1.0
 
   acorn-jsx@5.3.2(acorn@8.15.0):
     dependencies:
@@ -3620,8 +3568,6 @@ snapshots:
 
   ignore@7.0.5: {}
 
-  image-size@2.0.2: {}
-
   import-fresh@3.3.1:
     dependencies:
       parent-module: 1.0.1
@@ -4286,8 +4232,6 @@ snapshots:
       internal-slot: 1.1.0
 
   storyblok-js-client@7.1.4: {}
-
-  storyblok-js-client@7.1.5: {}
 
   string-width@4.2.3:
     dependencies:
