@@ -8,9 +8,11 @@ import Image from 'next/image';
 type Props = {
   src: string;
   alt?: string;
-  thumbWidth?: number;
-  thumbHeight?: number;
+  thumbWidth?: number | string;
+  thumbHeight?: number | string;
   sizes?: string;
+  /** Image visible dès l'ouverture de la page : chargée sans attendre. */
+  priority?: boolean;
   onLoaded?: (w: number, h: number) => void;
   onOpen?: () => void;
   hoverTitle?: string;
@@ -23,6 +25,7 @@ export default function ZoomableImage({
   thumbWidth = 1600,
   thumbHeight = 1200,
   sizes,
+  priority = false,
   onLoaded,
   onOpen,
   hoverTitle,
@@ -60,9 +63,9 @@ export default function ZoomableImage({
           src={src}
           alt={alt}
           fill
-          sizes={sizes || `${thumbWidth}px`}
+          sizes={sizes}
           className="object-cover z-0"
-          loading="lazy"
+          priority={priority}
           onLoad={(event) => {
             const img = event.currentTarget;
             onLoaded?.(img.naturalWidth, img.naturalHeight);

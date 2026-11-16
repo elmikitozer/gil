@@ -80,3 +80,11 @@ a {
     background: rgba(255, 255, 255, 0.45);
   }
 }
+
+/* Grille de vignettes (MasonryColumns) : mise en page calculée par le serveur,
+   position de chaque vignette fournie par des requêtes de conteneur. */
+.mg-t {
+  position: absolute;
+  width: var(--colw);
+  height: calc(var(--colw) / var(--r));
+}

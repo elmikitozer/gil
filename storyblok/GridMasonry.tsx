@@ -9,6 +9,7 @@ import MasonryColumns, {
   type VimeoVideoItem,
   type HybridVideoItem,
 } from '@/app/components/MasonryColumns';
+import { storyblokImageRatio } from '@/lib/storyblok-image';
 
 type StoryblokAsset = {
   filename?: string;
@@ -122,6 +123,7 @@ export default function GridMasonry({ blok }: { blok: GridMasonryBlok }) {
         blok: c,
         albumPhotos,
         isCoverPhoto: c.is_cover_photo === true,
+        ratio: storyblokImageRatio(c.media.filename),
       };
       acc.push(item);
     } else if (c?.component === 'video_item') {

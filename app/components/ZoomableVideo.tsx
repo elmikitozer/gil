@@ -8,8 +8,8 @@ type Props = {
   srcMp4: string;
   srcWebm?: string;
   poster?: string;
-  width: number;
-  height: number;
+  width: number | string;
+  height: number | string;
   autoPlay?: boolean;
   loop?: boolean;
   muted?: boolean;

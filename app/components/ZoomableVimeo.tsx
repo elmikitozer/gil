@@ -7,8 +7,8 @@ import useIsStoryblokEditor from './useIsStoryblokEditor';
 
 type Props = {
   vimeoId: string;
-  width: number;
-  height: number;
+  width: number | string;
+  height: number | string;
   onOpen: () => void;
   hoverTitle?: string;
   hoverCaption?: string;
@@ -52,7 +52,7 @@ export default function ZoomableVimeo({
             src={thumbnailUrl}
             alt={hoverTitle || 'Vidéo'}
             fill
-            sizes={`${width}px`}
+            sizes="(min-width: 768px) 33vw, 50vw"
             className="object-cover"
             unoptimized
           />
