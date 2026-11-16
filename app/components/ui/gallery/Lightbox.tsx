@@ -68,7 +68,8 @@ export default function Lightbox() {
       }}
       carousel={{
         finite: isSingleItem,
-        preload: 2,
+        // Une image voisine de chaque côté : 3 images chargées à l'ouverture d'un album.
+        preload: 1,
       }}
       animation={{
         fade: 250,
