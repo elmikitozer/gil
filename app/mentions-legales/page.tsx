@@ -33,9 +33,9 @@ export default function MentionsLegalesPage() {
             Mentions légales
           </h1>
 
-          <h3 className="mt-[clamp(20px,5vh,32px)] text-[clamp(11px,2.8vw,12px)] font-semibold tracking-[0.22em] text-neutral-900">
+          <h2 className="mt-[clamp(20px,5vh,32px)] text-[clamp(11px,2.8vw,12px)] font-semibold tracking-[0.22em] text-neutral-900 leading-normal">
             ÉDITEUR DU SITE
-          </h3>
+          </h2>
           <p className="mt-1 text-[clamp(12px,3.2vw,14px)] text-neutral-700 leading-snug">
             Gil Anselmi — Photographe<br />
             <a
@@ -55,9 +55,9 @@ export default function MentionsLegalesPage() {
             SIRET : 833 531 627 00028
           </p>
 
-          <h3 className="mt-[clamp(14px,3vh,20px)] text-[clamp(11px,2.8vw,12px)] font-semibold tracking-[0.22em] text-neutral-900">
+          <h2 className="mt-[clamp(14px,3vh,20px)] text-[clamp(11px,2.8vw,12px)] font-semibold tracking-[0.22em] text-neutral-900 leading-normal">
             DIRECTRICE DE LA PUBLICATION
-          </h3>
+          </h2>
           <p className="mt-1 text-[clamp(12px,3.2vw,14px)] text-neutral-700 leading-relaxed">
             <a
               href="https://www.instagram.com/gilanselmi"
@@ -69,9 +69,9 @@ export default function MentionsLegalesPage() {
             </a>
           </p>
 
-          <h3 className="mt-[clamp(28px,6vh,40px)] text-[clamp(10px,2.5vw,11px)] font-semibold tracking-[0.22em] text-neutral-700">
+          <h2 className="mt-[clamp(28px,6vh,40px)] text-[clamp(10px,2.5vw,11px)] font-semibold tracking-[0.22em] text-neutral-700 leading-normal">
             HÉBERGEMENT
-          </h3>
+          </h2>
           <p className="mt-0.5 text-[clamp(10px,2.8vw,12px)] text-neutral-500 leading-tight">
             Vercel Inc. —{' '}
             <a
@@ -84,9 +84,9 @@ export default function MentionsLegalesPage() {
             </a>
           </p>
 
-          <h3 className="mt-[clamp(6px,1.2vh,10px)] text-[clamp(10px,2.5vw,11px)] font-semibold tracking-[0.22em] text-neutral-700">
+          <h2 className="mt-[clamp(6px,1.2vh,10px)] text-[clamp(10px,2.5vw,11px)] font-semibold tracking-[0.22em] text-neutral-700 leading-normal">
             PROPRIÉTÉ INTELLECTUELLE
-          </h3>
+          </h2>
           <p className="mt-0.5 text-[clamp(10px,2.8vw,12px)] text-neutral-500 leading-tight">
             L&apos;ensemble du contenu de ce site est la propriété exclusive de Gil Anselmi, protégé par le droit d&apos;auteur. Toute reproduction est interdite sans autorisation écrite.
           </p>
