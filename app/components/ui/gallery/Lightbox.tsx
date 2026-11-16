@@ -108,12 +108,10 @@ export default function Lightbox() {
           // Custom rendering for vimeo/hybrid
           if (item.kind === 'vimeo' || item.kind === 'hybrid') {
             const vimeoId = extractVimeoId(item.vimeoId);
-            const maxVW = '90vw';
-            const maxVH = '90vh';
             return (
               <div className="flex items-center justify-center w-full h-full">
                 <div className="flex flex-col items-start">
-                  <div className={`relative w-[min(${maxVW},160vh)] h-[min(${maxVH},50.625vw)]`}>
+                  <div className="relative w-[min(90vw,160vh)] h-[min(90vh,50.625vw)]">
                     <iframe
                       key={vimeoId}
                       src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1&loop=1&title=0&byline=0&portrait=0`}
