@@ -9,7 +9,10 @@ export default {
   ],  theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        // Police du texte courant (Tailwind l'applique à <html>). Elle pointait vers
+        // « var(--font-sans) », variable jamais définie : la déclaration était invalide et
+        // le navigateur affichait sa police serif par défaut (Times). Rendu conservé, sans variable fantôme.
+        sans: ["serif"],
         serif: ["var(--font-serif)", "serif"],
       },
       colors: {
