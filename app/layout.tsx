@@ -2,6 +2,7 @@ import './globals.css';
 import { Libre_Caslon_Text } from 'next/font/google';
 import { Metadata } from 'next';
 import Navbar from './Navbar';
+import CurrentYear from './components/CurrentYear';
 
 export const metadata: Metadata = {
   title: 'Gil Anselmi — Photographer',
@@ -42,7 +43,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </main>
         <footer className="border-t border-neutral-200 mt-16">
           <div className="container mx-auto px-4 py-6 text-sm text-neutral-500 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-            <span>© {new Date().getFullYear()} Gil Anselmi. All rights reserved.</span>
+            <span>
+              © <CurrentYear fallback={new Date().getFullYear()} /> Gil Anselmi. All rights reserved.
+            </span>
             <a
               href="/mentions-legales"
               className="hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
