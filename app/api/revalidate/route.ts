@@ -1,5 +1,6 @@
 // app/api/revalidate/route.ts
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
+import { STORYBLOK_CACHE_TAG } from "@/lib/storyblok";
 import { NextResponse } from "next/server";
 import { timingSafeEqual } from "crypto";
 
@@ -33,8 +34,11 @@ export async function POST(req: Request) {
     action = body?.action || body?.event || "unknown";
   } catch {}
 
-  // 1) Revalider la home (et autres si besoin)
-  revalidatePath("/");
+  // 1) Périmer le contenu Storyblok en cache. Profil "max" : l'ancienne page
+  //    reste servie pendant la régénération, et le reste si Storyblok est
+  //    indisponible à ce moment-là (un revalidatePath purgeait le cache et
+  //    exposait une erreur 500 dans ce cas).
+  revalidateTag(STORYBLOK_CACHE_TAG, "max");
 
   // 2) Si un asset a changé, on "bump" la version images
   if (action.startsWith("asset.")) {
@@ -46,6 +50,6 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   if (!authorized(req.url)) return NextResponse.json({ ok: false }, { status: 401 });
-  revalidatePath("/");
+  revalidateTag(STORYBLOK_CACHE_TAG, "max");
   return NextResponse.json({ ok: true, revalidated: true, method: "GET" });
 }
