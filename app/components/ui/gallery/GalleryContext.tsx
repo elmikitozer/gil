@@ -23,10 +23,12 @@ export function useGallery() {
 }
 
 export function GalleryProvider({ items, children }: { items: Item[]; children: React.ReactNode }) {
-  const [originalItems] = useState(items);
-  const [currentItems, setCurrentItems] = useState(items);
+  // Album ouvert depuis une vignette ; `null` tant que la galerie affiche la liste reçue en prop.
+  // La liste courante est dérivée de la prop : elle suit ses changements (aperçu en direct de l'éditeur).
+  const [album, setAlbum] = useState<Item[] | null>(null);
   const [isOpen, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
+  const currentItems = album ?? items;
 
   const openAt = useCallback((i: number) => {
     setIndex(i);
@@ -34,15 +36,15 @@ export function GalleryProvider({ items, children }: { items: Item[]; children: 
   }, []);
 
   const openAlbum = useCallback((albumItems: Item[], startIndex: number) => {
-    setCurrentItems(albumItems);
+    setAlbum(albumItems);
     setIndex(startIndex);
     setOpen(true);
   }, []);
 
   const close = useCallback(() => {
     setOpen(false);
-    setCurrentItems(originalItems); // Restaurer les items originaux
-  }, [originalItems]);
+    setAlbum(null); // Retour à la liste de la prop
+  }, []);
 
   const next = useCallback(
     () => setIndex((i) => (i + 1) % currentItems.length),
