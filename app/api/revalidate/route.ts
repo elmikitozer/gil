@@ -1,14 +1,24 @@
 // app/api/revalidate/route.ts
 import { revalidateTag } from "next/cache";
-import { STORYBLOK_CACHE_TAG } from "@/lib/storyblok";
 import { after, NextResponse } from "next/server";
-import { timingSafeEqual } from "crypto";
+import { createHmac, timingSafeEqual } from "crypto";
+import { STORYBLOK_CACHE_TAG } from "@/lib/storyblok";
 
-function authorized(url: string) {
-  const provided = new URL(url).searchParams.get("secret") ?? "";
-  const expected = process.env.REVALIDATE_SECRET ?? "";
-  if (!expected || provided.length !== expected.length) return false;
-  return timingSafeEqual(Buffer.from(provided), Buffer.from(expected));
+// Webhook Storyblok : POST uniquement (aucun autre verbe n'est exporté, Next
+// répond 405), authentifié par la signature de Storyblok et non par un secret
+// dans l'URL.
+//
+// Quand un « Webhook secret » est configuré dans Storyblok, chaque requête
+// porte un en-tête `webhook-signature` : HMAC-SHA1 (hexadécimal) du corps brut,
+// avec ce secret pour clé.
+// https://www.storyblok.com/docs/concepts/webhooks
+function hasValidSignature(rawBody: string, signature: string | null): boolean {
+  const secret = process.env.STORYBLOK_WEBHOOK_SECRET;
+  if (!secret || !signature) return false;
+
+  const expected = Buffer.from(createHmac("sha1", secret).update(rawBody).digest("hex"));
+  const provided = Buffer.from(signature.trim().toLowerCase());
+  return provided.length === expected.length && timingSafeEqual(provided, expected);
 }
 
 // ⛏️ util: patch Edge Config "assetBump"
@@ -44,11 +54,17 @@ function warmHome(requestUrl: string) {
 }
 
 export async function POST(req: Request) {
-  if (!authorized(req.url)) return NextResponse.json({ ok: false }, { status: 401 });
+  // Le corps brut est lu avant toute analyse JSON : c'est lui qui est signé.
+  const rawBody = await req.text();
+  if (!hasValidSignature(rawBody, req.headers.get("webhook-signature"))) {
+    return NextResponse.json({ ok: false }, { status: 401 });
+  }
+
   let action = "unknown";
   try {
-    const body = await req.json();
-    action = body?.action || body?.event || "unknown";
+    const body: { action?: unknown; event?: unknown } = JSON.parse(rawBody);
+    const value = body.action ?? body.event;
+    if (typeof value === "string" && value) action = value;
   } catch {}
 
   // 1) Périmer le contenu Storyblok en cache. Profil "max" : l'ancienne page
@@ -64,11 +80,4 @@ export async function POST(req: Request) {
   }
 
   return NextResponse.json({ ok: true, revalidated: true, action });
-}
-
-export async function GET(req: Request) {
-  if (!authorized(req.url)) return NextResponse.json({ ok: false }, { status: 401 });
-  revalidateTag(STORYBLOK_CACHE_TAG, "max");
-  warmHome(req.url);
-  return NextResponse.json({ ok: true, revalidated: true, method: "GET" });
 }
