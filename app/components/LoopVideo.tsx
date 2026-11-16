@@ -4,7 +4,6 @@ import { useEffect, useRef } from 'react';
 
 type Props = {
   srcMp4: string;
-  srcWebm?: string;
   /** Image affichée avant le démarrage de la vidéo (et seule, si l'animation est réduite). */
   poster: string;
   className?: string;
@@ -16,7 +15,7 @@ type Props = {
  * `autoPlay` aurait lancé le téléchargement de plusieurs Mo dès le chargement de la page.
  * Avec « réduire les animations » activé, seule l'affiche est affichée.
  */
-export default function LoopVideo({ srcMp4, srcWebm, poster, className }: Props) {
+export default function LoopVideo({ srcMp4, poster, className }: Props) {
   const ref = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
@@ -45,7 +44,6 @@ export default function LoopVideo({ srcMp4, srcWebm, poster, className }: Props)
       aria-hidden="true"
       className={className}
     >
-      {srcWebm ? <source src={srcWebm} type="video/webm" /> : null}
       <source src={srcMp4} type="video/mp4" />
     </video>
   );
