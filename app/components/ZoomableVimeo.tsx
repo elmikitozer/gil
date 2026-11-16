@@ -1,9 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
 import HoverCover from '@/app/components/ui/HoverCover';
-import LightboxClose from './ui/LightboxClose';
 import { extractVimeoId } from '@/app/utils/vimeo';
 import useIsStoryblokEditor from './useIsStoryblokEditor';
 
@@ -11,7 +9,7 @@ type Props = {
   vimeoId: string;
   width: number;
   height: number;
-  onOpen?: () => void;
+  onOpen: () => void;
   hoverTitle?: string;
   hoverCaption?: string;
 };
@@ -24,21 +22,7 @@ export default function ZoomableVimeo({
   hoverTitle,
   hoverCaption,
 }: Props) {
-  const [open, setOpen] = useState(false);
   const isStoryblokEditor = useIsStoryblokEditor();
-
-  const onClose = useCallback(() => setOpen(false), []);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-    document.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
-    };
-  }, [open, onClose]);
 
   const cleanVimeoId = extractVimeoId(vimeoId);
   const thumbnailUrl = cleanVimeoId ? `https://vumbnail.com/${cleanVimeoId}.jpg` : '';
@@ -57,11 +41,7 @@ export default function ZoomableVimeo({
         onClick={() => {
           // Ne pas ouvrir la lightbox dans l'éditeur Storyblok
           if (isStoryblokEditor) return;
-          if (onOpen) {
-            onOpen();
-          } else {
-            setOpen(true);
-          }
+          onOpen();
         }}
         className="group relative block w-full focus:outline-none cursor-pointer overflow-hidden"
         style={{ width, height, lineHeight: 0 }}
@@ -92,31 +72,6 @@ export default function ZoomableVimeo({
         {/* Label hover */}
         <HoverCover text={hoverTitle} caption={hoverCaption} />
       </button>
-
-      {open && (
-        <div
-          className="fixed inset-0 z-[100] bg-white dark:bg-black flex items-center justify-center p-0 cursor-pointer"
-          onClick={onClose}
-          aria-modal="true"
-          aria-label={hoverTitle || 'Vidéo'}
-          role="dialog"
-        >
-          <LightboxClose onClick={onClose} size="lg" />
-          <div
-            className="w-[min(90vw,160vh)] h-[min(90vh,50.625vw)]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <iframe
-              src={`https://player.vimeo.com/video/${cleanVimeoId}?autoplay=1&loop=1&title=0&byline=0&portrait=0`}
-              className="w-full h-full"
-              style={{ border: 'none' }}
-              allow="autoplay; fullscreen; picture-in-picture"
-              allowFullScreen
-              title={hoverTitle || 'Vidéo'}
-            />
-          </div>
-        </div>
-      )}
     </>
   );
 }

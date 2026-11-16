@@ -1,8 +1,6 @@
 'use client';
 
-import LightboxClose from './ui/LightboxClose';
-
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import HoverCover from '@/app/components/ui/HoverCover';
 import useIsStoryblokEditor from './useIsStoryblokEditor';
 
@@ -16,7 +14,7 @@ type Props = {
   loop?: boolean;
   muted?: boolean;
   onLoaded?: (videoW: number, videoH: number) => void;
-  onOpen?: () => void;
+  onOpen: () => void;
   autoplayInViewport?: boolean;
   hoverTitle?: string; // ✅
   hoverCaption?: string; // ✅
@@ -37,7 +35,6 @@ export default function ZoomableVideo({
   hoverTitle,
   hoverCaption,
 }: Props) {
-  const [open, setOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const btnRef = useRef<HTMLButtonElement | null>(null);
   const isStoryblokEditor = useIsStoryblokEditor();
@@ -91,19 +88,6 @@ export default function ZoomableVideo({
     return () => io.disconnect();
   }, [autoplayInViewport]);
 
-  const onClose = useCallback(() => setOpen(false), []);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-    document.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
-    };
-  }, [open, onClose]);
-
   return (
     <>
       <button
@@ -112,11 +96,7 @@ export default function ZoomableVideo({
         onClick={() => {
           // Ne pas ouvrir la lightbox dans l'éditeur Storyblok
           if (isStoryblokEditor) return;
-          if (onOpen) {
-            onOpen();
-          } else {
-            setOpen(true);
-          }
+          onOpen();
         }}
         className="group relative block w-full focus:outline-none cursor-pointer"
         style={{ width, height, lineHeight: 0 }}
@@ -138,38 +118,6 @@ export default function ZoomableVideo({
         {/* Label hover */}
         <HoverCover text={hoverTitle} caption={hoverCaption} />
       </button>
-
-      {open && (
-        <div
-          className="fixed inset-0 z-[100] bg-white flex items-center justify-center p-0 cursor-pointer"
-          onClick={onClose}
-          aria-modal="true"
-          aria-label={hoverTitle || 'Vidéo'}
-          role="dialog"
-        >
-          <LightboxClose onClick={onClose} size="lg" />
-          <video
-            key={srcMp4} // Force re-render when video changes
-            poster={poster}
-            autoPlay
-            loop
-            muted={false}
-            controls
-            playsInline
-            preload="auto"
-            className="w-[min(100vw,90vh)] max-h-[90vh] object-contain"
-            onError={(e) => {
-              // Erreur silencieuse en production
-              if (process.env.NODE_ENV === 'development') {
-                console.error('Erreur vidéo:', srcMp4, e);
-              }
-            }}
-          >
-            {srcWebm && <source src={srcWebm} type="video/webm" />}
-            <source src={srcMp4} type="video/mp4" />
-          </video>
-        </div>
-      )}
     </>
   );
 }
