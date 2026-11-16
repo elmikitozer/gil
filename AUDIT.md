@@ -198,7 +198,18 @@ Poids du HTML de la home (`/`) : 271 Ko brut / 20 Ko gzip avant ; 679 Ko brut / 
 
 **SEO.** `/sitemap.xml` : `/` et `/information` (pas `/mentions-legales`, en « noindex », ni l'aperçu). `/robots.txt` : tout autorisé sauf `/api/` et `/storyblok-preview`, avec l'adresse du plan du site.
 
-**Vidéo des pages d'information.** `autoPlay` fait ignorer `preload` aux navigateurs : le fichier (5,5 Mo en WebM) était téléchargé dans tous les cas. Maintenant : affiche (JPEG 136 Ko tiré de la première image, pas de saut visuel), place carrée réservée, `preload="none"`, lecture déclenchée quand la vidéo apparaît à 25 %, pause quand elle sort ; avec « réduire les animations », seule l'affiche s'affiche (0 octet de vidéo mesuré). **Quand la vidéo est visible (cas normal sur ces deux pages), le poids reste celui d'avant (5,5 à 6 Mo).** Le vrai gain est dans le fichier : la vidéo fait 1440×1440 pour un affichage de 448 px au plus ; un essai de réencodage en 900×900 sans piste audio donne environ 1,7 Mo (MP4 et WebM). Non appliqué : décision et fichier source à vous.
+**Vidéo des pages d'information.** `autoPlay` fait ignorer `preload` aux navigateurs : le fichier était téléchargé dans tous les cas. Maintenant : affiche tirée de la première image (pas de saut visuel), place carrée réservée, `preload="none"`, lecture déclenchée quand la vidéo apparaît à 25 %, pause quand elle sort ; avec « réduire les animations », seule l'affiche s'affiche (0 octet de vidéo mesuré).
+
+Réencodage (commit `perf: vidéo des pages d'information réencodée…`) : l'original faisait 1440×1440 (13 Mbit/s) pour un affichage de 448 px au plus, soit 896 px sur Retina 2x (978 px sur un téléphone 3x). Nouveau fichier : H.264 High, 960×960, 30 i/s, 113 images, sans piste audio (l'original n'en avait déjà pas), CRF 18, `yuv420p`, `faststart`. SSIM 0,982 contre l'original ramené à 960 px (CRF 16 : 0,986 pour 4,0 Mo ; CRF 21 : 0,974 pour 2,4 Mo). Le WebM (VP9) est supprimé : H.264 est lu partout, et le navigateur prenait le WebM en premier.
+
+| | Avant | Après |
+|---|---|---|
+| Vidéo servie par les navigateurs | `info-video.webm` 5 482 829 o | `info-video.mp4` 3 273 182 o (−40 %) |
+| Fichier MP4 | 6 316 844 o | 3 273 182 o (−48 %) |
+| Affiche | 136 111 o | 149 480 o |
+| `public/videos/` (fichiers suivis) | 24,4 Mo | 15,9 Mo |
+
+Le poids téléchargé reste celui du fichier quand la vidéo est visible (cas normal sur ces deux pages). Un navigateur sans lecture H.264 n'afficherait que l'affiche (aucun cas connu).
 
 **Police.** `fonnts.com-Big_Caslon_CC.otf` (105 Ko) → `big-caslon.woff2` (59 Ko) ; les 736 contours, la table de caractères et le crénage sont identiques (le seul écart de tables est la signature numérique `DSIG`, retirée par la conversion). **Licence à vérifier** : la police est « Big Caslon CC » de The Type Founders, avec un contrat Typekit/Adobe Fonts dans ses métadonnées et un drapeau d'incorporation « aperçu et impression » (`fsType` 4) ; le nom du fichier suggère un téléchargement sur un site tiers. Je ne peux pas vérifier que l'hébergement de la police sur le site est autorisé.
 
@@ -222,6 +233,9 @@ Poids du HTML de la home (`/`) : 271 Ko brut / 20 Ko gzip avant ; 679 Ko brut / 
 8. **Mode sombre supprimé** plutôt qu'implémenté.
 9. **`media_item` hors grille retiré, `hero_full_bleed` conservé** : la vignette autonome avait une taille fixe 1600×1200 et aucune lightbox (réparer demandait des choix de conception) ; le hero se répare simplement. Les blocs `media_item` imbriqués dans `grid_masonry` ne sont pas concernés. Il ne faut pas placer un `media_item` directement dans le corps d'une page.
 
+10. **La grille reste sur l'optimiseur d'images de Vercel** (décision du 2026-11-16). Le compte Vercel est en plan Pro, pas Hobby : les 5 000 transformations par mois du plan gratuit ne s'appliquent pas, la facturation se fait à l'usage (voir § 4 pour le volume attendu). Aucun changement de code ; l'option « Storyblok pour la grille » est abandonnée.
+11. **Licence de la police Big Caslon : traitée après la mise en production, via Adobe Fonts** (décision du 2026-11-16). D'ici là, le site héberge le fichier `app/fonts/big-caslon.woff2` (voir § 2, lot 4B).
+
 ## 4. Corrections et constats postérieurs au rapport initial
 
 - **Vidéos** : le rapport donnait sept vidéos inutilisées (~28 Mo). **Deux sont utilisées** par la home via des blocs `video_item` du contenu Storyblok : `GA_IG_POST01.mp4` et `InstaGil.mp4`. Elles sont conservées. Cinq ont été supprimées. Un lien externe vers l'un des fichiers supprimés ne peut pas être exclu.
@@ -240,13 +254,12 @@ Parties A et B faites (voir § 2).
 
 ## 6. Points du rapport initial non planifiés
 
-Traités en 4B : `/api/ping`, vidéos des pages d'information (poster et préchargement ; le poids du fichier reste), police en woff2, `GalleryProvider`, notes à la racine, `ignoreDeprecations`. Restent :
+Traités en 4B : `/api/ping`, vidéos des pages d'information (affiche, préchargement, réencodage), police en woff2, `GalleryProvider`, notes à la racine, `ignoreDeprecations`. Restent :
 
 | Point | Fichier | Avis avant la mise en production |
 |---|---|---|
-| Licence de la police Big Caslon | `app/fonts/` | **À vérifier avant la production** (voir § 2, lot 4B). Si l'hébergement n'est pas autorisé, il faut une version licenciée ou une autre police. |
-| Poids de la vidéo des pages d'information | `public/videos/` | **Vaut la peine** : 5,5 à 6 Mo pour un affichage de 448 px ; ~1,7 Mo après réencodage. Fichier source à vous. |
-| Servir aussi la grille par Storyblok | `MasonryColumns`, `ZoomableImage` | Voir § 4. **Recommandé, avant la production** si vous visez le plan gratuit de Vercel (5 000 transformations/mois, 402 au-delà ; votre compte a déjà été bloqué pour usage excessif) : ~400 à 500 transformations pour la home seule, à chaque expiration de cache. Contrepartie : ce trafic passerait sur le quota de Storyblok (100 Go/mois au plan gratuit ; la page tarifaire ne dit pas si les images y comptent). Il faudrait aussi fixer `quality={75}` pour garder les poids actuels. |
+| Licence de la police Big Caslon | `app/fonts/` | **Décidé : après la production, via Adobe Fonts** (§ 3, décision 11). Prévoir de remplacer `big-caslon.woff2` par le chargement Adobe Fonts. |
+| Servir aussi la grille par Storyblok | `MasonryColumns`, `ZoomableImage` | **Abandonné** : la grille reste sur Vercel (§ 3, décision 10). |
 | Politique CSP incomplète | `next.config.ts` | Utile mais **pas avant la mise en ligne** : elle exige `unsafe-inline` (scripts inline de Next et de la page), les domaines Vimeo, Storyblok, R2 ; risque de casser l'éditeur ou les vidéos. Si vous la voulez : d'abord en `Content-Security-Policy-Report-Only`, après la mise en ligne. |
 | Miniatures Vimeo | `ZoomableVimeo.tsx` | **Sans objet aujourd'hui** : la home ne contient aucune vidéo Vimeo seule (les 13 vidéos de la grille sont des MP4). À traiter le jour où vous en ajoutez (utiliser l'affiche Storyblok plutôt que `vumbnail.com`). |
 | Tests et intégration continue | — | Peu utile avant la mise en production : Vercel exécute déjà le build (et le typecheck) à chaque déploiement. Une CI avec lint et typecheck est un plus après, mais elle devra connaître `STORYBLOK_PREVIEW_TOKEN`. |
@@ -265,6 +278,8 @@ Ne pas supprimer les variables ou jetons avant d'avoir déployé : la version ac
    - `STORYBLOK_WEBHOOK_SECRET` : secret aléatoire (`openssl rand -hex 32`), différent de l'ancien `REVALIDATE_SECRET`.
 3. En local (`.env.local`) : `STORYBLOK_PREVIEW_TOKEN` renseigné, `NEXT_PUBLIC_STORYBLOK_TOKEN` retiré.
 4. Décider de la fusion de `fix/audit` dans `main` (aujourd'hui : après le lot 4, ou par lots).
+
+(La licence de la police n'est pas un prérequis : elle sera traitée après la production, via Adobe Fonts.)
 
 ### Déploiement
 
@@ -305,4 +320,5 @@ Variables à conserver : `STORYBLOK_PREVIEW_TOKEN`, `STORYBLOK_WEBHOOK_SECRET`.
 |---|---|
 | 2026-11-16 | Création du document ; lots 0 à 3 documentés ; lot 4 listé |
 | 2026-11-16 | Lot 4, partie A : grille rendue côté serveur, lightbox via Storyblok, débordement corrigé |
+| 2026-11-16 | Décisions : grille sur Vercel (compte Pro), licence de la police après la production (Adobe Fonts) ; vidéo des pages d'information réencodée (H.264 960×960, 3,3 Mo) |
 | 2026-11-16 | Lot 4, partie A validée (préchargement réduit à 1 voisine) ; lot 4, partie B : accessibilité, SEO, factorisation, police, `/api/ping` ; § 6 et § 7 mis à jour |
