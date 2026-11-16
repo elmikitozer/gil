@@ -20,6 +20,8 @@ export function storyblokImageRatio(url?: string): number | undefined {
   return size ? size.width / size.height : undefined;
 }
 
+const MAX_WIDTH = 2560;
+
 /**
  * Loader `next/image` : sert l'image redimensionnée par le service d'images de
  * Storyblok (https://www.storyblok.com/docs/api/image-service), sans passer par
@@ -34,6 +36,9 @@ export function storyblokImageLoader({
   width: number;
   quality?: number;
 }): string {
-  if (!ASSET_URL.test(src)) return src;
-  return `${src}/m/${width}x0/filters:format(webp):quality(${quality ?? 80})`;
+  const size = storyblokImageSize(src);
+  if (!size) return src;
+  // Jamais plus large que l'original, ni que 2560 px (assez pour un écran 2x de 1280 px).
+  const w = Math.min(width, size.width, MAX_WIDTH);
+  return `${src}/m/${w}x0/filters:format(webp):quality(${quality ?? 80})`;
 }

@@ -1,12 +1,13 @@
-/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import React, { useMemo } from 'react';
+import Image from 'next/image';
 import YARLightbox, { SlideImage } from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 import './lightbox-custom.css';
 import { useGallery } from './GalleryContext';
 import { extractVimeoId } from '@/app/utils/vimeo';
+import { storyblokImageLoader, storyblokImageSize } from '@/lib/storyblok-image';
 
 export default function Lightbox() {
   const { isOpen, close, items, index, openAt } = useGallery();
@@ -136,6 +137,8 @@ export default function Lightbox() {
           if (item.kind === 'image') {
             const total = items.length;
             const current = itemIndex + 1;
+            // Dimensions d'origine (lues dans l'URL) ; valeur par défaut pour un asset hors Storyblok
+            const size = storyblokImageSize(item.src) ?? { width: 1600, height: 1067 };
 
             return (
               <div className="flex flex-col w-full h-full px-4 pt-4 pb-4 md:pt-10 md:pb-10">
@@ -152,10 +155,15 @@ export default function Lightbox() {
                 </div>
                 {/* Image container */}
                 <div className="h-[92%] md:h-[90%] flex items-center justify-center">
-                  <img
+                  <Image
+                    loader={storyblokImageLoader}
                     src={item.src}
                     alt={item.alt ?? ''}
-                    className="object-contain max-w-full max-h-full"
+                    width={size.width}
+                    height={size.height}
+                    sizes={`min(calc(100vw - 2rem), calc(${(size.width / size.height).toFixed(3)} * 85vh))`}
+                    loading="eager"
+                    className="object-contain max-w-full max-h-full w-auto h-auto"
                   />
                 </div>
                 {/* Desktop: Bottom bar with title left, counter center */}
