@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
   //   ignoreDuringBuilds: true, // ✅ désactive le blocage ESLint sur Vercel
   // },
   images: {
+    // Largeurs proposées par next/image (défaut Next, plus 1600, 2560 et 3200) : sans elles,
+    // un écran Retina de 1440 px demandait 3840 px là où 2048 suffisent.
+    deviceSizes: [640, 750, 828, 1080, 1200, 1600, 1920, 2048, 2560, 3200, 3840],
     remotePatterns: [
       { protocol: 'https', hostname: 'a.storyblok.com' }, // images Storyblok
     ],

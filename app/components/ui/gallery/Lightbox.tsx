@@ -9,6 +9,18 @@ import { useGallery } from './GalleryContext';
 import { extractVimeoId } from '@/app/utils/vimeo';
 import { storyblokImageLoader, storyblokImageSize } from '@/lib/storyblok-image';
 
+// Taille d'affichage de l'image (px CSS) en fonction de la fenêtre : la zone
+// disponible est la fenêtre moins les marges de la lightbox (32 + 32 px), et sa
+// hauteur 90 % (92 % sur mobile) de la hauteur moins les marges verticales.
+// Le navigateur en déduit la largeur à télécharger, devicePixelRatio compris.
+function lightboxSizes(ratio: number): string {
+  const r = ratio.toFixed(3);
+  return [
+    `(min-width: 768px) min(calc(100vw - 64px), calc(${r} * 0.9 * (100vh - 112px)))`,
+    `min(calc(100vw - 64px), calc(${r} * 0.92 * (100vh - 64px)))`,
+  ].join(', ');
+}
+
 export default function Lightbox() {
   const { isOpen, close, items, index, openAt } = useGallery();
 
@@ -161,9 +173,10 @@ export default function Lightbox() {
                     alt={item.alt ?? ''}
                     width={size.width}
                     height={size.height}
-                    sizes={`min(calc(100vw - 2rem), calc(${(size.width / size.height).toFixed(3)} * 85vh))`}
+                    sizes={lightboxSizes(size.width / size.height)}
                     loading="eager"
-                    className="object-contain max-w-full max-h-full w-auto h-auto"
+                    className="object-contain w-full h-full"
+                    style={{ maxWidth: size.width, maxHeight: size.height }}
                   />
                 </div>
                 {/* Desktop: Bottom bar with title left, counter center */}

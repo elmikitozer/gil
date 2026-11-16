@@ -20,7 +20,10 @@ export function storyblokImageRatio(url?: string): number | undefined {
   return size ? size.width / size.height : undefined;
 }
 
-const MAX_WIDTH = 2560;
+const MAX_WIDTH = 3840;
+
+// WebP qualité 90 : conserve le grain des photos (à 80, il est lissé).
+const DEFAULT_QUALITY = 90;
 
 /**
  * Loader `next/image` : sert l'image redimensionnée par le service d'images de
@@ -38,7 +41,7 @@ export function storyblokImageLoader({
 }): string {
   const size = storyblokImageSize(src);
   if (!size) return src;
-  // Jamais plus large que l'original, ni que 2560 px (assez pour un écran 2x de 1280 px).
+  // Jamais plus large que l'original, ni que 3840 px (la plus grande largeur proposée par next/image).
   const w = Math.min(width, size.width, MAX_WIDTH);
-  return `${src}/m/${w}x0/filters:format(webp):quality(${quality ?? 80})`;
+  return `${src}/m/${w}x0/filters:format(webp):quality(${quality ?? DEFAULT_QUALITY})`;
 }
