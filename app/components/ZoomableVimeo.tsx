@@ -43,7 +43,7 @@ export default function ZoomableVimeo({
           if (isStoryblokEditor) return;
           onOpen();
         }}
-        className="group relative block w-full focus:outline-none cursor-pointer overflow-hidden"
+        className="group relative block w-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900 cursor-pointer overflow-hidden"
         style={{ width, height, lineHeight: 0 }}
       >
         {/* Thumbnail avec lazy loading */}

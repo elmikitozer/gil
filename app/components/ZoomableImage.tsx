@@ -53,7 +53,7 @@ export default function ZoomableImage({
     <button
       type="button"
       onClick={handleClick}
-      className={`group relative block w-full focus:outline-none pressable ${
+      className={`group relative block w-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900 pressable ${
         pressed ? 'is-pressed' : ''
       } ${isEditor ? 'pointer-events-none' : 'cursor-pointer'}`}
       style={{ width: thumbWidth, height: thumbHeight, lineHeight: 0 }}

@@ -98,7 +98,7 @@ export default function ZoomableVideo({
           if (isStoryblokEditor) return;
           onOpen();
         }}
-        className="group relative block w-full focus:outline-none cursor-pointer"
+        className="group relative block w-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900 cursor-pointer"
         style={{ width, height, lineHeight: 0 }}
       >
         <video
