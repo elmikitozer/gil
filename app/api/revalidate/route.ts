@@ -1,24 +1,25 @@
 // app/api/revalidate/route.ts
 import { revalidateTag } from "next/cache";
 import { after, NextResponse } from "next/server";
-import { createHmac, timingSafeEqual } from "crypto";
+import { createHash, timingSafeEqual } from "crypto";
 import { STORYBLOK_CACHE_TAG } from "@/lib/storyblok";
 
 // Webhook Storyblok : POST uniquement (aucun autre verbe n'est exporté, Next
-// répond 405), authentifié par la signature de Storyblok et non par un secret
-// dans l'URL.
+// répond 405), authentifié par un secret passé dans l'URL (?secret=…).
 //
-// Quand un « Webhook secret » est configuré dans Storyblok, chaque requête
-// porte un en-tête `webhook-signature` : HMAC-SHA1 (hexadécimal) du corps brut,
-// avec ce secret pour clé.
-// https://www.storyblok.com/docs/concepts/webhooks
-function hasValidSignature(rawBody: string, signature: string | null): boolean {
-  const secret = process.env.STORYBLOK_WEBHOOK_SECRET;
-  if (!secret || !signature) return false;
+// Le plan gratuit de Storyblok ne propose ni « Webhook secret » (en-tête
+// webhook-signature) ni en-têtes personnalisés : l'URL est le seul endroit où
+// placer un secret. Il peut donc apparaître dans des journaux d'accès ; en
+// cas de doute, le changer dans Vercel puis dans l'URL du webhook.
+function hasValidSecret(requestUrl: string): boolean {
+  const expected = process.env.STORYBLOK_WEBHOOK_SECRET;
+  const provided = new URL(requestUrl).searchParams.get("secret");
+  if (!expected || !provided) return false;
 
-  const expected = Buffer.from(createHmac("sha1", secret).update(rawBody).digest("hex"));
-  const provided = Buffer.from(signature.trim().toLowerCase());
-  return provided.length === expected.length && timingSafeEqual(provided, expected);
+  // Comparaison en temps constant ; le hachage donne deux tampons de même
+  // longueur, ce qui évite aussi de révéler la longueur du secret.
+  const digest = (value: string) => createHash("sha256").update(value).digest();
+  return timingSafeEqual(digest(provided), digest(expected));
 }
 
 // ⛏️ util: patch Edge Config "assetBump"
@@ -54,15 +55,13 @@ function warmHome(requestUrl: string) {
 }
 
 export async function POST(req: Request) {
-  // Le corps brut est lu avant toute analyse JSON : c'est lui qui est signé.
-  const rawBody = await req.text();
-  if (!hasValidSignature(rawBody, req.headers.get("webhook-signature"))) {
+  if (!hasValidSecret(req.url)) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 
   let action = "unknown";
   try {
-    const body: { action?: unknown; event?: unknown } = JSON.parse(rawBody);
+    const body: { action?: unknown; event?: unknown } = await req.json();
     const value = body.action ?? body.event;
     if (typeof value === "string" && value) action = value;
   } catch {}
