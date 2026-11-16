@@ -1,3 +1,4 @@
+import "server-only";
 import type { ISbStoryData } from "@storyblok/react/rsc";
 
 const STORIES_ENDPOINT = "https://api.storyblok.com/v2/cdn/stories";
@@ -19,6 +20,21 @@ export class StoryblokFetchError extends Error {
 }
 
 /**
+ * Jeton d'accès Storyblok (type « preview » : lit le publié et les brouillons).
+ * Variable sans préfixe NEXT_PUBLIC_ et module marqué "server-only" : le jeton
+ * ne peut pas se retrouver dans le JavaScript envoyé au navigateur.
+ */
+export function getStoryblokToken(): string {
+  const token = process.env.STORYBLOK_PREVIEW_TOKEN;
+  if (!token) {
+    throw new StoryblokFetchError(
+      "Jeton Storyblok absent : la variable STORYBLOK_PREVIEW_TOKEN n'est pas définie."
+    );
+  }
+  return token;
+}
+
+/**
  * Récupère une story Storyblok côté serveur.
  *
  * - "published" : réponse mise en cache sous STORYBLOK_CACHE_TAG jusqu'à
@@ -32,12 +48,7 @@ export async function fetchStory(
   slug: string,
   version: StoryVersion
 ): Promise<ISbStoryData | null> {
-  const token = process.env.NEXT_PUBLIC_STORYBLOK_TOKEN;
-  if (!token) {
-    throw new StoryblokFetchError(
-      "Jeton Storyblok absent : la variable NEXT_PUBLIC_STORYBLOK_TOKEN n'est pas définie."
-    );
-  }
+  const token = getStoryblokToken();
 
   const params = new URLSearchParams({ version, token });
 
