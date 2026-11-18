@@ -1,8 +1,43 @@
 import './globals.css';
 import { Libre_Caslon_Text } from 'next/font/google';
-import { Metadata } from 'next';
+import { Metadata, Viewport } from 'next';
 import Navbar from './Navbar';
 import CurrentYear from './components/CurrentYear';
+import { SITE_URL } from '@/lib/site';
+
+// Remplace la balise <meta name="viewport"> écrite à la main : même contenu
+// (width=device-width, initial-scale=1, viewport-fit=cover), sans doublon.
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+};
+
+// Données structurées (JSON-LD) : uniquement des faits déjà publiés sur le site
+// (/information : photographe et réalisateur basé à Paris, e-mail ; lien Instagram du menu).
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE_URL}/#website`,
+      url: `${SITE_URL}/`,
+      name: 'Gil Anselmi',
+      inLanguage: 'en',
+    },
+    {
+      '@type': 'Person',
+      '@id': `${SITE_URL}/#person`,
+      name: 'Gil Anselmi',
+      url: `${SITE_URL}/`,
+      jobTitle: 'Photographer and director',
+      image: `${SITE_URL}/og.jpg`,
+      email: 'mailto:contact@gilanselmi.com',
+      homeLocation: { '@type': 'Place', name: 'Paris, France' },
+      sameAs: ['https://www.instagram.com/gilanselmi'],
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: 'Gil Anselmi — Photographer',
@@ -13,10 +48,15 @@ export const metadata: Metadata = {
     description: 'Portfolio of Gil Anselmi — photographer & film.',
     url: 'https://gilanselmi.com',
     siteName: 'Gil Anselmi',
-    images: [{ url: '/og.jpg', width: 1200, height: 630 }],
+    type: 'website',
+    locale: 'en_US',
+    // Dimensions réelles de public/og.jpg (1899×1200), image non recadrée.
+    images: [{ url: '/og.jpg', width: 1899, height: 1200, alt: 'Gil Anselmi, photographer' }],
   },
-  alternates: { canonical: 'https://gilanselmi.com' },
-  robots: { index: true, follow: true },
+  // Pas de canonical ni de robots ici : le canonical est défini page par page
+  // (app/page.tsx, /information, /mentions-legales), sinon la 404 et toute
+  // future page hériteraient de la home. Sans « robots », le défaut de Next
+  // reste index/follow, et la 404 n'a plus de balises contradictoires.
 };
 
 const caslon = Libre_Caslon_Text({
@@ -31,7 +71,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://a.storyblok.com" crossOrigin="" />
         <link rel="dns-prefetch" href="https://a.storyblok.com" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+        />
         {/* Largeur de la barre de défilement (0 avec les barres « overlay »), mesurée à l'apparition
             de la page et à chaque redimensionnement, pour que la grille pleine largeur (.full-bleed)
             ne dépasse pas de la fenêtre. */}

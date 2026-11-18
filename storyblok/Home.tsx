@@ -11,6 +11,7 @@ export default function Home({ blok }: { blok: PageBlok }) {
 
   return (
     <section {...storyblokEditable(blok)} className="container mx-auto px-4 py-16">
+      <h1 className="sr-only">Gil Anselmi — Photographer</h1>
       {items.map((nested) => (
         <StoryblokServerComponent blok={nested} key={nested._uid} />
       ))}

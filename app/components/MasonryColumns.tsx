@@ -126,6 +126,8 @@ export default function MasonryColumns({ items, gap = 0 }: { items: Item[]; gap?
     [cw, changed, noContainerQueries, ratios, gap]
   );
   const sizes = useMemo(() => thumbSizes(gap), [gap]);
+  // Première tuile image de la grille (candidate au LCP) : seule à passer en haute priorité.
+  const firstImageIndex = useMemo(() => items.findIndex((item) => item.kind === 'image'), [items]);
 
   return (
     <GalleryProvider items={items}>
@@ -145,6 +147,7 @@ export default function MasonryColumns({ items, gap = 0 }: { items: Item[]; gap?
               ratio={ratios[gi]}
               tileKey={keys[gi]}
               eager={gi < EAGER_TILES}
+              highPriority={gi === firstImageIndex && gi < EAGER_TILES}
               sizes={sizes}
               pxTile={px ? { w: px.colW, ...px.tiles[gi] } : null}
               vars={px ? undefined : tileVars(variants, gi)}
@@ -164,13 +167,14 @@ type TileProps = {
   ratio: number;
   tileKey: string;
   eager: boolean;
+  highPriority: boolean;
   sizes: string;
   pxTile: { w: number; left: number; top: number; height: number } | null;
   vars?: Record<string, string>;
   setMeasured: React.Dispatch<React.SetStateAction<Record<string, number>>>;
 };
 
-function MasonryTile({ item, gi, ratio, tileKey, eager, sizes, pxTile, vars, setMeasured }: TileProps) {
+function MasonryTile({ item, gi, ratio, tileKey, eager, highPriority, sizes, pxTile, vars, setMeasured }: TileProps) {
   const { openAt, openAlbum } = useGallery();
 
   const style = (
@@ -200,6 +204,7 @@ function MasonryTile({ item, gi, ratio, tileKey, eager, sizes, pxTile, vars, set
         thumbHeight="100%"
         sizes={sizes}
         priority={eager}
+        fetchPriority={highPriority ? 'high' : undefined}
         hoverTitle={item.title}
         hoverCaption={item.caption}
         onLoaded={measure}

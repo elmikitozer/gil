@@ -13,6 +13,8 @@ type Props = {
   sizes?: string;
   /** Image visible dès l'ouverture de la page : chargée sans attendre. */
   priority?: boolean;
+  /** Priorité réseau de l'image (ex. « high » pour l'image LCP). */
+  fetchPriority?: 'high' | 'low' | 'auto';
   onLoaded?: (w: number, h: number) => void;
   onOpen?: () => void;
   hoverTitle?: string;
@@ -26,6 +28,7 @@ export default function ZoomableImage({
   thumbHeight = 1200,
   sizes,
   priority = false,
+  fetchPriority,
   onLoaded,
   onOpen,
   hoverTitle,
@@ -68,6 +71,7 @@ export default function ZoomableImage({
           sizes={sizes}
           className="object-cover z-0"
           priority={priority}
+          fetchPriority={fetchPriority}
           onLoad={(event) => {
             const img = event.currentTarget;
             onLoaded?.(img.naturalWidth, img.naturalHeight);

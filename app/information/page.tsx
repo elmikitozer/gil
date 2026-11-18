@@ -8,6 +8,9 @@ export const metadata = {
     title: 'Information — Gil Anselmi',
     description: 'Contact and about information for Gil Anselmi, photographer based in Paris.',
     url: 'https://gilanselmi.com/information',
+    siteName: 'Gil Anselmi',
+    type: 'website',
+    images: [{ url: '/og.jpg', width: 1899, height: 1200, alt: 'Gil Anselmi, photographer' }],
   },
 };
 
