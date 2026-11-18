@@ -3,6 +3,11 @@ import { StoryblokServerComponent } from '@storyblok/react/rsc';
 import { fetchStory } from '@/lib/storyblok';
 import '@/storyblok/registry.server';
 
+// Le canonical n'est plus dans le layout racine : il est déclaré ici (valeur inchangée).
+export const metadata = {
+  alternates: { canonical: 'https://gilanselmi.com' },
+};
+
 // Page statique : prérendue au build, puis régénérée quand le webhook
 // Storyblok invalide l'étiquette de cache (app/api/revalidate).
 //
