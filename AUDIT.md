@@ -162,7 +162,7 @@ Poids du HTML de la home (`/`) : 271 Ko brut / 20 Ko gzip avant ; 679 Ko brut / 
 
 **Constats de la partie A.**
 - **Une image a des dimensions fausses dans son URL** : `doc156_v2.jpg` (URL 2894×1060, soit 2,73 ; fichier réel 3,05). Le code compare le ratio de l'URL à l'image chargée et prend la mesure si l'écart dépasse 3 %, donc l'affichage reste celui d'aujourd'hui ; seul cet élément se replace après son chargement. Ré-importer cette image dans Storyblok supprime ce cas.
-- **Les 12 vidéos de la grille ont un ratio « auto » et ne sont pas des assets Storyblok** (fichiers sur Cloudflare R2 ou `/videos`) : leurs dimensions ne sont connues qu'au chargement de leurs métadonnées, comme avant. Elles restent donc la seule source de réorganisation de la grille (une fois la vidéo vue). Renseigner le champ « Ratio » de ces blocs `video_item` dans Storyblok la supprimerait (action de votre côté).
+- **Les 13 vidéos de la grille ont un ratio « auto » (sauf `InstaGil.mp4`, 3:2) et ne sont pas des assets Storyblok** (11 fichiers sur Cloudflare R2 en `r2.dev`, 2 dans `/videos` ; corrigé le 2026-11-23, voir § 4) : leurs dimensions ne sont connues qu'au chargement de leurs métadonnées, comme avant. Elles restent donc la seule source de réorganisation de la grille (une fois la vidéo vue). Renseigner le champ « Ratio » de ces blocs `video_item` dans Storyblok la supprimerait (action de votre côté).
 - **Champ « Ratio » de `media_item`** : valeur `auto` sur les 91 blocs, aucun effet. Avis : le supprimer du schéma (le faire fonctionner recadrerait les photos à un ratio imposé, donc changerait l'ordre et l'apparence). Non touché, décision à vous. Le champ « Ratio » de `video_item`, lui, est utile.
 - Les premières vignettes (4) sont chargées sans attendre (`priority`) ; les autres restent paresseuses.
 
@@ -238,6 +238,7 @@ Le poids téléchargé reste celui du fichier quand la vidéo est visible (cas n
 
 ## 4. Corrections et constats postérieurs au rapport initial
 
+- **Hébergement des vidéos (état des lieux du 2026-11-23)** : la grille compte **13** vidéos et non 12 : 11 sur Cloudflare R2 (`pub-077dd9d9….r2.dev`, adresse de développement selon Cloudflare) et 2 dans `public/videos` (`GA_IG_POST01.mp4`, `InstaGil.mp4`). L'album « Luis De Javier » contient en plus **2 vidéos sur Cloudinary**, mortes depuis la désactivation du compte (HTTP 401) : `PullLetterMagazine_Miumiu_10s_og5nls.mov` (original introuvable) et `Pastel_Beauty_Project_001_hz7lo5.mov` (probablement identique au fichier R2 du même nom). Aucun bloc n'est « hybride » (aucun `vimeoId`) : grille et lightbox lisent le même fichier. Une visite qui défile jusqu'en bas télécharge environ 80 Mo de vidéo. Décision : tout passer sur R2 via une page d'envoi (`/admin/videos`), voir `docs/VIDEOS_R2.md`.
 - **Vidéos** : le rapport donnait sept vidéos inutilisées (~28 Mo). **Deux sont utilisées** par la home via des blocs `video_item` du contenu Storyblok : `GA_IG_POST01.mp4` et `InstaGil.mp4`. Elles sont conservées. Cinq ont été supprimées. Un lien externe vers l'un des fichiers supprimés ne peut pas être exclu.
 - **`any`** : 16 et non 15, bloquants pour le lint.
 - **Edge Config** : le projet Vercel `gil` n'a jamais eu `EDGE_CONFIG`, `EDGE_CONFIG_ID` ni `VERCEL_TOKEN` ; le mécanisme ne tournait pas en production.

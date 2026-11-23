@@ -42,7 +42,7 @@ export type VimeoVideoItem = {
 
 export type HybridVideoItem = {
   kind: 'hybrid';
-  srcMp4: string; // Preview Cloudinary pour la grille
+  srcMp4: string; // Fichier MP4 lu dans la grille (aperçu)
   vimeoId: string; // Vidéo complète Vimeo pour la lightbox
   srcWebm?: string;
   poster?: string;
