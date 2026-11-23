@@ -2,12 +2,23 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-type Stored = { key: string; url: string; poster: string | null; size: number; lastModified: string };
+type Stored = {
+  key: string;
+  url: string;
+  poster: string | null;
+  size: number;
+  lastModified: string;
+  /** Empreinte SHA-256 du fichier d'origine (null pour une vidéo envoyée avant cette fonction). */
+  sha256: string | null;
+  /** Utilisée dans Storyblok (brouillon ou publié) ; null si Storyblok n'a pas pu être lu. */
+  used: boolean | null;
+};
 
 type Step =
   | { kind: 'idle' }
   | { kind: 'working'; label: string; fraction: number | null }
   | { kind: 'done'; url: string; note: string }
+  | { kind: 'duplicate'; url: string; when: string }
   | { kind: 'error'; message: string };
 
 type Presigned = { key: string; uploadUrl: string; headers: Record<string, string>; publicUrl: string };
@@ -17,6 +28,14 @@ const date = (iso: string) =>
   iso ? new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
 
 class UploadError extends Error {}
+
+const FIELD = 'Lien de la vidéo';
+
+/** Empreinte SHA-256 (hexadécimal) du fichier tel qu'il a été déposé. */
+async function sha256Hex(file: Blob): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', await file.arrayBuffer());
+  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('');
+}
 
 async function presign(body: object): Promise<Presigned> {
   const res = await fetch('/api/admin/videos/presign', {
@@ -67,6 +86,110 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
+function VideoRow({ video: v, onDeleted }: { video: Stored; onDeleted: () => unknown }) {
+  const name = v.key.replace(/^uploads\//, '');
+  const [confirming, setConfirming] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState('');
+
+  async function remove() {
+    setBusy(true);
+    setMessage('');
+    try {
+      const res = await fetch('/api/admin/videos', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: v.key }),
+      });
+      if (res.ok) {
+        await onDeleted();
+        return;
+      }
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      setMessage(data.error || 'La suppression a échoué. Réessayez.');
+    } catch {
+      setMessage('La suppression a échoué : vérifiez votre accès à Internet.');
+    }
+    setBusy(false);
+    setConfirming(false);
+  }
+
+  return (
+    <li className="flex flex-col gap-2 py-3">
+      <div className="flex items-center gap-3">
+        {v.poster ? (
+          // eslint-disable-next-line @next/next/no-img-element -- vignette d'administration, hors site public
+          <img src={v.poster} alt="" loading="lazy" className="h-14 w-14 shrink-0 rounded object-cover" />
+        ) : (
+          <span className="h-14 w-14 shrink-0 rounded bg-neutral-200" />
+        )}
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm">{name}</p>
+          <p className="text-xs text-neutral-600">
+            {mb(v.size)} · {date(v.lastModified)}
+            {v.used === true && <span className="ml-2 rounded bg-neutral-900 px-1.5 py-0.5 text-white">Utilisée sur le site</span>}
+            {v.used === null && <span className="ml-2 text-neutral-500">Utilisation inconnue</span>}
+          </p>
+        </div>
+        <CopyButton text={v.url} />
+        <button
+          type="button"
+          disabled={v.used !== false || busy}
+          onClick={() => {
+            setMessage('');
+            setConfirming(true);
+          }}
+          title={
+            v.used === true
+              ? 'Utilisée sur le site : retirez d’abord le bloc dans Storyblok et publiez.'
+              : v.used === null
+                ? 'Impossible de vérifier l’utilisation sur le site pour le moment.'
+                : undefined
+          }
+          className="shrink-0 rounded border border-red-800 px-3 py-1 text-sm text-red-800 hover:bg-red-800 hover:text-white disabled:cursor-not-allowed disabled:border-neutral-300 disabled:text-neutral-400 disabled:hover:bg-transparent"
+        >
+          Supprimer
+        </button>
+      </div>
+      {v.used === true && (
+        <p className="text-xs text-neutral-600">
+          Pour la supprimer, retirez d’abord le bloc qui la contient dans Storyblok et publiez la page.
+        </p>
+      )}
+      {confirming && (
+        <div role="alertdialog" aria-label="Confirmer la suppression" className="flex flex-col gap-2 rounded border border-red-800 bg-red-50 px-3 py-3">
+          <p className="text-sm text-red-900">
+            Supprimer définitivement « {name} » et son affiche ? Cette action est irréversible.
+          </p>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              disabled={busy}
+              onClick={remove}
+              className="rounded bg-red-800 px-3 py-1 text-sm text-white disabled:opacity-50"
+            >
+              {busy ? 'Suppression…' : 'Supprimer définitivement'}
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => setConfirming(false)}
+              className="rounded border border-neutral-400 px-3 py-1 text-sm"
+            >
+              Annuler
+            </button>
+          </div>
+        </div>
+      )}
+      {message && (
+        <p role="alert" className="text-sm text-red-800">
+          {message}
+        </p>
+      )}
+    </li>
+  );
+}
+
 export default function VideoUploader() {
   const [step, setStep] = useState<Step>({ kind: 'idle' });
   const [videos, setVideos] = useState<Stored[] | null>(null);
@@ -84,10 +207,12 @@ export default function VideoUploader() {
           if (!res.ok) throw new Error(data.error || 'La liste des vidéos n’a pas pu être lue.');
           setVideos(data.videos ?? []);
           setListError('');
+          return data.videos ?? [];
         })
-        .catch((e: unknown) =>
-          setListError(e instanceof Error ? e.message : 'La liste des vidéos n’a pas pu être lue.')
-        ),
+        .catch((e: unknown) => {
+          setListError(e instanceof Error ? e.message : 'La liste des vidéos n’a pas pu être lue.');
+          return null;
+        }),
     []
   );
 
@@ -107,6 +232,15 @@ export default function VideoUploader() {
   async function handle(file: File) {
     setStep({ kind: 'working', label: 'Analyse de la vidéo…', fraction: null });
     try {
+      // Doublon : même fichier d'origine déjà envoyé (empreinte identique) → on donne son lien.
+      const hash = await sha256Hex(file);
+      const known = (await loadList()) ?? videos ?? [];
+      const twin = known.find((v) => v.sha256 === hash);
+      if (twin) {
+        setStep({ kind: 'duplicate', url: twin.url, when: date(twin.lastModified) });
+        return;
+      }
+
       const { prepareVideo, posterAndSize, PrepareError } = await import('@/lib/video-compress');
       let prepared;
       try {
@@ -145,6 +279,13 @@ export default function VideoUploader() {
       const posterTarget = await presign({ kind: 'poster', videoKey: target.key, size: poster.poster.size });
       setStep({ kind: 'working', label: 'Envoi de l’affiche…', fraction: null });
       await put(posterTarget, poster.poster);
+
+      // Empreinte enregistrée sur la vidéo pour reconnaître un futur doublon (sans gravité si échec).
+      await fetch('/api/admin/videos/finalize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: target.key, sha256: hash }),
+      }).catch(() => undefined);
 
       const note =
         prepared.action === 'compressed'
@@ -224,10 +365,22 @@ export default function VideoUploader() {
           <div className="flex flex-col gap-3 rounded border border-green-700 bg-green-50 px-4 py-4">
             <p className="text-green-900">C’est en ligne. {step.note}</p>
             <p className="text-sm text-neutral-700">
-              Copiez ce lien et collez-le dans le champ « srcMp4 » du bloc vidéo, dans Storyblok :
+              Copiez ce lien et collez-le dans le champ « {FIELD} » du bloc vidéo, dans Storyblok :
             </p>
             <div className="flex items-center gap-3">
               <code className="min-w-0 flex-1 break-all rounded bg-white px-2 py-1 text-sm">{step.url}</code>
+              <CopyButton text={step.url} />
+            </div>
+          </div>
+        )}
+        {step.kind === 'duplicate' && (
+          <div className="flex flex-col gap-3 rounded border border-neutral-400 bg-white px-4 py-4">
+            <p>
+              Cette vidéo a déjà été envoyée{step.when ? ` le ${step.when}` : ''} : rien n’a été renvoyé. Voici son lien, à
+              coller dans le champ « {FIELD} » :
+            </p>
+            <div className="flex items-center gap-3">
+              <code className="min-w-0 flex-1 break-all rounded bg-neutral-100 px-2 py-1 text-sm">{step.url}</code>
               <CopyButton text={step.url} />
             </div>
           </div>
@@ -250,21 +403,7 @@ export default function VideoUploader() {
         {videos && videos.length > 0 && (
           <ul className="flex flex-col divide-y divide-neutral-200">
             {videos.map((v) => (
-              <li key={v.key} className="flex items-center gap-3 py-3">
-                {v.poster ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- vignette d'administration, hors site public
-                  <img src={v.poster} alt="" loading="lazy" className="h-14 w-14 shrink-0 rounded object-cover" />
-                ) : (
-                  <span className="h-14 w-14 shrink-0 rounded bg-neutral-200" />
-                )}
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm">{v.key.replace(/^uploads\//, '')}</p>
-                  <p className="text-xs text-neutral-600">
-                    {mb(v.size)} · {date(v.lastModified)}
-                  </p>
-                </div>
-                <CopyButton text={v.url} />
-              </li>
+              <VideoRow key={v.key} video={v} onDeleted={loadList} />
             ))}
           </ul>
         )}

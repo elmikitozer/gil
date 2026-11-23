@@ -25,15 +25,26 @@ Vous n'avez pas besoin de renommer le fichier : la page s'en charge, et une vid�
 
 Pour retrouver le lien d'une vidéo envoyée plus tôt, regardez la liste **« Vidéos déjà envoyées »**, plus bas dans la page. Chaque vidéo y a son bouton **Copier**.
 
+Si vous déposez une vidéo **déjà envoyée** (exactement le même fichier), la page ne l'envoie pas une seconde fois. Elle affiche « Cette vidéo a déjà été envoyée le … » avec son lien et le bouton **Copier**.
+
 ## 2. Placer la vidéo dans Storyblok
 
 1. Ouvrez la page d'accueil dans l'éditeur visuel de Storyblok, comme d'habitude.
 2. Ajoutez un bloc vidéo (**video_item**), ou ouvrez celui que vous voulez modifier.
-3. Collez le lien dans le champ **srcMp4**.
+3. Collez le lien dans le champ **Lien de la vidéo**.
    - Vous n'avez rien d'autre à remplir : l'image d'attente (« affiche ») et les proportions de la vidéo sont trouvées automatiquement.
 4. Déplacez le bloc où vous voulez dans la grille, puis cliquez sur **Publier**.
 
 Dans l'éditeur, une vidéo qui n'a **pas** été envoyée par cette page porte un bandeau jaune : **« Vidéo à renvoyer par la page d'envoi »**. Ce bandeau n'apparaît jamais sur le site public. Pour le faire disparaître, envoyez la vidéo par la page, puis remplacez le lien.
+
+## 3. Supprimer une vidéo
+
+Dans la liste **« Vidéos déjà envoyées »** :
+
+- une vidéo marquée **« Utilisée sur le site »** ne peut pas être supprimée. Retirez d'abord le bloc qui la contient dans Storyblok et **publiez**, puis rechargez la page d'envoi ;
+- pour une vidéo non utilisée, cliquez sur **Supprimer**, puis sur **Supprimer définitivement** pour confirmer. La vidéo et son affiche sont effacées pour de bon : cette action ne peut pas être annulée.
+
+« Utilisation inconnue » signifie que la page n'a pas pu interroger Storyblok. La suppression est alors bloquée par prudence : réessayez un peu plus tard.
 
 ## Si un message rouge s'affiche
 
