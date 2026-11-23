@@ -2,6 +2,12 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // Domaine public des vidéos, figé au build et identique côté serveur et navigateur
+  // (aperçu de l'éditeur) : lib/videos.ts y réécrit les anciens liens r2.dev.
+  // Changer la variable impose donc un nouveau déploiement. Vide : aucune réécriture.
+  env: {
+    VIDEOS_PUBLIC_BASE_URL: process.env.VIDEOS_PUBLIC_BASE_URL ?? '',
+  },
   // eslint: {
   //   ignoreDuringBuilds: true, // ✅ désactive le blocage ESLint sur Vercel
   // },

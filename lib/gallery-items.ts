@@ -4,7 +4,7 @@
 import type { SbBlokData } from '@storyblok/react/rsc';
 import type { ImageItem, Item } from '@/app/components/ui/gallery/types';
 import { storyblokImageRatio } from '@/lib/storyblok-image';
-import { uploadedVideoInfo } from '@/lib/videos';
+import { publicVideoUrl, uploadedVideoInfo } from '@/lib/videos';
 
 export type StoryblokAsset = {
   filename?: string;
@@ -61,7 +61,11 @@ export function videoItemToItem(blok: VideoItemBlok, albumTitle?: string): Item 
   // son affiche (même nom en .jpg) sont connues sans réglage dans Storyblok.
   // Les dimensions réelles priment sur le champ « Ratio » : la grille finit de
   // toute façon par mesurer la vidéo, autant partir de la bonne proportion.
-  const uploaded = uploadedVideoInfo(blok.srcMp4);
+  // Adresses r2.dev réécrites vers le domaine des vidéos AVANT d'en déduire l'affiche :
+  // vidéo et affiche sont ainsi toujours servies par le même hôte.
+  const srcMp4 = publicVideoUrl(blok.srcMp4);
+  const srcWebm = publicVideoUrl(blok.srcWebm);
+  const uploaded = uploadedVideoInfo(srcMp4);
   const common = {
     poster: blok.poster?.filename || uploaded?.poster,
     // Texte alternatif : celui du bloc, à défaut le titre (sans les deux, le composant met un libellé)
@@ -71,17 +75,17 @@ export function videoItemToItem(blok: VideoItemBlok, albumTitle?: string): Item 
     caption: blok.caption,
     ...(isAlbumEntry ? {} : { blok }),
   };
-  if (blok.srcMp4 && blok.vimeoId) {
+  if (srcMp4 && blok.vimeoId) {
     return {
       kind: 'hybrid',
-      srcMp4: blok.srcMp4, // aperçu pour la grille
+      srcMp4, // aperçu pour la grille
       vimeoId: blok.vimeoId, // vidéo complète pour la lightbox
-      srcWebm: blok.srcWebm,
+      srcWebm,
       ...common,
     };
   }
   if (blok.vimeoId) return { kind: 'vimeo', vimeoId: blok.vimeoId, ...common };
-  if (blok.srcMp4) return { kind: 'video', srcMp4: blok.srcMp4, srcWebm: blok.srcWebm, ...common };
+  if (srcMp4) return { kind: 'video', srcMp4, srcWebm, ...common };
   console.warn('video_item sans vimeoId ni srcMp4:', blok);
   return null;
 }

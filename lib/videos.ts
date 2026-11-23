@@ -18,6 +18,34 @@ export const MAX_VIDEO_SECONDS = 60;
 /** En-tête de cache posé sur chaque fichier : les noms sont uniques, donc jamais réécrits. */
 export const UPLOAD_CACHE_CONTROL = 'public, max-age=31536000, immutable';
 
+/**
+ * Adresse r2.dev du bucket, celle des liens collés dans Storyblok avant le domaine définitif.
+ * Au rendu, `publicVideoUrl` la remplace par VIDEOS_PUBLIC_BASE_URL : un lien collé une fois
+ * reste valable après la bascule vers videos.gilanselmi.com et la fermeture de r2.dev.
+ */
+export const LEGACY_PUBLIC_ORIGIN = 'https://pub-077dd9d9d31e445e93c96024bb4992c6.r2.dev';
+
+/**
+ * Remplace l'origine r2.dev du bucket par VIDEOS_PUBLIC_BASE_URL (valeur figée au build par
+ * next.config.ts, identique côté serveur et navigateur). Rien ne change si la variable est
+ * vide, égale à l'ancienne origine, ou si l'adresse est relative (/videos/…) ou d'un autre hôte.
+ * Seul le préfixe est remplacé : le reste de la chaîne (chemin déjà encodé) est conservé tel quel.
+ */
+export function publicVideoUrl(url: string): string;
+export function publicVideoUrl(url: string | undefined): string | undefined;
+export function publicVideoUrl(url: string | undefined): string | undefined {
+  const base = (process.env.VIDEOS_PUBLIC_BASE_URL ?? '').replace(/\/+$/, '');
+  if (!url || !base || base === LEGACY_PUBLIC_ORIGIN) return url;
+  let origin: string;
+  try {
+    origin = new URL(url).origin;
+  } catch {
+    return url; // adresse relative
+  }
+  if (origin !== LEGACY_PUBLIC_ORIGIN || !url.startsWith(LEGACY_PUBLIC_ORIGIN + '/')) return url;
+  return base + url.slice(LEGACY_PUBLIC_ORIGIN.length);
+}
+
 const UPLOADED_VIDEO = /\/uploads\/[a-z0-9-]+-[a-z0-9]{6}-(\d{2,5})x(\d{2,5})\.mp4$/;
 const UPLOADED_KEY = /^uploads\/[a-z0-9-]+-[a-z0-9]{6}-\d{2,5}x\d{2,5}\.mp4$/;
 
