@@ -12,6 +12,14 @@ Branche `feat/videos-r2`, 2026-11-23. Ce document remplace les anciens guides Cl
   - L'affiche (première image, JPEG de 720 px de large au plus) porte le même nom en `.jpg`.
   - Chaque fichier reçoit `Cache-Control: public, max-age=31536000, immutable` ; ce réglage est sûr parce que les noms sont uniques.
 - **Grille** : pour une adresse de cette forme, `lib/gallery-items.ts` déduit le ratio et l'affiche. La cliente ne colle donc qu'un lien.
+- **Suppression** (bouton dans la liste) : `DELETE /api/admin/videos { key }`.
+  - La clé doit correspondre **exactement** au motif d'une vidéo de la page, sans aucune normalisation. L'affiche est déduite côté serveur, et seules ces clés sont acceptées (`assertUploadKey` dans `lib/r2.ts`). Les anciens fichiers (`Smash (2)/…`) sont hors d'atteinte.
+  - La suppression est refusée (409) si le nom de la vidéo ou de son affiche apparaît dans une story Storyblok, en brouillon ou publiée (`lib/storyblok-usage.ts`). Elle est aussi refusée (503) si Storyblok ne répond pas.
+- **Doublons** : la page calcule l'empreinte SHA-256 du fichier déposé.
+  - Si une vidéo déjà envoyée porte la même empreinte, rien n'est renvoyé et la page affiche le lien existant.
+  - Après chaque envoi, le serveur enregistre l'empreinte en métadonnée `x-amz-meta-sha256` (copie de l'objet sur lui-même). Aucun en-tête n'est ajouté à l'envoi direct, donc la règle CORS reste inchangée.
+  - Un fichier **différent** du même film (par exemple l'original `.mov` d'une vidéo envoyée réencodée) n'est pas reconnu comme doublon.
+- **Affiche** : `lib/video-poster.ts` prend la première image non noire des 3 premières secondes, après le fondu d'ouverture.
 - **Garde-fou** : dans l'éditeur visuel Storyblok uniquement, un bandeau jaune signale toute vidéo, de la grille ou d'un album, qui ne vient pas de la page d'envoi (`app/components/EditorVideoWarning.tsx`).
 - **Chargement** : une vidéo ne se charge qu'après 300 ms de visibilité à plus de 50 % (`ZoomableVideo.tsx`). Son affiche n'est posée qu'à moins d'un écran de distance : 4 affiches à l'ouverture en 1440×900, 3 en 390×844 (mesuré), les autres au défilement.
 - **Liens collés une seule fois** : au rendu, `publicVideoUrl` (`lib/videos.ts`) remplace l'origine exacte `https://pub-077dd9d9d31e445e93c96024bb4992c6.r2.dev` par `VIDEOS_PUBLIC_BASE_URL`, avant d'en déduire l'affiche et le ratio.
@@ -23,6 +31,8 @@ Branche `feat/videos-r2`, 2026-11-23. Ce document remplace les anciens guides Cl
 
 | Fichier | Rôle |
 |---|---|
+| `lib/video-poster.ts` | Choix de l'affiche (première image non noire), module autonome |
+| `lib/storyblok-usage.ts` | Recherche des vidéos utilisées dans toutes les stories (brouillon et publié) |
 | `lib/videos.ts` | Limites (40 Mo, 60 s), nommage, lecture des dimensions dans l'adresse |
 | `lib/r2.ts` | Client S3 (`aws4fetch`), URL présignées, liste |
 | `lib/admin-auth.ts`, `lib/admin-session.ts` | Mot de passe et cookie de session signé (HMAC, 30 jours) |
@@ -175,3 +185,54 @@ Non testé :
 - HandBrake.
 
 Contrôle de sécurité : le déploiement de preview (CLI) contient 178 fichiers sources et aucun fichier `.env*` autre que `.env.example`.
+
+### Ajouts du 2026-11-24 : suppression, doublons, affiches
+
+**Tests en local**, avec le wrapper qui fait apparaître les 13 vidéos comme utilisées :
+- les 13 vidéos sont marquées « Utilisée sur le site » et leur bouton Supprimer est désactivé ;
+- un doublon est reconnu sans aucun envoi vers R2 ;
+- une nouvelle vidéo reçoit son empreinte et est reconnue au dépôt suivant ;
+- la suppression avec confirmation fonctionne, y compris pour les 2 fichiers d'essai de la cliente, que Storyblok ne citait pas.
+
+**Essais négatifs** en local et sur la preview :
+- 401 sans session ;
+- 400 pour `Smash (2)/…`, `../`, une affiche envoyée directement, une adresse complète, une clé avec saut de ligne, une clé en tableau ;
+- 404 pour une clé inconnue ;
+- 409 pour une vidéo utilisée (en local seulement).
+
+**Affiches** : seule celle d'UGG était noire (luminance 0). Elle a été régénérée avec `lib/video-poster.ts` (image à 0,6 s). Les 12 autres étaient claires (luminance de 103 à 186).
+
+**Incident du 2026-11-24.**
+- Sur la preview, le test « vidéo utilisée » a visé UGG. Ses nouveaux liens ne sont pas encore dans Storyblok, donc la route l'a jugée libre et l'a supprimée, avec son affiche.
+- Restauration immédiate sous la même clé : fichier identique (MD5 vérifié), empreinte, type et cache ; affiche régénérée à l'identique (52 520 o).
+- Le script de test ne vise plus de vraie vidéo pour ce cas.
+
+À retenir : jusqu'au collage des liens dans Storyblok, **aucune** des 13 vidéos n'est protégée contre la suppression.
+
+**État du bucket** au 2026-11-24 : `uploads/` contient exactement les 13 vidéos et leurs 13 affiches (26 objets) ; `Smash (2)/` garde 13 anciens fichiers jusqu'à l'étape 7.
+
+## Mise en production (ordre)
+
+1. **CORS** (Cloudflare, bucket) : origines `https://gilanselmi.com` et `https://www.gilanselmi.com` en plus de la preview ; méthodes `PUT`, `GET`, `HEAD` ; en-têtes `content-type`, `cache-control`.
+2. **Variables de Production** (Vercel › gil › Settings › Environment Variables, environnement *Production*), avec les mêmes valeurs qu'en Preview :
+   - `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` ;
+   - `R2_JURISDICTION=eu` ;
+   - `VIDEOS_PUBLIC_BASE_URL=https://pub-077dd9d9d31e445e93c96024bb4992c6.r2.dev` (jusqu'à la bascule DNS) ;
+   - `ADMIN_VIDEOS_PASSWORD`, `ADMIN_SESSION_SECRET`.
+3. **Fusion** : pull request `feat/videos-r2` → `main`, relecture, fusion. Vercel déploie la production. (La production tourne aujourd'hui sur `a21613e`, la tête de `main` : rien d'autre en attente.)
+4. **Vérifications avant de toucher au contenu** :
+   - la home et `/information` sont inchangées (anciennes vidéos toujours servies) ;
+   - `https://gilanselmi.com/admin/videos` demande le mot de passe, avec l'en-tête `noindex` ;
+   - la liste affiche les 13 vidéos.
+5. **Storyblok** : renommer le champ `srcMp4` en « Lien de la vidéo » (**nom affiché seulement** : le nom technique doit rester `srcMp4`). Puis coller les 13 liens de la table, plus le lien Pastel 001 dans l'album « Luis De Javier », et **publier**. Miumiu reste de côté.
+6. **Vérifications après publication** :
+   - la home en ordinateur et en mobile ; chaque vidéo démarre ;
+   - la lightbox et l'album ;
+   - aucune erreur 404 dans la console ;
+   - dans l'éditeur, le seul bandeau jaune restant est celui de l'album (Miumiu) ;
+   - dans la page d'envoi, les 13 vidéos sont « Utilisée sur le site ».
+7. **Plus tard, bascule DNS** (section « Bascule DNS ») : puis `VIDEOS_PUBLIC_BASE_URL=https://videos.gilanselmi.com` en Production et en Preview, **redéploiement**, et vérification que la home cite `videos.gilanselmi.com`.
+8. **Deux semaines sans 404 après la bascule** :
+   - désactiver r2.dev ;
+   - supprimer `Smash (2)/` du bucket ;
+   - retirer du dépôt `public/videos/GA_IG_POST01.mp4` et `InstaGil.mp4` (garder `info-video.mp4` et son affiche : la page Information les utilise).
