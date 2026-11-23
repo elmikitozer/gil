@@ -13,7 +13,11 @@ Branche `feat/videos-r2`, 2026-11-23. Ce document remplace les anciens guides Cl
   - Chaque fichier reçoit `Cache-Control: public, max-age=31536000, immutable` ; ce réglage est sûr parce que les noms sont uniques.
 - **Grille** : pour une adresse de cette forme, `lib/gallery-items.ts` déduit le ratio et l'affiche. La cliente ne colle donc qu'un lien.
 - **Garde-fou** : dans l'éditeur visuel Storyblok uniquement, un bandeau jaune signale toute vidéo, de la grille ou d'un album, qui ne vient pas de la page d'envoi (`app/components/EditorVideoWarning.tsx`).
-- **Chargement** : une vidéo ne se charge qu'après 300 ms de visibilité à plus de 50 % (`ZoomableVideo.tsx`).
+- **Chargement** : une vidéo ne se charge qu'après 300 ms de visibilité à plus de 50 % (`ZoomableVideo.tsx`). Son affiche n'est posée qu'à moins d'un écran de distance : 4 affiches à l'ouverture en 1440×900, 3 en 390×844 (mesuré), les autres au défilement.
+- **Liens collés une seule fois** : au rendu, `publicVideoUrl` (`lib/videos.ts`) remplace l'origine exacte `https://pub-077dd9d9d31e445e93c96024bb4992c6.r2.dev` par `VIDEOS_PUBLIC_BASE_URL`, avant d'en déduire l'affiche et le ratio.
+  - Les liens r2.dev collés aujourd'hui serviront donc `videos.gilanselmi.com` après la bascule, sans retoucher Storyblok.
+  - La valeur est **figée au build** (`env` de `next.config.ts`), identique côté serveur et dans l'aperçu de l'éditeur. La changer impose de redéployer.
+  - Variable vide ou égale à r2.dev : aucune réécriture. Les adresses relatives (`/videos/…`) et les autres hôtes ne sont jamais touchés.
 
 ### Fichiers
 
@@ -80,7 +84,7 @@ Les 13 vidéos ont été envoyées par la page le 2026-11-23. Leurs affiches pè
 
 ### Table de migration (étape 6) : liens à coller dans Storyblok
 
-Ces liens utilisent l'adresse `r2.dev` provisoire. Après la bascule du domaine, remplacer `https://pub-077dd9d9d31e445e93c96024bb4992c6.r2.dev` par `https://videos.gilanselmi.com`, ou copier les nouveaux liens depuis la page d'envoi.
+Les liens se collent **une seule fois**, tels quels, avec leur adresse r2.dev (`…` = `https://pub-077dd9d9d31e445e93c96024bb4992c6.r2.dev`). Le site les réécrit vers le domaine définitif (voir « Liens collés une seule fois »).
 
 | Bloc `video_item` (uid) | Place dans la grille | Fichier d'origine | Nouveau lien |
 |---|---|---|---|
@@ -98,7 +102,7 @@ Ces liens utilisent l'adresse `r2.dev` provisoire. Après la bascule du domaine,
 | 9b87a515 | items[88] | 1121_V3.mov | `…/uploads/1121-v3-eccuxs-1080x1512.mp4` |
 | ffe634e8 | items[95] | UGG_COMMERCIAL1025.mov | `…/uploads/ugg-commercial1025-f9ej0l-1920x1080.mp4` |
 | bae9c3e2 | album « Luis De Javier », album_videos[1] | Pastel_Beauty_Project_001 (Cloudinary, perdu) | même lien que eae3ba8d (fichier probablement identique) |
-| a442c04e | album « Luis De Javier », album_videos[0] | PullLetterMagazine_Miumiu_10s (Cloudinary, perdu) | **en attente de l'original** |
+| a442c04e | album « Luis De Javier », album_videos[0] | PullLetterMagazine_Miumiu_10s (Cloudinary, perdu) | **mis de côté** : original pas encore disponible (2026-11-23). Le lien Cloudinary reste mort et le bandeau jaune le signale dans l'éditeur. À l'arrivée du fichier : l'envoyer par la page, coller le lien. |
 
 `InstaGil` avait le ratio forcé « 3:2 » alors que la vidéo est carrée. Le ratio lu dans le lien (720×720) prend le pas sur ce champ. L'affichage final ne change pas, puisque la grille mesurait déjà la vidéo : seul le saut au chargement disparaît.
 
@@ -108,15 +112,15 @@ Les anciennes adresses (`r2.dev/Smash (2)/…` et `/videos/…`) restent servies
 
 1. ~~Sauvegardes, réencodage, envoi des 13 vidéos~~ (fait le 2026-11-23).
 2. Récupérer l'original « Miumiu 10s » et l'envoyer par la page.
-3. Bascule DNS (liste ci-dessous), puis `VIDEOS_PUBLIC_BASE_URL=https://videos.gilanselmi.com`.
+3. Bascule DNS (liste ci-dessous). Ensuite, `VIDEOS_PUBLIC_BASE_URL=https://videos.gilanselmi.com` dans Vercel, puis **redéployer** : la valeur est figée au build. Vérifier que le HTML de la home en ligne cite `videos.gilanselmi.com`.
 4. Fusion de `feat/videos-r2` et mise en production. Avant le déploiement, poser les variables de Production.
-5. Dans Storyblok, remplacer les liens bloc par bloc (table ci-dessus, avec le domaine définitif), puis publier.
+5. Dans Storyblok, coller les liens bloc par bloc (table ci-dessus, tels quels), puis publier. Cette étape peut se faire **avant ou après** la bascule DNS.
    - Le bandeau jaune de l'éditeur doit avoir disparu partout.
 6. Vérifier la home publique, la lightbox et l'album ; aucune 404 dans la console.
 7. Deux semaines sans 404 :
    - supprimer `public/videos/GA_IG_POST01.mp4` et `public/videos/InstaGil.mp4` du dépôt ;
    - supprimer les anciens objets `Smash (2)/` du bucket ;
-   - désactiver l'adresse `r2.dev`.
+   - désactiver l'adresse `r2.dev`, seulement après avoir vérifié l'étape 3 (sinon les vidéos s'arrêtent : les liens de Storyblok restent en r2.dev et c'est le site qui les réécrit).
 
 ## Bascule DNS : OVH puis Cloudflare, dans l'ordre
 
@@ -132,7 +136,7 @@ Les anciennes adresses (`r2.dev/Smash (2)/…` et `/videos/…`) restent servies
    - garder `http://localhost:3000` pour le développement, et les previews si besoin ;
    - méthodes : `PUT`, `GET`, `HEAD` ;
    - en-têtes : `content-type`, `cache-control`.
-9. **Vercel** : définir `VIDEOS_PUBLIC_BASE_URL=https://videos.gilanselmi.com`, en Preview et en Production.
+9. **Vercel** : définir `VIDEOS_PUBLIC_BASE_URL=https://videos.gilanselmi.com`, en Preview et en Production, puis **redéployer** (valeur figée au build).
 
 ## Limites connues
 
@@ -143,6 +147,15 @@ Les anciennes adresses (`r2.dev/Smash (2)/…` et `/videos/…`) restent servies
 - La fiche HandBrake n'a pas été testée dans HandBrake.
 
 ## Parcours testé / non testé (2026-11-23)
+
+Rendu de la grille avec les liens migrés, vérifié sans écrire dans Storyblok : un `fetch` enveloppé au build et au lancement réécrit les réponses de l'API Storyblok avec les liens de la table.
+- 13 sources vidéo sur le nouvel hôte quand `VIDEOS_PUBLIC_BASE_URL` change, et 77 ratios identiques avec ou sans réécriture ;
+- ratio de chaque vignette vidéo égal aux dimensions de la vidéo (InstaGil : 1, et non plus 3:2) ;
+- dans Chrome, en 1440×900 et 390×844 : 13 vidéos lues, 13 affiches, lightbox ouverte et en lecture, aucune erreur ;
+- les vignettes vidéo ne changent plus de taille. Le décalage d'un pixel restant vient de la photo `doc156_v2.jpg`, aux dimensions fausses dans son URL (voir AUDIT.md) ; il existait déjà.
+
+Preview : test complet dans Chrome. Connexion, compression d'une vidéo HEVC (3,8 → 1,8 Mo), envoi direct vers R2 (sans en-tête Vercel vers R2), **bouton « Copier » cliqué : presse-papiers identique au lien**, aucune erreur console.
+
 
 Testé :
 - page d'envoi en local sur le vrai bucket R2 ;
@@ -156,11 +169,9 @@ Testé :
 - bandeau de l'éditeur dans l'aperçu signé, absent de la home publique.
 
 Non testé :
-- le clic réel sur « Copier » : le lien a été lu, mais le presse-papiers n'a pas été vérifié ;
 - le collage dans Storyblok et la publication (aucun accès en écriture), ainsi que le libellé réel du champ `srcMp4` dans l'éditeur ;
 - l'interface de la page dans Safari ;
 - l'envoi depuis le navigateur sur la preview, qui attend la règle CORS ;
-- le rendu de la grille avec les nouveaux liens : seule la lecture des dimensions dans l'adresse (`uploadedVideoInfo`) a été vérifiée ; le rendu complet le sera à l'étape 5 de la migration ;
 - HandBrake.
 
 Contrôle de sécurité : le déploiement de preview (CLI) contient 178 fichiers sources et aucun fichier `.env*` autre que `.env.example`.
