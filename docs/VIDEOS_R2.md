@@ -141,3 +141,26 @@ Les anciennes adresses (`r2.dev/Smash (2)/…` et `/videos/…`) restent servies
 - Le parcours dans Safari, côté interface, n'a pas été piloté automatiquement. Sa logique (détection, refus, envoi tel quel) a été testée dans le banc d'essai Safari.
 - HDR : la détection de Mediabunny a manqué l'échantillon synthétique, d'où un contrôle supplémentaire sur `bt2020` / `pq` / `hlg`. Aucun fichier réel d'iPhone n'a été testé.
 - La fiche HandBrake n'a pas été testée dans HandBrake.
+
+## Parcours testé / non testé (2026-11-23)
+
+Testé :
+- page d'envoi en local sur le vrai bucket R2 ;
+- connexion, avec mauvais et bon mot de passe ;
+- compression d'une vidéo (7,9 → 1,8 Mo) ;
+- envoi tel quel des 13 vidéos réencodées ;
+- refus du ProRes et d'une vidéo de plus de 60 s (contre un faux R2) ;
+- liste des vidéos envoyées ;
+- service public des 13 vidéos et des 13 affiches (lecture par morceaux, cache `immutable`) ;
+- API sur la preview protégée, via `vercel curl` : connexion, 401 sans session, présignature sur l'adresse UE, 413 au-delà de 40 Mo ;
+- bandeau de l'éditeur dans l'aperçu signé, absent de la home publique.
+
+Non testé :
+- le clic réel sur « Copier » : le lien a été lu, mais le presse-papiers n'a pas été vérifié ;
+- le collage dans Storyblok et la publication (aucun accès en écriture), ainsi que le libellé réel du champ `srcMp4` dans l'éditeur ;
+- l'interface de la page dans Safari ;
+- l'envoi depuis le navigateur sur la preview, qui attend la règle CORS ;
+- le rendu de la grille avec les nouveaux liens : seule la lecture des dimensions dans l'adresse (`uploadedVideoInfo`) a été vérifiée ; le rendu complet le sera à l'étape 5 de la migration ;
+- HandBrake.
+
+Contrôle de sécurité : le déploiement de preview (CLI) contient 178 fichiers sources et aucun fichier `.env*` autre que `.env.example`.
