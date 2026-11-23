@@ -10,6 +10,8 @@ import { UPLOAD_CACHE_CONTROL, UPLOAD_PREFIX } from '@/lib/videos';
 //   R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET
 //   VIDEOS_PUBLIC_BASE_URL : adresse publique du bucket, sans barre finale
 //     (https://pub-….r2.dev aujourd'hui, https://videos.gilanselmi.com ensuite)
+//   R2_JURISDICTION (facultatif) : « eu » pour un bucket en juridiction européenne
+//     (point d'accès https://<compte>.eu.r2.cloudflarestorage.com)
 //   R2_ENDPOINT (facultatif) : remplace https://<compte>.r2.cloudflarestorage.com
 //     (tests locaux uniquement)
 
@@ -18,11 +20,19 @@ const PRESIGN_SECONDS = 15 * 60;
 type R2Config = { client: AwsClient; bucketUrl: string; publicBase: string };
 
 function config(): R2Config | null {
-  const { R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET, VIDEOS_PUBLIC_BASE_URL, R2_ENDPOINT } =
-    process.env;
+  const {
+    R2_ACCOUNT_ID,
+    R2_ACCESS_KEY_ID,
+    R2_SECRET_ACCESS_KEY,
+    R2_BUCKET,
+    VIDEOS_PUBLIC_BASE_URL,
+    R2_ENDPOINT,
+    R2_JURISDICTION,
+  } = process.env;
   if (!R2_ACCESS_KEY_ID || !R2_SECRET_ACCESS_KEY || !R2_BUCKET || !VIDEOS_PUBLIC_BASE_URL) return null;
   if (!R2_ENDPOINT && !R2_ACCOUNT_ID) return null;
-  const endpoint = (R2_ENDPOINT || `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`).replace(/\/+$/, '');
+  const jurisdiction = R2_JURISDICTION ? `.${R2_JURISDICTION.toLowerCase()}` : '';
+  const endpoint = (R2_ENDPOINT || `https://${R2_ACCOUNT_ID}${jurisdiction}.r2.cloudflarestorage.com`).replace(/\/+$/, '');
   return {
     client: new AwsClient({
       accessKeyId: R2_ACCESS_KEY_ID,
