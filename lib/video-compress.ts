@@ -32,6 +32,9 @@ const CEILING_BPP = 0.13;
 /** Débit de secours si l'encodeur ignore le quantificateur. */
 const FALLBACK_BPP = 0.075;
 const QUANTIZERS = [22, 26];
+/** Affiche : largeur maximale et qualité JPEG. */
+const POSTER_MAX_WIDTH = 720;
+const POSTER_QUALITY = 0.8;
 
 export type Prepared = {
   /** Fichier à envoyer (MP4). */
@@ -252,11 +255,16 @@ export async function posterAndSize(blob: Blob): Promise<{ poster: Blob; width: 
     const width = v.videoWidth;
     const height = v.videoHeight;
     const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    canvas.getContext('2d')!.drawImage(v, 0, 0, width, height);
+    // Affiche réduite : le navigateur télécharge l'affiche de chaque vignette dès
+    // l'ouverture de la page ; elle n'est visible qu'avant le démarrage de la vidéo.
+    const scale = Math.min(1, POSTER_MAX_WIDTH / width);
+    canvas.width = Math.round(width * scale);
+    canvas.height = Math.round(height * scale);
+    const g = canvas.getContext('2d')!;
+    g.imageSmoothingQuality = 'high';
+    g.drawImage(v, 0, 0, canvas.width, canvas.height);
     const poster = await new Promise<Blob>((resolve, reject) =>
-      canvas.toBlob((b) => (b ? resolve(b) : reject(new PrepareError('L’affiche n’a pas pu être créée.'))), 'image/jpeg', 0.85)
+      canvas.toBlob((b) => (b ? resolve(b) : reject(new PrepareError('L’affiche n’a pas pu être créée.'))), 'image/jpeg', POSTER_QUALITY)
     );
     return { poster, width, height };
   } finally {
