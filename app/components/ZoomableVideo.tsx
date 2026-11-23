@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import HoverCover from '@/app/components/ui/HoverCover';
 import useIsStoryblokEditor from './useIsStoryblokEditor';
 
@@ -44,6 +44,25 @@ export default function ZoomableVideo({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const btnRef = useRef<HTMLButtonElement | null>(null);
   const isStoryblokEditor = useIsStoryblokEditor();
+  // Affiche posée seulement quand la vignette est à l'écran ou à moins d'un écran :
+  // le navigateur télécharge l'affiche de toute <video> qui en porte une, même hors écran.
+  const [posterSrc, setPosterSrc] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const el = btnRef.current;
+    if (!poster || !el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setPosterSrc(poster);
+          io.disconnect();
+        }
+      },
+      { rootMargin: '100% 0px', threshold: 0 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [poster]);
 
   useEffect(() => {
     const v = videoRef.current;
@@ -116,7 +135,7 @@ export default function ZoomableVideo({
       >
         <video
           ref={videoRef}
-          poster={poster}
+          poster={posterSrc}
           autoPlay={autoPlay}
           loop={loop}
           muted={muted}
