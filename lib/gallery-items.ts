@@ -4,6 +4,7 @@
 import type { SbBlokData } from '@storyblok/react/rsc';
 import type { ImageItem, Item } from '@/app/components/ui/gallery/types';
 import { storyblokImageRatio } from '@/lib/storyblok-image';
+import { uploadedVideoInfo } from '@/lib/videos';
 
 export type StoryblokAsset = {
   filename?: string;
@@ -56,11 +57,16 @@ function isVideoItemBlok(entry: AlbumEntry): entry is VideoItemBlok {
 export function videoItemToItem(blok: VideoItemBlok, albumTitle?: string): Item | null {
   const isAlbumEntry = albumTitle !== undefined;
   const title = isAlbumEntry ? blok.title || albumTitle : blok.title;
+  // Vidéo envoyée par /admin/videos : ses dimensions (dans le nom du fichier) et
+  // son affiche (même nom en .jpg) sont connues sans réglage dans Storyblok.
+  // Les dimensions réelles priment sur le champ « Ratio » : la grille finit de
+  // toute façon par mesurer la vidéo, autant partir de la bonne proportion.
+  const uploaded = uploadedVideoInfo(blok.srcMp4);
   const common = {
-    poster: blok.poster?.filename,
+    poster: blok.poster?.filename || uploaded?.poster,
     // Texte alternatif : celui du bloc, à défaut le titre (sans les deux, le composant met un libellé)
     alt: blok.alt || title || undefined,
-    ratio: blok.ratio,
+    ratio: uploaded ? `${uploaded.width}:${uploaded.height}` : blok.ratio,
     title,
     caption: blok.caption,
     ...(isAlbumEntry ? {} : { blok }),
