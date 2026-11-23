@@ -1,6 +1,6 @@
 import 'server-only';
 import { AwsClient } from 'aws4fetch';
-import { UPLOAD_CACHE_CONTROL, UPLOAD_PREFIX } from '@/lib/videos';
+import { UPLOAD_CACHE_CONTROL, UPLOAD_PREFIX, isUploadKey } from '@/lib/videos';
 
 // Accès au bucket Cloudflare R2 des vidéos, par l'API compatible S3.
 // Les clés restent côté serveur : le navigateur ne reçoit que des URL
@@ -107,4 +107,60 @@ export async function listUploads(): Promise<StoredObject[]> {
     token = tag(xml, 'IsTruncated') === 'true' ? tag(xml, 'NextContinuationToken') : undefined;
   } while (token);
   return objects;
+}
+
+// --- Opérations réservées aux fichiers envoyés par la page (clés vérifiées par isUploadKey) ---
+// Ces fonctions refusent toute autre clé : le jeton R2 peut agir sur tout le bucket, la
+// vérification ici est la seule barrière qui protège les anciens fichiers (Smash (2)/…).
+
+function assertUploadKey(key: string): void {
+  if (!isUploadKey(key) && !isUploadKey(key.replace(/\.jpg$/, '.mp4'))) {
+    throw new Error('Clé refusée : seuls les fichiers envoyés par la page sont accessibles');
+  }
+}
+
+export type ObjectHead = { size: number; sha256: string | null; contentType: string | null };
+
+/** Métadonnées d'un fichier envoyé, ou `null` s'il n'existe pas. */
+export async function headUpload(key: string): Promise<ObjectHead | null> {
+  assertUploadKey(key);
+  const { client, bucketUrl } = required();
+  const res = await client.fetch(`${bucketUrl}/${encodeKey(key)}`, { method: 'HEAD' });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`R2 a répondu ${res.status} (HEAD)`);
+  return {
+    size: Number(res.headers.get('content-length') ?? 0),
+    sha256: res.headers.get('x-amz-meta-sha256'),
+    contentType: res.headers.get('content-type'),
+  };
+}
+
+/**
+ * Enregistre l'empreinte SHA-256 du fichier d'origine sur la vidéo envoyée (copie de l'objet
+ * sur lui-même avec remplacement des métadonnées : type et cache sont réécrits à l'identique).
+ * Fait côté serveur pour ne pas ajouter d'en-tête à l'envoi direct du navigateur (règle CORS).
+ */
+export async function setUploadSha256(key: string, sha256: string): Promise<void> {
+  if (!isUploadKey(key)) throw new Error('Clé refusée : empreinte réservée aux vidéos envoyées');
+  const { client, bucketUrl } = required();
+  const bucket = new URL(bucketUrl).pathname.replace(/^\/+/, '');
+  const res = await client.fetch(`${bucketUrl}/${encodeKey(key)}`, {
+    method: 'PUT',
+    headers: {
+      'x-amz-copy-source': `/${bucket}/${encodeKey(key)}`,
+      'x-amz-metadata-directive': 'REPLACE',
+      'x-amz-meta-sha256': sha256,
+      'Content-Type': 'video/mp4',
+      'Cache-Control': UPLOAD_CACHE_CONTROL,
+    },
+  });
+  if (!res.ok) throw new Error(`R2 a répondu ${res.status} (copie des métadonnées)`);
+}
+
+/** Supprime un fichier envoyé (204 attendu ; R2 répond aussi 204 pour une clé absente). */
+export async function deleteUpload(key: string): Promise<void> {
+  assertUploadKey(key);
+  const { client, bucketUrl } = required();
+  const res = await client.fetch(`${bucketUrl}/${encodeKey(key)}`, { method: 'DELETE' });
+  if (!res.ok && res.status !== 404) throw new Error(`R2 a répondu ${res.status} (suppression)`);
 }
