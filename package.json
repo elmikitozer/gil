@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@storyblok/react": "^5.4.3",
+    "aws4fetch": "1.0.20",
+    "mediabunny": "1.65.2",
     "next": "16.4.6",
     "react": "19.1.0",
     "react-dom": "19.1.0",

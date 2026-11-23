@@ -30,6 +30,9 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      // Page d'envoi des vidéos et son API : jamais indexées.
+      { source: '/admin/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
+      { source: '/api/admin/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
       {
         source: '/:path*',
         headers: [
