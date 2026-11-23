@@ -4,6 +4,7 @@ import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } fro
 import ZoomableImage from './ZoomableImage';
 import ZoomableVideo from './ZoomableVideo';
 import ZoomableVimeo from './ZoomableVimeo';
+import EditorVideoWarning from './EditorVideoWarning';
 import { storyblokEditable } from '@storyblok/react/rsc';
 
 import { GalleryProvider, useGallery } from './ui/gallery/GalleryContext';
@@ -266,6 +267,7 @@ function MasonryTile({ item, gi, ratio, tileKey, eager, highPriority, sizes, pxT
   return (
     <div className="mg-t" style={style} {...(item.blok ? storyblokEditable(item.blok) : {})}>
       {content}
+      <EditorVideoWarning item={item} />
     </div>
   );
 }
