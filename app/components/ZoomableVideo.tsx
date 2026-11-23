@@ -4,6 +4,9 @@ import { useEffect, useRef } from 'react';
 import HoverCover from '@/app/components/ui/HoverCover';
 import useIsStoryblokEditor from './useIsStoryblokEditor';
 
+/** Durée de visibilité (à plus de 50 %) avant de charger et lancer la vidéo. */
+const VISIBLE_DELAY_MS = 300;
+
 type Props = {
   srcMp4: string;
   srcWebm?: string;
@@ -64,31 +67,37 @@ export default function ZoomableVideo({
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReduced) return;
 
+    // Chargement seulement après VISIBLE_DELAY_MS à plus de 50 % à l'écran :
+    // une vignette traversée pendant un défilement rapide ne télécharge rien.
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
           if (e.isIntersecting && e.intersectionRatio > 0.5) {
-            // Charger la vidéo si pas déjà fait
-            if (v.readyState === 0) {
-              v.load();
-            }
-            // Petit délai pour éviter de surcharger
-            setTimeout(() => {
+            if (timer) continue;
+            timer = setTimeout(() => {
+              timer = undefined;
+              if (v.readyState === 0) v.load();
               v.play().catch(() => {});
-            }, 100);
+            }, VISIBLE_DELAY_MS);
           } else {
+            if (timer) clearTimeout(timer);
+            timer = undefined;
             v.pause();
           }
         }
       },
       {
         threshold: [0, 0.5],
-        rootMargin: '100px', // Pré-charge plus tôt
+        rootMargin: '100px',
       }
     );
 
     io.observe(el);
-    return () => io.disconnect();
+    return () => {
+      if (timer) clearTimeout(timer);
+      io.disconnect();
+    };
   }, [autoplayInViewport]);
 
   return (
