@@ -24,6 +24,7 @@ import {
   type InputVideoTrack,
 } from 'mediabunny';
 import { MAX_VIDEO_BYTES, MAX_VIDEO_SECONDS } from '@/lib/videos';
+import { PosterError, posterAndSize as posterFromBlob } from '@/lib/video-poster';
 
 const MAX_SHORT_SIDE = 1080;
 const MAX_FPS = 30;
@@ -32,9 +33,6 @@ const CEILING_BPP = 0.13;
 /** Débit de secours si l'encodeur ignore le quantificateur. */
 const FALLBACK_BPP = 0.075;
 const QUANTIZERS = [22, 26];
-/** Affiche : largeur maximale et qualité JPEG. */
-const POSTER_MAX_WIDTH = 720;
-const POSTER_QUALITY = 0.8;
 
 export type Prepared = {
   /** Fichier à envoyer (MP4). */
@@ -232,44 +230,12 @@ export async function prepareVideo(file: File, onProgress?: Progress): Promise<P
   return { blob: new Blob([best], { type: 'video/mp4' }), action: 'compressed', originalBytes: file.size };
 }
 
-/**
- * Affiche (première image) et dimensions réelles d'affichage, lues par le
- * navigateur sur le fichier qui sera envoyé.
- */
-export async function posterAndSize(blob: Blob): Promise<{ poster: Blob; width: number; height: number }> {
-  const url = URL.createObjectURL(blob);
-  const v = document.createElement('video');
-  v.muted = true;
-  v.playsInline = true;
-  v.preload = 'auto';
-  v.src = url;
+/** Affiche et dimensions : voir lib/video-poster.ts (première image non noire). */
+export async function posterAndSize(blob: Blob) {
   try {
-    await new Promise<void>((resolve, reject) => {
-      v.onloadeddata = () => resolve();
-      v.onerror = () => reject(new PrepareError('Le navigateur n’arrive pas à lire la vidéo préparée. ' + HANDBRAKE));
-    });
-    if (v.currentTime !== 0) {
-      v.currentTime = 0;
-      await new Promise<void>((resolve) => (v.onseeked = () => resolve()));
-    }
-    const width = v.videoWidth;
-    const height = v.videoHeight;
-    const canvas = document.createElement('canvas');
-    // Affiche réduite : le navigateur télécharge l'affiche de chaque vignette dès
-    // l'ouverture de la page ; elle n'est visible qu'avant le démarrage de la vidéo.
-    const scale = Math.min(1, POSTER_MAX_WIDTH / width);
-    canvas.width = Math.round(width * scale);
-    canvas.height = Math.round(height * scale);
-    const g = canvas.getContext('2d')!;
-    g.imageSmoothingQuality = 'high';
-    g.drawImage(v, 0, 0, canvas.width, canvas.height);
-    const poster = await new Promise<Blob>((resolve, reject) =>
-      canvas.toBlob((b) => (b ? resolve(b) : reject(new PrepareError('L’affiche n’a pas pu être créée.'))), 'image/jpeg', POSTER_QUALITY)
-    );
-    return { poster, width, height };
-  } finally {
-    URL.revokeObjectURL(url);
-    v.removeAttribute('src');
-    v.load();
+    return await posterFromBlob(blob);
+  } catch (e) {
+    if (e instanceof PosterError) throw new PrepareError(`${e.message} ${HANDBRAKE}`);
+    throw e;
   }
 }
