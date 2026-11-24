@@ -88,70 +88,64 @@ export default function Lightbox() {
           const item = items[itemIndex];
           if (!item) return undefined;
 
-          // Custom rendering for videos
+          const total = items.length;
+          const current = itemIndex + 1;
+
+          // Vidéos (MP4) : même cadre et même légende que les images
           if (item.kind === 'video') {
-            const maxHeight = isSingleItem ? '90vh' : '80vh';
-            const maxWidth = isSingleItem ? '90vw' : '80vw';
             return (
-              <div className="flex items-center justify-center w-full h-full">
-                <div className="relative flex flex-col items-start">
-                  <video
-                    key={item.srcMp4}
-                    className={`object-contain`}
-                    style={{ maxHeight, maxWidth }}
-                    controls
-                    autoPlay
-                    playsInline
-                    muted={false}
-                    loop
-                    preload="auto"
-                    aria-label={item.alt || item.title || undefined}
-                    poster={item.poster ?? undefined}
-                  >
-                    {item.srcWebm ? <source src={item.srcWebm} type="video/webm" /> : null}
-                    <source src={item.srcMp4} type="video/mp4" />
-                  </video>
-                  {item.title && (
-                    <div className="mt-2 text-lg text-black pointer-events-none">
-                      {item.title}
-                    </div>
-                  )}
-                </div>
-              </div>
+              <LightboxCaption
+                title={item.title}
+                current={current}
+                total={total}
+                showCounter={!isSingleItem}
+              >
+                <video
+                  key={item.srcMp4}
+                  className="object-contain max-w-full max-h-full"
+                  controls
+                  autoPlay
+                  playsInline
+                  muted={false}
+                  loop
+                  preload="auto"
+                  aria-label={item.alt || item.title || undefined}
+                  poster={item.poster ?? undefined}
+                >
+                  {item.srcWebm ? <source src={item.srcWebm} type="video/webm" /> : null}
+                  <source src={item.srcMp4} type="video/mp4" />
+                </video>
+              </LightboxCaption>
             );
           }
 
-          // Custom rendering for vimeo/hybrid
+          // Vimeo / hybride : même cadre et même légende que les images
           if (item.kind === 'vimeo' || item.kind === 'hybrid') {
             const vimeoId = extractVimeoId(item.vimeoId);
             return (
-              <div className="flex items-center justify-center w-full h-full">
-                <div className="flex flex-col items-start">
-                  <div className="relative w-[min(90vw,160vh)] h-[min(90vh,50.625vw)]">
-                    <iframe
-                      key={vimeoId}
-                      src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1&loop=1&title=0&byline=0&portrait=0`}
-                      className="w-full h-full"
-                      style={{ border: 'none' }}
-                      allow="autoplay; fullscreen; picture-in-picture"
-                      allowFullScreen
-                      title={item.alt || item.title || 'Video'}
-                    />
-                  </div>
-                  {item.title && (
-                    <div className="mt-2 text-lg text-black pointer-events-none">
-                      {item.title}
-                    </div>
-                  )}
+              <LightboxCaption
+                title={item.title}
+                current={current}
+                total={total}
+                showCounter={!isSingleItem}
+              >
+                {/* Zone du média : le lecteur 16:9 y tient en entier (largeur et hauteur disponibles) */}
+                <div className="w-full h-full flex items-center justify-center" style={{ containerType: 'size' }}>
+                  <iframe
+                    key={vimeoId}
+                    src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1&loop=1&title=0&byline=0&portrait=0`}
+                    style={{ border: 'none', width: 'min(100cqw, 177.778cqh)', aspectRatio: '16 / 9' }}
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowFullScreen
+                    title={item.alt || item.title || 'Video'}
+                  />
                 </div>
-              </div>
+              </LightboxCaption>
             );
           }
 
           // For images - uniform height, symmetric padding top/bottom
           if (item.kind === 'image') {
-            const total = items.length;
-            const current = itemIndex + 1;
             // Dimensions d'origine (lues dans l'URL) ; valeur par défaut pour un asset hors Storyblok
             const size = storyblokImageSize(item.src) ?? { width: 1600, height: 1067 };
 
