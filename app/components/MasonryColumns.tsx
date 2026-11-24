@@ -144,7 +144,6 @@ export default function MasonryColumns({ items, gap = 0 }: { items: Item[]; gap?
             <MasonryTile
               key={keys[gi]}
               item={item}
-              gi={gi}
               ratio={ratios[gi]}
               tileKey={keys[gi]}
               eager={gi < EAGER_TILES}
@@ -164,7 +163,6 @@ export default function MasonryColumns({ items, gap = 0 }: { items: Item[]; gap?
 
 type TileProps = {
   item: Item;
-  gi: number;
   ratio: number;
   tileKey: string;
   eager: boolean;
@@ -175,8 +173,8 @@ type TileProps = {
   setMeasured: React.Dispatch<React.SetStateAction<Record<string, number>>>;
 };
 
-function MasonryTile({ item, gi, ratio, tileKey, eager, highPriority, sizes, pxTile, vars, setMeasured }: TileProps) {
-  const { openAt, openAlbum } = useGallery();
+function MasonryTile({ item, ratio, tileKey, eager, highPriority, sizes, pxTile, vars, setMeasured }: TileProps) {
+  const { openAlbum } = useGallery();
 
   const style = (
     pxTile
@@ -235,7 +233,8 @@ function MasonryTile({ item, gi, ratio, tileKey, eager, highPriority, sizes, pxT
       />
     );
   } else if (item.kind === 'video' || item.kind === 'hybrid') {
-    // Hybride : la grille affiche la preview MP4 ; la lightbox ouvre la vidéo complète
+    // Hybride : la grille affiche la preview MP4 ; la lightbox ouvre la vidéo complète.
+    // Une vidéo seule s'ouvre comme une photo seule : un seul élément, sans compteur ni carrousel.
     content = (
       <ZoomableVideo
         srcMp4={item.srcMp4}
@@ -247,7 +246,7 @@ function MasonryTile({ item, gi, ratio, tileKey, eager, highPriority, sizes, pxT
         hoverTitle={item.title}
         hoverCaption={item.caption}
         onLoaded={measure}
-        onOpen={() => openAt(gi)}
+        onOpen={() => openAlbum([item], 0)}
       />
     );
   } else if (item.kind === 'vimeo') {
@@ -259,7 +258,7 @@ function MasonryTile({ item, gi, ratio, tileKey, eager, highPriority, sizes, pxT
         height="100%"
         hoverTitle={item.title}
         hoverCaption={item.caption}
-        onOpen={() => openAt(gi)}
+        onOpen={() => openAlbum([item], 0)}
       />
     );
   }
