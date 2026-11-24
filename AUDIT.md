@@ -1,6 +1,6 @@
 # Audit et corrections — gilanselmi.com
 
-Dernière mise à jour : 2026-11-16, fin du lot 4, partie B.
+Dernière mise à jour : 2026-11-24, légendes de la visionneuse (branche `feat/lightbox-captions`, rien n'est poussé).
 Branche de travail : `fix/audit` (53 commits depuis `15fbdd8`, documents compris ; **rien n'est poussé ni déployé**).
 Projet Vercel : `gil` (domaine `gilanselmi.com`). Le dossier local est lié par erreur au projet vide `anselmi`.
 
@@ -16,6 +16,7 @@ Ce document est mis à jour à la fin de chaque lot.
 | 3 | Nettoyage : code, CSS, mode sombre, Edge Config, fichiers publics | **Fait**, validé |
 | 4A | Grille et images : rendu serveur, lightbox, débordement | **Fait**, validé (ajustement : 1 image voisine préchargée) |
 | 4B | Accessibilité, SEO, qualité, factorisation | **Fait**, en attente de votre validation |
+| 5 | Légendes de la visionneuse harmonisées, traduction automatique désactivée | **Fait** sur `feat/lightbox-captions`, non fusionné |
 
 ### Vérifications à la fin du lot 3
 
@@ -221,6 +222,29 @@ Le poids téléchargé reste celui du fichier quand la vidéo est visible (cas n
 
 **Notes.** Neuf notes de travail dans `docs/` (`git mv`, historique conservé). `README.md` (modèle create-next-app, jamais personnalisé) et `AUDIT.md` restent à la racine.
 
+## Lot 5 — Légendes de la visionneuse et traduction automatique (2026-11-24)
+
+Branche `feat/lightbox-captions` (créée depuis `main`, rien de poussé).
+
+| Commit | Objet |
+|---|---|
+| `df5d2eb` | `LightboxCaption.tsx` : la barre de légende des images y est factorisée. Rendu identique (positions, tailles et styles mesurés avant/après, 0 écart) |
+| `6209dcf` | Les vidéos MP4 et Vimeo/hybrides utilisent le même cadre et la même barre que les images |
+| `e4eda5c` | Une vidéo seule s'ouvre comme une photo seule (`openAlbum([élément], 0)` dans `MasonryColumns.tsx`) |
+| `d7a7b78` | `<meta name="google" content="notranslate">` (via `metadata.other`) et `translate="no"` sur `<html>` |
+
+**Origine.** Les photos avaient reçu le style « album » le 20/01/2026 (`b49d989`, `d4e40da`) ; les vidéos étaient restées sur l'ancien style (titre droit 18 px sous le média). L'écart n'avait rien à voir avec l'audit ni avec la branche vidéos (voir le rapport du 24/11).
+
+**Résultat.** Un seul composant, `app/components/ui/gallery/LightboxCaption.tsx`, pour les trois branches (image, vidéo MP4, Vimeo/hybride). Ordinateur : barre du bas, titre en italique 20 px à gauche, compteur « fig. n sur N » au centre. Mobile : barre du haut, titre à gauche, compteur à droite, 16 px. Le compteur n'apparaît que si la liste ouverte compte plusieurs éléments : photo seule et vidéo seule n'en ont pas ; une vidéo d'album en a un. Une vidéo seule n'ouvre plus la grille entière (fini le « fig. 43 sur 77 », et les flèches ne la font plus changer d'élément).
+
+**Pas changé, à votre demande.** Le champ `caption` reste affiché au survol de la grille et absent de la visionneuse. Les titres saisis dans Storyblok et leur casse (« NEW BALANCE », « THE DOG SHOW », « UGG ») ne sont pas touchés.
+
+**Seul écart visuel hors légende.** Les vidéos sont calées dans la zone des photos (90 % de la hauteur, largeur disponible) au lieu de 80 % de la fenêtre (une vidéo seule s'ouvrait dans la grille entière, donc jamais en mode « élément unique » à 90 %). Sur 1440 × 900, la vidéo « UGG » passe de 1152 × 648 à 1260 × 709 px. Les photos ne bougent pas.
+
+**Traduction automatique.** Le `<head>` et la balise `<html>` de `/`, `/information` et `/mentions-legales` ont été comparés avant/après (HTML servi par `next dev`) : les seules différences sont `<meta name="google" content="notranslate"/>` et `translate="no"`. Titre, description, canonical, balises Open Graph, `robots` et JSON-LD (contenu identique) sont inchangés ; `robots.txt` et `sitemap.xml` ne sont pas concernés. Le « no » vaut aussi pour les passages en `lang="fr"` de `/mentions-legales` : un visiteur anglophone ne pourra plus faire traduire cette page en un clic. Chrome (la traduction réelle sur un navigateur francophone) n'a pas été rejoué par mes soins : seule la présence des deux marqueurs est vérifiée.
+
+**Vérifications.** Typecheck 0 erreur ; lint 0 erreur, 0 warning ; build (Next 16.4.6) passe, mêmes routes qu'avant. Captures avant/après, ordinateur 1440 × 900 et mobile 390 × 844 (2x), des cas photo seule (avec et sans titre), album (avec et sans titre), vidéo seule (avec et sans titre) et vidéo dans un album. **Limites** : le cas Vimeo/hybride n'existe pas dans le contenu actuel, il n'a donc pas été vu à l'écran (le lecteur 16:9 est dimensionné par des unités de conteneur, `cqw`/`cqh`) ; « NEW BALANCE » n'apparaissait pas dans le rendu local (cache), la capture « vidéo seule » montre « UGG », même code ; Chrome seulement, vidéos non lues. **Constat existant, non traité** : sur mobile, le compteur du haut à droite passe sous le bouton de fermeture, pour les photos comme pour les vidéos.
+
 ## 3. Décisions prises
 
 1. **Webhook par secret d'URL.** Le plan Storyblok gratuit n'offre ni « Webhook secret » ni en-têtes personnalisés ; la vérification de signature (`91adacb`) a donc été remplacée (`63c6943`). Conservés : POST uniquement, comparaison en temps constant, variable `STORYBLOK_WEBHOOK_SECRET`, réchauffement de la home. Limite assumée : le secret peut apparaître dans des journaux d'accès ; l'enjeu reste faible (il permet seulement de déclencher une régénération). En cas de doute, le changer dans Vercel puis dans l'URL du webhook.
@@ -323,3 +347,4 @@ Variables à conserver : `STORYBLOK_PREVIEW_TOKEN`, `STORYBLOK_WEBHOOK_SECRET`.
 | 2026-11-16 | Lot 4, partie A : grille rendue côté serveur, lightbox via Storyblok, débordement corrigé |
 | 2026-11-16 | Décisions : grille sur Vercel (compte Pro), licence de la police après la production (Adobe Fonts) ; vidéo des pages d'information réencodée (H.264 960×960, 3,3 Mo) |
 | 2026-11-16 | Lot 4, partie A validée (préchargement réduit à 1 voisine) ; lot 4, partie B : accessibilité, SEO, factorisation, police, `/api/ping` ; § 6 et § 7 mis à jour |
+| 2026-11-24 | Lot 5 : légendes de la visionneuse harmonisées (`LightboxCaption`), vidéo seule ouverte comme une photo seule, traduction automatique désactivée (branche `feat/lightbox-captions`) |
