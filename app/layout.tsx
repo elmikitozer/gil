@@ -43,6 +43,9 @@ export const metadata: Metadata = {
   title: 'Gil Anselmi — Photographer',
   description: 'Portfolio of Gil Anselmi — photographer & film.',
   metadataBase: new URL('https://gilanselmi.com'),
+  // Empêche la traduction automatique par les navigateurs (noms de marques et de magazines :
+  // « Issue 14 » ne doit pas devenir « Numéro 14 »). Va avec translate="no" sur <html>.
+  other: { google: 'notranslate' },
   openGraph: {
     title: 'Gil Anselmi — Photographer',
     description: 'Portfolio of Gil Anselmi — photographer & film.',
@@ -67,7 +70,7 @@ const caslon = Libre_Caslon_Text({
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" translate="no" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://a.storyblok.com" crossOrigin="" />
         <link rel="dns-prefetch" href="https://a.storyblok.com" />
