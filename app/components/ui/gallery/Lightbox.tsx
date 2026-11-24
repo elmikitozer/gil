@@ -6,6 +6,7 @@ import YARLightbox, { SlideImage } from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 import './lightbox-custom.css';
 import { useGallery } from './GalleryContext';
+import LightboxCaption from './LightboxCaption';
 import { extractVimeoId } from '@/app/utils/vimeo';
 import { storyblokImageLoader, storyblokImageSize } from '@/lib/storyblok-image';
 
@@ -155,47 +156,24 @@ export default function Lightbox() {
             const size = storyblokImageSize(item.src) ?? { width: 1600, height: 1067 };
 
             return (
-              <div className="flex flex-col w-full h-full px-4 pt-4 pb-4 md:pt-10 md:pb-10">
-                {/* Mobile: Top bar with title left, counter right */}
-                <div className="md:hidden h-[8%] flex items-start justify-between pointer-events-none">
-                  <div className="text-base italic text-black">
-                    {item.title || ''}
-                  </div>
-                  {!isSingleItem && (
-                    <div lang="fr" className="text-base italic text-black">
-                      fig. {current} sur {total}
-                    </div>
-                  )}
-                </div>
-                {/* Image container */}
-                <div className="h-[92%] md:h-[90%] flex items-center justify-center">
-                  <Image
-                    loader={storyblokImageLoader}
-                    src={item.src}
-                    alt={item.alt ?? ''}
-                    width={size.width}
-                    height={size.height}
-                    sizes={lightboxSizes(size.width / size.height)}
-                    loading="eager"
-                    className="object-contain w-full h-full"
-                    style={{ maxWidth: size.width, maxHeight: size.height }}
-                  />
-                </div>
-                {/* Desktop: Bottom bar with title left, counter center */}
-                <div className="hidden md:flex h-[10%] items-center justify-center">
-                  <div className="w-full flex items-center pointer-events-none">
-                    <div className="flex-1 text-xl italic text-black">
-                      {item.title || ''}
-                    </div>
-                    {!isSingleItem && (
-                      <div lang="fr" className="absolute left-1/2 -translate-x-1/2 text-xl italic text-black">
-                        fig. {current} sur {total}
-                      </div>
-                    )}
-                    <div className="flex-1" />
-                  </div>
-                </div>
-              </div>
+              <LightboxCaption
+                title={item.title}
+                current={current}
+                total={total}
+                showCounter={!isSingleItem}
+              >
+                <Image
+                  loader={storyblokImageLoader}
+                  src={item.src}
+                  alt={item.alt ?? ''}
+                  width={size.width}
+                  height={size.height}
+                  sizes={lightboxSizes(size.width / size.height)}
+                  loading="eager"
+                  className="object-contain w-full h-full"
+                  style={{ maxWidth: size.width, maxHeight: size.height }}
+                />
+              </LightboxCaption>
             );
           }
 
